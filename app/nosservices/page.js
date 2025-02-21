@@ -2,22 +2,21 @@
 import Navbar from "../../components/Navbar";
 import Image from "next/image";
 import { useState, useCallback, useRef } from "react";
-
 const services = [
 	{
-		icon: "🌐",
+		icon: "/bulbe.png",
 		title: "Développement Web",
 		description: "Création de sites web modernes et responsive",
 		bgColor: "#004165",
 	},
 	{
-		icon: "🛠",
+		icon: "/supporttechnique.png",
 		title: "Support Technique",
 		description: "Assistance et maintenance professionnelle",
 		bgColor: "#005180",
 	},
 	{
-		icon: "💡",
+		icon: "/internetpicto.png",
 		title: "Conseil",
 		description: "Solutions digitales sur mesure",
 		bgColor: "#006A9E",
@@ -115,11 +114,18 @@ export default function Services() {
 											transformOrigin: index === 2 ? "right" : "left",
 										}}>
 										<div
-											className={`absolute transition-all duration-700 ease-in-out flex items-center gap-8 ${
-												index === 2 ? "right-8" : "left-8"
+											className={`absolute transition-all duration-700 ease-in-out flex items-center gap-12 ${
+												index === 2
+													? "right-3 flex-row-reverse" // Added flex-row-reverse for the right circle
+													: "left-3"
 											}`}>
-											<span className="text-6xl text-white shrink-0">
-												{service.icon}
+											<span className="text-6xl text-white shrink-0 w-64 h-64 relative">
+												<Image
+													src={service.icon}
+													alt={service.title}
+													fill
+													className="object-contain p-4"
+												/>
 											</span>
 											<div
 												className={`transition-all duration-300 text-white ${
@@ -127,10 +133,10 @@ export default function Services() {
 														? "opacity-100 delay-200"
 														: "opacity-0 delay-0"
 												}`}>
-												<h3 className="text-2xl font-bold mb-2">
+												<h3 className="text-4xl font-bold mb-4">
 													{service.title}
 												</h3>
-												<p className="whitespace-normal max-w-[600px]">
+												<p className="whitespace-normal max-w-[600px] text-xl">
 													{service.description}
 												</p>
 											</div>
