@@ -117,7 +117,7 @@ export default function Contact() {
 			setActiveModal(index);
 			requestAnimationFrame(() => {
 				setIsExpanded(true);
-				setTimeout(() => setIsAnimating(false), 700);
+				setTimeout(() => setIsAnimating(false), 500);
 			});
 		},
 		[isAnimating]
@@ -133,7 +133,7 @@ export default function Contact() {
 			setCirclePosition(null);
 			setIsAnimating(false);
 			document.body.style.overflow = "auto";
-		}, 700);
+		}, 300);
 	}, [isAnimating]);
 
 	return (
@@ -159,6 +159,11 @@ export default function Contact() {
 										width: "288px",
 										opacity:
 											activeModal !== null && activeModal !== index ? 0 : 1,
+										// Make non-selected circles fade out faster
+										transitionDuration:
+											activeModal !== null && activeModal !== index
+												? "300ms"
+												: "700ms",
 									}}>
 									<div
 										onClick={(e) => !activeModal && handleCircleClick(e, index)}
@@ -175,11 +180,7 @@ export default function Contact() {
 										{/* Circle Content */}
 										<div
 											className={`flex flex-col items-center transition-opacity duration-700
-                                            ${
-																							!isExpanded
-																								? "opacity-100"
-																								: "opacity-0"
-																						}`}>
+											${!isExpanded ? "opacity-100" : "opacity-0"}`}>
 											<span className="text-6xl text-white mb-4">
 												{option.icon}
 											</span>
@@ -198,24 +199,20 @@ export default function Contact() {
 					{activeModal !== null && (
 						<div
 							className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none
-                            transition-opacity duration-300 ${
-															isExpanded && !isAnimating
-																? "opacity-100"
-																: "opacity-0"
-														}`}>
+							transition-opacity duration-300 ${
+								isExpanded && !isAnimating ? "opacity-100" : "opacity-0"
+							}`}>
 							<div
 								className={`relative w-[90%] max-w-4xl pointer-events-auto
-                                transition-all duration-300 ${
-																	isExpanded ? "scale-100" : "scale-95"
-																}`}>
+								transition-all duration-300 ${isExpanded ? "scale-100" : "scale-95"}`}>
 								<div className="text-white">
 									{contactOptions[activeModal].content}
 								</div>
 								<button
 									onClick={!isAnimating ? closeModal : undefined}
 									className="absolute -top-2 -right-2 text-white text-xl 
-                                        hover:text-[#7DD4FF] transition-colors p-4 
-                                        hover:bg-black/10 rounded-full"
+										hover:text-[#7DD4FF] transition-colors p-4 
+										hover:bg-black/10 rounded-full"
 									aria-label="Close modal">
 									✕
 								</button>

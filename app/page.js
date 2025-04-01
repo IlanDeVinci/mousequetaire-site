@@ -1,5 +1,14 @@
+"use client";
+
 import Image from "next/image";
 import Navbar from "../components/Navbar";
+import dynamic from "next/dynamic";
+
+// Import the wind animation with no SSR since it uses browser APIs
+const WindAnimationInitializer = dynamic(
+	() => import("../components/WindAnimation"),
+	{ ssr: false }
+);
 
 export default function Home() {
 	return (
@@ -8,6 +17,13 @@ export default function Home() {
 			<main className="pt-20">
 				<section className="relative min-h-[90vh] flex items-center bg-[#002132]">
 					<div className="absolute inset-0 bg-gradient-to-br from-[#002132]/90 to-[#006A9E]/20 z-10" />
+
+					{/* Wind Animation SVG */}
+					<svg
+						className="wind-svg"
+						viewBox="0 0 1000 1000"
+						preserveAspectRatio="none"></svg>
+
 					<div className="container mx-auto px-4 relative z-20">
 						<div className="max-w-3xl mx-auto text-center">
 							<h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 animate-fade-in">
@@ -25,6 +41,7 @@ export default function Home() {
 							</a>
 						</div>
 					</div>
+					<WindAnimationInitializer />
 				</section>
 			</main>
 		</>

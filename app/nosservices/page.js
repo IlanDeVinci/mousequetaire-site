@@ -28,21 +28,21 @@ const sections = [
 		title: "Expertise Technique",
 		description:
 			"Notre équipe possède une expertise approfondie dans les dernières technologies web et mobile.",
-		image: "/expertise.jpg",
+		image: "/images/ronds.png",
 		isReversed: false,
 	},
 	{
 		title: "Support 24/7",
 		description:
 			"Une équipe dédiée à votre service pour répondre à vos besoins en temps réel.",
-		image: "/support.jpg",
+		image: "/images/webp.png",
 		isReversed: true,
 	},
 	{
 		title: "Solutions Innovantes",
 		description:
 			"Des solutions créatives et innovantes pour répondre à vos défis numériques.",
-		image: "/innovation.jpg",
+		image: "/images/feuille.png",
 		isReversed: false,
 	},
 ];
@@ -154,12 +154,12 @@ export default function Services() {
 								section.isReversed ? "md:flex-row-reverse" : "md:flex-row"
 							} items-center gap-12 mb-24`}>
 							<div className="flex-1">
-								<div className="relative h-[400px] w-full rounded-xl overflow-hidden">
+								<div className="relative h-[400px] w-full rounded-xl overflow-hidden m-4">
 									<Image
 										src={section.image}
 										alt={section.title}
 										fill
-										className="object-cover"
+										className="object-contain p-8"
 									/>
 								</div>
 							</div>
