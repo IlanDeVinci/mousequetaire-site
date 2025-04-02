@@ -23,7 +23,7 @@ class PathTree {
 
     // Constraints for consistent behavior
     this.initialStraightSegments = 2; // Require at least 2 straight segments at start
-    this.maxVerticalGrids = 3; // Maximum vertical grid blocks (increased to allow more turning)
+    this.maxVerticalGrids = 2; // Reduced from 3 to 2 for less vertical movement
     this.endYPositions = new Set(); // Track end Y positions to ensure they're different
     this.lastTurnDirection = {}; // Track last turn direction for each path
 
@@ -51,6 +51,12 @@ class PathTree {
 
     // Strictly prevent any leftward movement
     this.allowedDirections = ["right", "up", "down"]; // Never allow left direction
+
+    // Store intersection points
+    this.intersectionPoints = [];
+
+    // Higher probability for right movement after first turn
+    this.rightMovementProbability = 0.75; // 75% chance to favor right movement
   }
 
   generatePaths() {
@@ -335,8 +341,8 @@ class PathTree {
         atTurnPoint &&
         path.verticalGridsUsed < this.maxVerticalGrids
       ) {
-        // 50% chance for another turn if we haven't maxed out vertical grids
-        if (Math.random() < 0.5) {
+        // Reduced chance for another turn - higher probability of continuing right
+        if (Math.random() > this.rightMovementProbability) {
           // Choose a direction - must be different than the first turn to avoid repetitive up/down
           const newDirection =
             this.lastTurnDirection[path.id] === "up" ? "down" : "up";
@@ -463,46 +469,36 @@ class PathTree {
     // Move in the current direction, ensuring we never go left
     switch (path.direction) {
       case "right":
-        nextX += segmentLength; // Always move right, never left
-        // Constrain horizontal extension to prevent overflow
+        nextX += segmentLength;
         nextX = Math.min(nextX, this.maxRightExtension);
-        this.minX = Math.max(this.minX, nextX);
         break;
       case "up":
         nextY -= segmentLength;
-        // Ensure we don't go too far up
         nextY = Math.max(nextY, 30);
         break;
       case "down":
         nextY += segmentLength;
-        // Ensure we don't go too far down
         nextY = Math.min(nextY, this.viewHeight - 30);
         break;
-      case "left": // Should never happen, but just in case
-        // Force right movement instead of left
+      default:
+        // Force right movement for any other direction
         nextX += segmentLength;
         path.direction = "right";
         break;
     }
 
-    // Add line segment to path
-    const newPathData = `${path.pathData} L${nextX},${nextY}`;
-
     // Track key points for length calculation
-    path.points.push({ x: nextX, y: nextY });
+    const newPoint = { x: nextX, y: nextY };
 
     // Add position to tracking
-    const posKey = `${nextX},${nextY}`;
-    this.pathPositions.add(posKey);
+    this.pathPositions.add(`${nextX},${nextY}`);
 
-    // Return updated path
     return {
       ...path,
       x: nextX,
       y: nextY,
-      pathData: newPathData,
-      points: [...path.points],
-      actions: [...path.actions],
+      pathData: `${path.pathData} L${nextX},${nextY}`,
+      points: [...path.points, newPoint],
     };
   }
 
@@ -538,17 +534,13 @@ class PathTree {
     let endY = startY;
 
     // Calculate control points and end point based on current and new directions
-    if (
-      path.direction === "right" &&
-      (newDirection === "up" || newDirection === "down")
-    ) {
+    if (path.direction === "right") {
       // Turning from right to up/down
       endX = startX + curveRadius;
       endY =
         newDirection === "up" ? startY - curveRadius : startY + curveRadius;
 
       // Create a quarter-circle bezier curve
-      // For a 90-degree turn, control points are at distance * 0.552
       const controlDistance = curveRadius * 0.552;
       const cp1x = startX + controlDistance;
       const cp1y = startY;
@@ -559,10 +551,7 @@ class PathTree {
           : startY + controlDistance;
 
       curvePathData = `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
-    } else if (
-      (path.direction === "up" || path.direction === "down") &&
-      newDirection === "right"
-    ) {
+    } else {
       // Turning from up/down to right
       endX = startX + curveRadius;
       endY =
@@ -584,12 +573,6 @@ class PathTree {
     // Add curve to path
     const newPathData = `${path.pathData} ${curvePathData}`;
 
-    // Store action for debugging
-    const updatedActions = [
-      ...path.actions,
-      `curved-turn-${newDirection}-at-${startX},${startY}-radius-${curveRadius}`,
-    ];
-
     // Update path tracking
     this.lastTurnDirection[path.id] = newDirection;
 
@@ -597,8 +580,7 @@ class PathTree {
     const posKey = `${endX},${endY}`;
     this.pathPositions.add(posKey);
 
-    // Create updated path object
-    const updatedPath = {
+    return {
       ...path,
       x: endX,
       y: endY,
@@ -610,10 +592,124 @@ class PathTree {
           ? path.verticalGridsUsed + 1
           : path.verticalGridsUsed,
       points: [...path.points, { x: endX, y: endY }],
-      actions: updatedActions,
+      actions: [
+        ...path.actions,
+        `curved-turn-${newDirection}-at-${startX},${startY}-radius-${curveRadius}`,
+      ],
     };
+  }
 
-    return updatedPath;
+  findIntersections() {
+    // Clear previous intersections
+    this.intersectionPoints = [];
+
+    // We need actual DOM elements to check intersections
+    const pathElements = document.querySelectorAll(".wind-path");
+    if (!pathElements || pathElements.length < 2) return [];
+
+    // Prepare paths for processing
+    const processedPaths = [];
+
+    // Process each path element
+    pathElements.forEach((pathEl, index) => {
+      const length = pathEl.getTotalLength();
+      // Sample more points for better intersection detection
+      const samplePoints = Math.max(50, Math.floor(length / 10));
+      const points = [];
+
+      // Sample points along the path
+      for (let i = 0; i < samplePoints; i++) {
+        const point = pathEl.getPointAtLength((i * length) / samplePoints);
+        points.push([point.x, point.y]);
+      }
+
+      // Create line segments from points
+      const segments = [];
+      for (let i = 0; i < points.length - 1; i++) {
+        segments.push([points[i], points[i + 1]]);
+      }
+
+      processedPaths.push({ index, segments });
+    });
+
+    // Find intersections between paths
+    for (let i = 0; i < processedPaths.length; i++) {
+      const path1 = processedPaths[i];
+
+      for (let j = i + 1; j < processedPaths.length; j++) {
+        const path2 = processedPaths[j];
+
+        for (const seg1 of path1.segments) {
+          for (const seg2 of path2.segments) {
+            const intersection = this.doLinesIntersect(seg1, seg2);
+            if (intersection) {
+              this.intersectionPoints.push({
+                x: intersection.x,
+                y: intersection.y,
+                pathIndices: [path1.index, path2.index],
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Remove duplicates by comparing distances
+    const uniqueIntersections = [];
+    const minDistance = 10;
+
+    for (const point of this.intersectionPoints) {
+      let isDuplicate = false;
+
+      for (const existingPoint of uniqueIntersections) {
+        const dx = point.x - existingPoint.x;
+        const dy = point.y - existingPoint.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minDistance) {
+          isDuplicate = true;
+          break;
+        }
+      }
+
+      if (!isDuplicate) {
+        uniqueIntersections.push(point);
+      }
+    }
+
+    this.intersectionPoints = uniqueIntersections;
+    return uniqueIntersections;
+  }
+
+  doLinesIntersect(line1, line2) {
+    const [[x1, y1], [x2, y2]] = line1;
+    const [[x3, y3], [x4, y4]] = line2;
+
+    // Calculate line directions
+    const dx1 = x2 - x1;
+    const dy1 = y2 - y1;
+    const dx2 = x4 - x3;
+    const dy2 = y4 - y3;
+
+    // Calculate determinant
+    const denominator = dy2 * dx1 - dx2 * dy1;
+
+    // If lines are parallel
+    if (Math.abs(denominator) < 0.0001) return null;
+
+    // Calculate intersection parameters
+    const ua = (dx2 * (y1 - y3) - dy2 * (x1 - x3)) / denominator;
+    const ub = (dx1 * (y1 - y3) - dy1 * (x1 - x3)) / denominator;
+
+    // Check if intersection is within both line segments
+    if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) {
+      // Calculate intersection point
+      const x = x1 + ua * dx1;
+      const y = y1 + ua * dy1;
+      return { x, y };
+    }
+
+    return null;
   }
 }
 
@@ -633,6 +729,22 @@ class WindAnimation {
       maxPaths: 6,
       viewWidth: window.innerWidth,
       viewHeight: 500,
+    };
+
+    // Color palette for gradient
+    this.colors = {
+      start: "#87CEFA", // Light sky blue
+      end: "#00008B", // Dark blue
+    };
+
+    // Intersection markers
+    this.intersectionMarkers = [];
+    this.markerLifetime = 5000; // 5 seconds
+
+    // Colors for intersection markers
+    this.markerColors = {
+      fill: "#000000", // Black fill
+      stroke: "#3498db", // Blue stroke
     };
 
     // Recalculate on window resize to prevent overflow
@@ -671,12 +783,13 @@ class WindAnimation {
 
     this.svg.innerHTML = "";
     this.pendingRegeneration.clear();
+    this.intersectionMarkers = [];
+
+    // Create gradient definition
+    this.createGradientDefs();
 
     // Generate tree of paths
     const pathData = this.pathTree.generatePaths();
-
-    // Validate we have enough paths
-    console.log(`Generated ${pathData.length} paths`);
 
     // Create SVG paths with distinct styles for better visibility
     pathData.forEach((d, index) => {
@@ -685,18 +798,19 @@ class WindAnimation {
         "path"
       );
       path.setAttribute("class", "wind-path");
-
-      // Add different class based on index to help with debugging
       path.classList.add(`path-${index}`);
 
       if (index === 0) {
-        path.classList.add("main-path"); // Add class to main path
+        path.classList.add("main-path");
+        path.setAttribute("stroke", "url(#mainGradient)");
       } else {
-        path.classList.add("branch-path"); // Add class to branches
+        path.classList.add("branch-path");
+        path.setAttribute("stroke", "url(#branchGradient)");
       }
 
       path.setAttribute("d", d);
       path.setAttribute("stroke-width", "2.5");
+      path.setAttribute("fill", "none"); // Ensure paths are not filled
       path.style.filter = "blur(0px)";
 
       this.svg.appendChild(path);
@@ -708,7 +822,7 @@ class WindAnimation {
       const length = path.getTotalLength();
       path.setAttribute("data-length", length);
       path.setAttribute("data-progress", "0");
-      path.setAttribute("data-phase", "appearing"); // Track animation phase
+      path.setAttribute("data-phase", "appearing");
 
       path.style.opacity = "1";
       path.style.transition = "none";
@@ -716,18 +830,100 @@ class WindAnimation {
       // Set up for reverse animation (start to end)
       const visibleLength = length * 0.15;
       path.style.strokeDasharray = `${visibleLength}, ${length}`;
-      path.style.strokeDashoffset = 0; // Start from the start
+      path.style.strokeDashoffset = 0;
       path.style.setProperty("--path-length", length);
     });
 
+    // Create intersection markers sooner - reduced from 1000ms to 500ms
+    setTimeout(() => this.createIntersectionMarkers(), 500);
+
     this.activateAnimation();
+  }
+
+  createGradientDefs() {
+    // Create gradient definitions for paths
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+
+    // Create main path gradient (brighter blue)
+    const mainGradient = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "linearGradient"
+    );
+    mainGradient.setAttribute("id", "mainGradient");
+    // Set gradient direction explicitly to horizontal
+    mainGradient.setAttribute("x1", "0%");
+    mainGradient.setAttribute("y1", "0%");
+    mainGradient.setAttribute("x2", "100%");
+    mainGradient.setAttribute("y2", "0%");
+
+    const mainStop1 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    mainStop1.setAttribute("offset", "0%");
+    mainStop1.setAttribute("stop-color", "#A0D8FF");
+
+    const mainStop2 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    mainStop2.setAttribute("offset", "100%");
+    mainStop2.setAttribute("stop-color", "#0000CD");
+
+    mainGradient.appendChild(mainStop1);
+    mainGradient.appendChild(mainStop2);
+
+    // Create branch path gradient (slightly darker blue)
+    const branchGradient = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "linearGradient"
+    );
+    branchGradient.setAttribute("id", "branchGradient");
+    // Set gradient direction explicitly to horizontal
+    branchGradient.setAttribute("x1", "0%");
+    branchGradient.setAttribute("y1", "0%");
+    branchGradient.setAttribute("x2", "100%");
+    branchGradient.setAttribute("y2", "0%");
+
+    const branchStop1 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    branchStop1.setAttribute("offset", "0%");
+    branchStop1.setAttribute("stop-color", "#87CEFA");
+
+    const branchStop2 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    branchStop2.setAttribute("offset", "100%");
+    branchStop2.setAttribute("stop-color", "#00008B");
+
+    branchGradient.appendChild(branchStop1);
+    branchGradient.appendChild(branchStop2);
+
+    defs.appendChild(mainGradient);
+    defs.appendChild(branchGradient);
+
+    this.svg.appendChild(defs);
   }
 
   regeneratePaths() {
     if (!this.svg) return;
 
+    // Clean up any existing intersection markers
+    this.intersectionMarkers.forEach((marker) => {
+      if (marker && marker.parentNode) {
+        marker.parentNode.removeChild(marker);
+      }
+    });
+    this.intersectionMarkers = [];
+
     this.svg.innerHTML = "";
     this.pendingRegeneration.clear();
+
+    // Recreate gradient defs
+    this.createGradientDefs();
 
     // Generate new tree of paths
     const pathData = this.pathTree.generatePaths();
@@ -741,7 +937,15 @@ class WindAnimation {
       path.setAttribute("class", "wind-path");
       path.setAttribute("d", d);
       path.setAttribute("stroke-width", "2.5");
-      path.style.filter = "blur(0px)";
+      path.setAttribute("fill", "none"); // Ensure paths are not filled
+
+      if (index === 0) {
+        path.classList.add("main-path");
+        path.setAttribute("stroke", "url(#mainGradient)");
+      } else {
+        path.classList.add("branch-path");
+        path.setAttribute("stroke", "url(#branchGradient)");
+      }
 
       this.svg.appendChild(path);
     });
@@ -763,6 +967,152 @@ class WindAnimation {
       path.style.strokeDashoffset = 0; // Start from the start
       path.style.setProperty("--path-length", length);
     });
+
+    // Create intersection markers sooner - reduced from 1000ms to 500ms
+    setTimeout(() => this.createIntersectionMarkers(), 500);
+  }
+
+  createIntersectionMarkers() {
+    // First, remove any existing markers
+    this.intersectionMarkers.forEach((marker) => {
+      if (marker && marker.parentNode) {
+        marker.parentNode.removeChild(marker);
+      }
+    });
+    this.intersectionMarkers = [];
+
+    // Find intersections using improved algorithm
+    const intersections = this.pathTree.findIntersections();
+
+    // Remove markers that are too close to each other
+    const filteredIntersections = [];
+    const minimumDistance = 20; // Minimum distance between markers in pixels
+
+    // Sort intersections by x position first to prioritize leftmost markers
+    const sortedIntersections = [...intersections].sort((a, b) => a.x - b.x);
+
+    for (const point of sortedIntersections) {
+      let tooClose = false;
+
+      // Check if this point is too close to any already filtered point
+      for (const existingPoint of filteredIntersections) {
+        const dx = point.x - existingPoint.x;
+        const dy = point.y - existingPoint.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < minimumDistance) {
+          tooClose = true;
+          break;
+        }
+      }
+
+      // If not too close to any existing point, add it
+      if (!tooClose) {
+        filteredIntersections.push(point);
+      }
+    }
+
+    // Get a maximum of 6 intersections
+    let selectedIntersections = filteredIntersections
+      .filter(() => Math.random() < 0.5)
+      // Ensure they're sorted by X position for sequential animation
+      .sort((a, b) => a.x - b.x);
+
+    // Limit to maximum 6 markers
+    if (selectedIntersections.length > 6) {
+      // If we have more than 6, take a distributed sample to cover the width
+      const step = Math.floor(selectedIntersections.length / 6);
+      const limitedIntersections = [];
+
+      // Take markers at regular intervals to cover full range
+      for (let i = 0; i < 6; i++) {
+        const index = Math.min(i * step, selectedIntersections.length - 1);
+        limitedIntersections.push(selectedIntersections[index]);
+      }
+      selectedIntersections = limitedIntersections;
+    }
+
+    console.log(
+      `Found ${intersections.length} intersections, filtered to ${filteredIntersections.length}, showing ${selectedIntersections.length} in sequence (max 6)`
+    );
+
+    // Get min and max X positions for proportional delays
+    const xValues = selectedIntersections.map((point) => point.x);
+    const minX = Math.min(...xValues);
+    const maxX = Math.max(...xValues);
+    const xRange = maxX - minX || 1; // Avoid division by zero
+
+    // Create marker for each selected intersection
+    selectedIntersections.forEach((point, index) => {
+      const marker = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+      );
+
+      marker.setAttribute("cx", point.x);
+      marker.setAttribute("cy", point.y);
+      marker.setAttribute("r", 7);
+      marker.setAttribute("fill", this.markerColors.fill);
+      marker.setAttribute("stroke", this.markerColors.stroke);
+      marker.setAttribute("stroke-width", 2);
+      marker.setAttribute("class", "intersection-marker");
+      marker.setAttribute("data-x-position", point.x);
+      marker.setAttribute("data-index", index.toString()); // Store display order index
+
+      // Initially set opacity to 0
+      marker.style.opacity = "0";
+
+      this.svg.appendChild(marker);
+      this.intersectionMarkers.push(marker);
+
+      // Simplified sequential timing based purely on x position
+      const xPositionRatio = (point.x - minX) / xRange; // 0 to 1 based on position
+      const baseDelay = 50; // minimum delay
+      const maxAdditionalDelay = 1000; // maximum additional delay
+      const sequentialDelay = baseDelay + xPositionRatio * maxAdditionalDelay;
+
+      setTimeout(() => {
+        if (marker && marker.parentNode) {
+          marker.style.opacity = "1";
+        }
+      }, sequentialDelay);
+    });
+  }
+
+  fadeOutIntersectionMarkers(pathDisappearProgress) {
+    // Start fadeout earlier - at 30% path disappearing progress instead of 50%
+    if (pathDisappearProgress <= 0) return;
+
+    if (pathDisappearProgress > 0) {
+      // Sort markers by their index to ensure they fade out in the same order they appeared (left to right)
+      const sortedMarkers = [...this.intersectionMarkers].sort((a, b) => {
+        const indexA = parseInt(a.getAttribute("data-index") || "0");
+        const indexB = parseInt(b.getAttribute("data-index") || "0");
+        return indexA - indexB;
+      });
+
+      // Use longer sequential delays between markers
+      sortedMarkers.forEach((marker, index) => {
+        if (marker && marker.parentNode) {
+          // More time between each marker (200ms per marker)
+          const fadeDelay = index * 150;
+
+          setTimeout(() => {
+            marker.style.opacity = "0";
+
+            // Remove from DOM after transition completes
+            setTimeout(() => {
+              if (marker.parentNode) {
+                marker.parentNode.removeChild(marker);
+              }
+            }, 550); // Slightly longer than the 0.5s CSS transition
+          }, fadeDelay);
+        }
+      });
+
+      // Clear the array after scheduling all fadeouts
+      this.intersectionMarkers = [];
+    }
   }
 
   activateAnimation() {
@@ -813,81 +1163,85 @@ class WindAnimation {
     const deltaTime = (timestamp - this.lastTimestamp) / 1000;
     this.lastTimestamp = timestamp;
 
-    // Check for paths that need to be regenerated
+    // Check if any path needs regeneration
     for (const [path, timeToRegenerate] of this.pendingRegeneration.entries()) {
       if (timestamp >= timeToRegenerate) {
-        // When any path needs regeneration, regenerate the entire tree
         this.regeneratePaths();
         break;
       }
     }
 
-    // Consistent animation speed for all paths
     const animationSpeed = 0.4;
+    let allPathsVisible = true;
 
-    this.paths.forEach((path, index) => {
+    // Track if any path is in disappearing phase
+    let anyPathDisappearing = false;
+    let maxDisappearProgress = 0;
+
+    // Handle animation phases for paths
+    this.paths.forEach((path) => {
       if (this.pendingRegeneration.has(path)) return;
 
       const pathLength = parseFloat(path.getAttribute("data-length"));
       let pathProgress = parseFloat(path.getAttribute("data-progress") || "0");
       const phase = path.getAttribute("data-phase") || "appearing";
 
-      // Handle different animation phases
+      // Optimized animation phase handling
       if (phase === "appearing") {
-        // Phase 1: Appear from start to end (reversed direction)
-        if (pathProgress < 1) {
-          pathProgress = Math.min(1, pathProgress + deltaTime * animationSpeed);
-          path.setAttribute("data-progress", pathProgress.toString());
+        pathProgress = Math.min(1, pathProgress + deltaTime * animationSpeed);
+        path.setAttribute("data-progress", pathProgress.toString());
 
-          // Animation now goes from start to end
-          const visibleLength = pathLength * pathProgress;
-          path.style.strokeDasharray = `${visibleLength}, ${pathLength}`;
-          path.style.strokeDashoffset = 0;
+        // Animation now goes from start to end
+        const visibleLength = pathLength * pathProgress;
+        path.style.strokeDasharray = `${visibleLength}, ${pathLength}`;
 
-          if (pathProgress === 1) {
-            // Path is fully visible, switch to "visible" phase
-            path.setAttribute("data-phase", "visible");
-            path.style.strokeDasharray = `${pathLength}, 0`; // Make entire path visible
-            path.style.strokeDashoffset = 0;
-            path.setAttribute("data-visible-time", timestamp.toString());
-          }
+        if (pathProgress === 1) {
+          path.setAttribute("data-phase", "visible");
+          path.style.strokeDasharray = `${pathLength}, 0`;
+          path.setAttribute("data-visible-time", timestamp.toString());
+        } else {
+          allPathsVisible = false;
         }
       } else if (phase === "visible") {
-        // Phase 2: Keep path fully visible for a duration
         const visibleStartTime = parseFloat(
-          path.getAttribute("data-visible-time") || "0"
+          path.getAttribute("data-visible-time")
         );
-        const visibleDuration = timestamp - visibleStartTime;
-
-        if (visibleDuration >= this.visibilityDuration) {
-          // Time to start disappearing
+        if (timestamp - visibleStartTime >= this.visibilityDuration) {
           path.setAttribute("data-phase", "disappearing");
           path.setAttribute("data-progress", "0");
         }
       } else if (phase === "disappearing") {
-        // Phase 3: Disappear gradually (from end to start - reversed)
-        if (pathProgress < 1) {
-          pathProgress = Math.min(1, pathProgress + deltaTime * animationSpeed);
-          path.setAttribute("data-progress", pathProgress.toString());
+        pathProgress = Math.min(1, pathProgress + deltaTime * animationSpeed);
+        path.setAttribute("data-progress", pathProgress.toString());
 
-          // For disappearing, use end-to-start animation
-          const visibleLength = pathLength * (1 - pathProgress);
-          path.style.strokeDasharray = `${visibleLength}, ${pathLength}`;
-          path.style.strokeDashoffset = -pathLength + visibleLength;
+        const visibleLength = pathLength * (1 - pathProgress);
+        path.style.strokeDasharray = `${visibleLength}, ${pathLength}`;
+        path.style.strokeDashoffset = -pathLength + visibleLength;
 
-          if (pathProgress === 1 && !this.pendingRegeneration.has(path)) {
-            path.setAttribute("data-status", "completed");
-            if (!this.pendingRegeneration.size) {
-              // Schedule regeneration of the entire tree
-              this.pendingRegeneration.set(
-                path,
-                timestamp + this.regenerationDelay
-              );
-            }
+        // Track disappearing state - set an offset of -0.3 to start marker fade 1s earlier
+        // This will make fadeOutIntersectionMarkers() start working earlier
+        anyPathDisappearing = true;
+        maxDisappearProgress = Math.max(
+          maxDisappearProgress,
+          pathProgress - 0.3
+        );
+
+        if (pathProgress === 1 && !this.pendingRegeneration.has(path)) {
+          path.setAttribute("data-status", "completed");
+          if (!this.pendingRegeneration.size) {
+            this.pendingRegeneration.set(
+              path,
+              timestamp + this.regenerationDelay
+            );
           }
         }
       }
     });
+
+    // Handle intersection marker fading based on path state
+    if (anyPathDisappearing && this.intersectionMarkers.length > 0) {
+      this.fadeOutIntersectionMarkers(maxDisappearProgress);
+    }
 
     requestAnimationFrame(this.animate);
   }

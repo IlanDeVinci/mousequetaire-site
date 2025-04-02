@@ -3,83 +3,91 @@
 @tailwind utilities;
 
 :root {
-	--background: #002132;
-	--foreground: #ffffff;
-	--accent: #006a9e;
+  --background: #002132;
+  --foreground: #ffffff;
+  --accent: #006a9e;
 }
 
 @media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-	color: var(--foreground);
-	background: var(--background);
-	font-family: Arial, Helvetica, sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Wind Animation Styles */
 .wind-svg {
-	position: absolute;
-	width: 100%;
-	top: 0;
-	left: 0;
-	z-index: 5;
-	overflow: visible;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  overflow: visible;
 }
 
 .wind-path {
-	fill: none;
-	stroke: #00bfff; /* Bright cyber blue color */
-	opacity: 0.7;
-	stroke-linecap: round;
-	pointer-events: none;
+  fill: none;
+  opacity: 0.7;
+  stroke-linecap: round;
+  pointer-events: none;
 }
 
 .wind-path.loop,
 .wind-path.doubleLoop {
-	opacity: 0.6;
+  opacity: 0.6;
+}
+
+/* Simplified transition for intersection markers - exactly 0.5s fade */
+.intersection-marker {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  pointer-events: none;
+  will-change: opacity;
+  transform-origin: center center;
 }
 
 @layer utilities {
-	.animate-fade-in {
-		animation: fadeIn 1s ease-in forwards;
-	}
+  .animate-fade-in {
+    animation: fadeIn 1s ease-in forwards;
+  }
 
-	.animate-fade-in-delayed {
-		animation: fadeIn 1s ease-in 0.5s forwards;
-		opacity: 0;
-	}
+  .animate-fade-in-delayed {
+    animation: fadeIn 1s ease-in 0.5s forwards;
+    opacity: 0;
+  }
 }
 
 @layer components {
-	.nav-link-hover {
-		@apply relative px-4 py-2 transition-all duration-300 ease-in-out;
-	}
+  .nav-link-hover {
+    @apply relative px-4 py-2 transition-all duration-300 ease-in-out;
+  }
 
-	.nav-link-hover::before {
-		@apply content-[''] absolute inset-0 bg-white/0 rounded-full transition-all duration-300 ease-out opacity-0;
-	}
+  .nav-link-hover::before {
+    @apply content-[''] absolute inset-0 bg-white/0 rounded-full transition-all duration-300 ease-out opacity-0;
+  }
 
-	.nav-link-hover:hover::before {
-		@apply opacity-100 bg-white/10;
-	}
+  .nav-link-hover:hover::before {
+    @apply opacity-100 bg-white/10;
+  }
 
-	.nav-transition {
-		@apply transition-all duration-300 ease-in-out;
-	}
+  .nav-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
 }
 
 @keyframes fadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(20px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
