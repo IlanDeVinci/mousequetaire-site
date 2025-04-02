@@ -13,7 +13,7 @@ class PathTree {
     this.pathSegments = 10 + Math.floor(Math.random() * 5); // 10-14 segments per path
 
     // Fixed grid settings
-    this.gridSize = 50; // Fixed grid size in pixels with no variation
+    this.gridSize = 25; // Changed from 50 to 25 to make the tree about half the size
 
     // Path offset settings to avoid all paths turning at same points
     this.pathOffsets = [];
@@ -73,8 +73,8 @@ class PathTree {
     this.turnTypesAtCoordinates = {}; // Reset turn types
     this.curveRadiusAtCoordinates = {}; // Reset curve radius tracking
 
-    // Move path tree 2/3 of the way to the right
-    const startX = this.viewWidth * (1 / 2);
+    // Move path tree 2/3 of the way to the right (updated from 1/2)
+    const startX = this.viewWidth * (2 / 3);
     this.minX = startX;
 
     const startY = this.viewHeight / 2;
@@ -813,6 +813,9 @@ class WindAnimation {
       path.setAttribute("fill", "none"); // Ensure paths are not filled
       path.style.filter = "blur(0px)";
 
+      // Hide paths completely before animation begins
+      path.style.opacity = "0";
+
       this.svg.appendChild(path);
     });
 
@@ -824,7 +827,8 @@ class WindAnimation {
       path.setAttribute("data-progress", "0");
       path.setAttribute("data-phase", "appearing");
 
-      path.style.opacity = "1";
+      // Start with opacity 0 to ensure complete invisibility before animation
+      path.style.opacity = "0";
       path.style.transition = "none";
 
       // Set up for reverse animation (start to end)
@@ -939,6 +943,9 @@ class WindAnimation {
       path.setAttribute("stroke-width", "2.5");
       path.setAttribute("fill", "none"); // Ensure paths are not filled
 
+      // Initially hide paths
+      path.style.opacity = "0";
+
       if (index === 0) {
         path.classList.add("main-path");
         path.setAttribute("stroke", "url(#mainGradient)");
@@ -958,7 +965,7 @@ class WindAnimation {
       path.setAttribute("data-progress", "0");
       path.setAttribute("data-phase", "appearing");
 
-      path.style.opacity = "1";
+      path.style.opacity = "0";
       path.style.transition = "none";
 
       // Set up for reverse animation (start to end)
@@ -970,6 +977,14 @@ class WindAnimation {
 
     // Create intersection markers sooner - reduced from 1000ms to 500ms
     setTimeout(() => this.createIntersectionMarkers(), 500);
+
+    // Add a slight delay before showing new paths
+    setTimeout(() => {
+      this.paths.forEach((path) => {
+        path.style.opacity = "1";
+        path.style.transition = "opacity 0.3s ease-in";
+      });
+    }, 100);
   }
 
   createIntersectionMarkers() {
@@ -1121,6 +1136,15 @@ class WindAnimation {
       this.resetPaths();
       this.progress = 0;
       this.lastTimestamp = performance.now();
+
+      // Slight delay before showing paths
+      setTimeout(() => {
+        this.paths.forEach((path) => {
+          path.style.opacity = "1";
+          path.style.transition = "opacity 0.3s ease-in";
+        });
+      }, 100);
+
       requestAnimationFrame(this.animate);
     }
   }
@@ -1140,7 +1164,8 @@ class WindAnimation {
       path.setAttribute("data-visible-time", "0");
 
       path.style.transition = "none";
-      path.style.opacity = "1";
+      // Start hidden
+      path.style.opacity = "0";
 
       // Set up for reverse animation (start to end)
       const visibleLength = length * 0.15;
