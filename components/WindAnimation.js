@@ -37,6 +37,20 @@ class PathTree {
     this.forcedInitialDirections = ["up", "down", "up", "down", "up", "down"]; // Pre-assign initial directions
     this.forcedYOffsets = [60, -60, 120, -120, 180, -180]; // Ensure vertical spacing
     this.initialSegmentCounts = [4, 2, 5, 3, 6, 2]; // How many horizontal segments before first turn
+
+    // Add support for curved paths
+    this.useCurvedTurns = true; // Enable curved turns by default
+    this.curveRadiusGrid = 1; // Curve radius in grid units
+
+    // Add tracking for turn types at specific coordinates - use exact coordinate as key
+    this.turnTypesAtCoordinates = {}; // Track if curved/straight turn used at specific points
+    this.curveRadiusAtCoordinates = {}; // Track curve radius at specific points
+
+    // Constrain path extension to prevent overflow
+    this.maxRightExtension = viewWidth * 0.95; // Limit horizontal extension to prevent overflow
+
+    // Strictly prevent any leftward movement
+    this.allowedDirections = ["right", "up", "down"]; // Never allow left direction
   }
 
   generatePaths() {
@@ -50,9 +64,11 @@ class PathTree {
     this.pathPositions = new Set();
     this.forbiddenPositions = new Set();
     this.pathDirectionsAtPoint = {};
+    this.turnTypesAtCoordinates = {}; // Reset turn types
+    this.curveRadiusAtCoordinates = {}; // Reset curve radius tracking
 
     // Move path tree 2/3 of the way to the right
-    const startX = this.viewWidth * (2 / 3);
+    const startX = this.viewWidth * (1 / 2);
     this.minX = startX;
 
     const startY = this.viewHeight / 2;
@@ -210,21 +226,57 @@ class PathTree {
     }
 
     // Force a vertical turn to happen after initial segments
-    // Use the predetermined direction for this path
     const forcedDirection =
       this.forcedInitialDirections[
         path.pathIndex % this.forcedInitialDirections.length
       ];
-    path.direction = forcedDirection;
-    this.lastTurnDirection[path.id] = forcedDirection;
-    path.lastTurnPoint = path.x;
-    path.verticalGridsUsed++;
 
-    // Record this forced turn
-    path.actions.push(`forced-turn-${forcedDirection}-at-${path.x},${path.y}`);
+    // Use exact coordinates as key for turn consistency
+    const turnKey = `${path.x},${path.y}:${forcedDirection}`;
+
+    // Determine if this turn should be curved
+    let shouldCurve;
+    let curveRadius = this.gridSize * this.curveRadiusGrid;
+
+    if (this.turnTypesAtCoordinates[turnKey] !== undefined) {
+      // Use same turn type as previous path at this exact position
+      shouldCurve = this.turnTypesAtCoordinates[turnKey];
+
+      // Also use the same curve radius if it was curved
+      if (shouldCurve && this.curveRadiusAtCoordinates[turnKey]) {
+        curveRadius = this.curveRadiusAtCoordinates[turnKey];
+      }
+    } else {
+      // Randomly decide if this turn should be curved
+      shouldCurve = Math.random() < 0.5 && this.useCurvedTurns;
+
+      // Sometimes use half radius for more variation
+      if (shouldCurve && Math.random() < 0.3) {
+        curveRadius = this.gridSize * (this.curveRadiusGrid / 2);
+      }
+
+      // Record both turn type and radius for future paths
+      this.turnTypesAtCoordinates[turnKey] = shouldCurve;
+      if (shouldCurve) {
+        this.curveRadiusAtCoordinates[turnKey] = curveRadius;
+      }
+    }
+
+    if (shouldCurve) {
+      path = this.createCurvedTurn(path, forcedDirection, curveRadius);
+    } else {
+      path.direction = forcedDirection;
+      this.lastTurnDirection[path.id] = forcedDirection;
+      path.lastTurnPoint = path.x;
+      path.verticalGridsUsed++;
+
+      // Record this forced turn
+      path.actions.push(
+        `forced-turn-${forcedDirection}-at-${path.x},${path.y}`
+      );
+    }
 
     // Continue for a fixed length in this vertical direction
-    // Use different lengths for different paths to ensure they end at different points
     const verticalSegments = 1 + (path.pathIndex % 3); // 1-3 vertical segments based on path index
     for (
       let i = 0;
@@ -235,21 +287,41 @@ class PathTree {
       path.segmentsCreated++;
     }
 
-    // Always turn back to horizontal after first vertical segment
-    path.direction = "right";
-    path.lastTurnPoint = path.x;
-    path.actions.push(`turn-right-at-${path.x},${path.y}`);
+    // Always turn back to horizontal after vertical segment
+    const horizontalTurnKey = `${path.x},${path.y}:right`;
+    let shouldCurveHorizontal;
+    let horizontalCurveRadius = this.gridSize * this.curveRadiusGrid;
 
-    // Continue horizontally for a minimum distance before any further turns
-    const minHorizontalAfterTurn = 3; // At least 3 horizontal segments after first turn
-    let horizontalSegmentsAfterTurn = 0;
-    while (
-      horizontalSegmentsAfterTurn < minHorizontalAfterTurn &&
-      path.segmentsCreated < this.pathSegments
-    ) {
-      path = this.extendPath(path);
-      path.segmentsCreated++;
-      horizontalSegmentsAfterTurn++;
+    if (this.turnTypesAtCoordinates[horizontalTurnKey] !== undefined) {
+      shouldCurveHorizontal = this.turnTypesAtCoordinates[horizontalTurnKey];
+
+      if (
+        shouldCurveHorizontal &&
+        this.curveRadiusAtCoordinates[horizontalTurnKey]
+      ) {
+        horizontalCurveRadius =
+          this.curveRadiusAtCoordinates[horizontalTurnKey];
+      }
+    } else {
+      shouldCurveHorizontal = Math.random() < 0.5 && this.useCurvedTurns;
+
+      if (shouldCurveHorizontal && Math.random() < 0.3) {
+        horizontalCurveRadius = this.gridSize * (this.curveRadiusGrid / 2);
+      }
+
+      this.turnTypesAtCoordinates[horizontalTurnKey] = shouldCurveHorizontal;
+      if (shouldCurveHorizontal) {
+        this.curveRadiusAtCoordinates[horizontalTurnKey] =
+          horizontalCurveRadius;
+      }
+    }
+
+    if (shouldCurveHorizontal) {
+      path = this.createCurvedTurn(path, "right", horizontalCurveRadius);
+    } else {
+      path.direction = "right";
+      path.lastTurnPoint = path.x;
+      path.actions.push(`turn-right-at-${path.x},${path.y}`);
     }
 
     // Continue generating path with normal rules but avoiding overlap
@@ -269,15 +341,52 @@ class PathTree {
           const newDirection =
             this.lastTurnDirection[path.id] === "up" ? "down" : "up";
 
-          path.direction = newDirection;
-          this.lastTurnDirection[path.id] = newDirection;
-          path.lastTurnPoint = path.x;
-          path.verticalGridsUsed++;
+          // Check for existing turn type at this exact coordinate
+          const lateralTurnKey = `${path.x},${path.y}:${newDirection}`;
+          let shouldCurveLateral;
+          let lateralCurveRadius = this.gridSize * this.curveRadiusGrid;
 
-          // Record this additional turn
-          path.actions.push(
-            `additional-turn-${newDirection}-at-${path.x},${path.y}`
-          );
+          if (this.turnTypesAtCoordinates[lateralTurnKey] !== undefined) {
+            shouldCurveLateral = this.turnTypesAtCoordinates[lateralTurnKey];
+
+            if (
+              shouldCurveLateral &&
+              this.curveRadiusAtCoordinates[lateralTurnKey]
+            ) {
+              lateralCurveRadius =
+                this.curveRadiusAtCoordinates[lateralTurnKey];
+            }
+          } else {
+            shouldCurveLateral = Math.random() < 0.5 && this.useCurvedTurns;
+
+            if (shouldCurveLateral && Math.random() < 0.3) {
+              lateralCurveRadius = this.gridSize * (this.curveRadiusGrid / 2);
+            }
+
+            this.turnTypesAtCoordinates[lateralTurnKey] = shouldCurveLateral;
+            if (shouldCurveLateral) {
+              this.curveRadiusAtCoordinates[lateralTurnKey] =
+                lateralCurveRadius;
+            }
+          }
+
+          if (shouldCurveLateral) {
+            path = this.createCurvedTurn(
+              path,
+              newDirection,
+              lateralCurveRadius
+            );
+          } else {
+            path.direction = newDirection;
+            this.lastTurnDirection[path.id] = newDirection;
+            path.lastTurnPoint = path.x;
+            path.verticalGridsUsed++;
+
+            // Record this additional turn
+            path.actions.push(
+              `additional-turn-${newDirection}-at-${path.x},${path.y}`
+            );
+          }
 
           // Continue for 1-2 vertical segments
           const additionalVertical = 1 + Math.floor(Math.random() * 2);
@@ -291,9 +400,36 @@ class PathTree {
           }
 
           // Return to horizontal
-          path.direction = "right";
-          path.lastTurnPoint = path.x;
-          path.actions.push(`return-right-at-${path.x},${path.y}`);
+          const returnKey = `${path.x},${path.y}:right`;
+          let shouldCurveReturn;
+          let returnCurveRadius = this.gridSize * this.curveRadiusGrid;
+
+          if (this.turnTypesAtCoordinates[returnKey] !== undefined) {
+            shouldCurveReturn = this.turnTypesAtCoordinates[returnKey];
+
+            if (shouldCurveReturn && this.curveRadiusAtCoordinates[returnKey]) {
+              returnCurveRadius = this.curveRadiusAtCoordinates[returnKey];
+            }
+          } else {
+            shouldCurveReturn = Math.random() < 0.5 && this.useCurvedTurns;
+
+            if (shouldCurveReturn && Math.random() < 0.3) {
+              returnCurveRadius = this.gridSize * (this.curveRadiusGrid / 2);
+            }
+
+            this.turnTypesAtCoordinates[returnKey] = shouldCurveReturn;
+            if (shouldCurveReturn) {
+              this.curveRadiusAtCoordinates[returnKey] = returnCurveRadius;
+            }
+          }
+
+          if (shouldCurveReturn) {
+            path = this.createCurvedTurn(path, "right", returnCurveRadius);
+          } else {
+            path.direction = "right";
+            path.lastTurnPoint = path.x;
+            path.actions.push(`return-right-at-${path.x},${path.y}`);
+          }
         }
       }
 
@@ -324,10 +460,12 @@ class PathTree {
     let nextX = path.x;
     let nextY = path.y;
 
-    // Move in the current direction
+    // Move in the current direction, ensuring we never go left
     switch (path.direction) {
       case "right":
-        nextX += segmentLength;
+        nextX += segmentLength; // Always move right, never left
+        // Constrain horizontal extension to prevent overflow
+        nextX = Math.min(nextX, this.maxRightExtension);
         this.minX = Math.max(this.minX, nextX);
         break;
       case "up":
@@ -339,6 +477,11 @@ class PathTree {
         nextY += segmentLength;
         // Ensure we don't go too far down
         nextY = Math.min(nextY, this.viewHeight - 30);
+        break;
+      case "left": // Should never happen, but just in case
+        // Force right movement instead of left
+        nextX += segmentLength;
+        path.direction = "right";
         break;
     }
 
@@ -385,6 +528,93 @@ class PathTree {
 
     return path;
   }
+
+  createCurvedTurn(path, newDirection, customRadius) {
+    const startX = path.x;
+    const startY = path.y;
+    const curveRadius = customRadius || this.gridSize * this.curveRadiusGrid;
+    let curvePathData = "";
+    let endX = startX;
+    let endY = startY;
+
+    // Calculate control points and end point based on current and new directions
+    if (
+      path.direction === "right" &&
+      (newDirection === "up" || newDirection === "down")
+    ) {
+      // Turning from right to up/down
+      endX = startX + curveRadius;
+      endY =
+        newDirection === "up" ? startY - curveRadius : startY + curveRadius;
+
+      // Create a quarter-circle bezier curve
+      // For a 90-degree turn, control points are at distance * 0.552
+      const controlDistance = curveRadius * 0.552;
+      const cp1x = startX + controlDistance;
+      const cp1y = startY;
+      const cp2x = endX;
+      const cp2y =
+        newDirection === "up"
+          ? startY - controlDistance
+          : startY + controlDistance;
+
+      curvePathData = `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+    } else if (
+      (path.direction === "up" || path.direction === "down") &&
+      newDirection === "right"
+    ) {
+      // Turning from up/down to right
+      endX = startX + curveRadius;
+      endY =
+        path.direction === "up" ? startY - curveRadius : startY + curveRadius;
+
+      // Create a quarter-circle bezier curve
+      const controlDistance = curveRadius * 0.552;
+      const cp1x = startX;
+      const cp1y =
+        path.direction === "up"
+          ? startY - controlDistance
+          : startY + controlDistance;
+      const cp2x = startX + controlDistance;
+      const cp2y = endY;
+
+      curvePathData = `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
+    }
+
+    // Add curve to path
+    const newPathData = `${path.pathData} ${curvePathData}`;
+
+    // Store action for debugging
+    const updatedActions = [
+      ...path.actions,
+      `curved-turn-${newDirection}-at-${startX},${startY}-radius-${curveRadius}`,
+    ];
+
+    // Update path tracking
+    this.lastTurnDirection[path.id] = newDirection;
+
+    // Update position tracking
+    const posKey = `${endX},${endY}`;
+    this.pathPositions.add(posKey);
+
+    // Create updated path object
+    const updatedPath = {
+      ...path,
+      x: endX,
+      y: endY,
+      direction: newDirection,
+      pathData: newPathData,
+      lastTurnPoint: endX,
+      verticalGridsUsed:
+        path.direction !== newDirection
+          ? path.verticalGridsUsed + 1
+          : path.verticalGridsUsed,
+      points: [...path.points, { x: endX, y: endY }],
+      actions: updatedActions,
+    };
+
+    return updatedPath;
+  }
 }
 
 class WindAnimation {
@@ -401,16 +631,43 @@ class WindAnimation {
 
     this.config = {
       maxPaths: 6,
-      viewWidth: 500,
+      viewWidth: window.innerWidth,
       viewHeight: 500,
     };
+
+    // Recalculate on window resize to prevent overflow
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", this.handleResize.bind(this));
+    }
 
     this.pathTree = new PathTree(this.config.viewWidth, this.config.viewHeight);
     this.init();
   }
 
+  handleResize() {
+    this.config.viewWidth = window.innerWidth;
+    if (this.svg) {
+      this.svg.setAttribute(
+        "viewBox",
+        `0 0 ${this.config.viewWidth} ${this.config.viewHeight}`
+      );
+    }
+    this.regeneratePaths();
+  }
+
   init() {
     if (!this.svg) return;
+
+    // Set viewBox to match window dimensions for proper scaling
+    this.svg.setAttribute(
+      "viewBox",
+      `0 0 ${this.config.viewWidth} ${this.config.viewHeight}`
+    );
+
+    // Add CSS to ensure SVG doesn't overflow horizontally
+    this.svg.style.maxWidth = "100%";
+    this.svg.style.width = "100%";
+    this.svg.style.overflow = "hidden";
 
     this.svg.innerHTML = "";
     this.pendingRegeneration.clear();
