@@ -33,9 +33,16 @@ body {
 
 .wind-path {
   fill: none;
-  opacity: 0.7;
+  opacity: 0;
   stroke-linecap: round;
   pointer-events: none;
+  stroke-width: 0; /* Start with zero width to prevent any visible dots */
+  transition: opacity 0.3s ease, stroke-width 0.3s ease;
+}
+
+.wind-path.visible {
+  opacity: 0.7;
+  stroke-width: 2.5;
 }
 
 .wind-path.loop,
@@ -52,6 +59,40 @@ body {
   transform-origin: center center;
 }
 
+/* Animated gradient definitions */
+@keyframes animateGradient {
+  0% {
+    stop-color: #87cefa;
+  }
+  50% {
+    stop-color: #1e90ff;
+  }
+  100% {
+    stop-color: #87cefa;
+  }
+}
+
+@keyframes animateGradientDark {
+  0% {
+    stop-color: #00008b;
+  }
+  50% {
+    stop-color: #0000cd;
+  }
+  100% {
+    stop-color: #00008b;
+  }
+}
+
+.animated-gradient-start {
+  animation: animateGradient 4s ease-in-out infinite;
+}
+
+.animated-gradient-end {
+  animation: animateGradientDark 4s ease-in-out infinite;
+}
+
+/* Rest of utility classes */
 @layer utilities {
   .animate-fade-in {
     animation: fadeIn 1s ease-in forwards;

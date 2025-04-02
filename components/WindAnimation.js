@@ -47,7 +47,7 @@ class PathTree {
     this.curveRadiusAtCoordinates = {}; // Track curve radius at specific points
 
     // Constrain path extension to prevent overflow
-    this.maxRightExtension = viewWidth * 0.95; // Limit horizontal extension to prevent overflow
+    this.maxRightExtension = viewWidth * 0.98; // Increased from 0.95 to 0.98 to allow for more extension
 
     // Strictly prevent any leftward movement
     this.allowedDirections = ["right", "up", "down"]; // Never allow left direction
@@ -57,6 +57,9 @@ class PathTree {
 
     // Higher probability for right movement after first turn
     this.rightMovementProbability = 0.75; // 75% chance to favor right movement
+
+    // Add extra segments to ensure clean disappearing
+    this.extraEndSegments = 2; // Add 2 extra segments at the end
   }
 
   generatePaths() {
@@ -513,11 +516,18 @@ class PathTree {
     // If we need to extend the path to reach target length
     if (currentLength < this.targetPathLength) {
       const extraLength = this.targetPathLength - currentLength;
-      // Limit maximum extension to prevent paths from extending too far
-      const maxExtension = this.gridSize * 4;
+      // Extend further to allow clean animation ending
+      const maxExtension = this.gridSize * 6; // Increased from 4 to 6
       const actualExtension = Math.min(extraLength, maxExtension);
 
       const extraX = path.x + actualExtension;
+      path.pathData += ` L${extraX},${path.y}`;
+      path.x = extraX;
+    }
+
+    // Add additional segments to ensure clean disappearance
+    for (let i = 0; i < this.extraEndSegments; i++) {
+      const extraX = path.x + this.gridSize;
       path.pathData += ` L${extraX},${path.y}`;
       path.x = extraX;
     }
@@ -809,12 +819,13 @@ class WindAnimation {
       }
 
       path.setAttribute("d", d);
-      path.setAttribute("stroke-width", "2.5");
-      path.setAttribute("fill", "none"); // Ensure paths are not filled
-      path.style.filter = "blur(0px)";
 
-      // Hide paths completely before animation begins
+      // Explicitly set these attributes to zero for complete invisibility
+      path.setAttribute("stroke-width", "0");
+      path.setAttribute("fill", "none");
       path.style.opacity = "0";
+      path.style.strokeWidth = "0";
+      path.style.filter = "blur(0px)";
 
       this.svg.appendChild(path);
     });
@@ -827,8 +838,9 @@ class WindAnimation {
       path.setAttribute("data-progress", "0");
       path.setAttribute("data-phase", "appearing");
 
-      // Start with opacity 0 to ensure complete invisibility before animation
+      // Explicitly set all properties that could make the path visible
       path.style.opacity = "0";
+      path.style.strokeWidth = "0";
       path.style.transition = "none";
 
       // Set up for reverse animation (start to end)
@@ -838,7 +850,7 @@ class WindAnimation {
       path.style.setProperty("--path-length", length);
     });
 
-    // Create intersection markers sooner - reduced from 1000ms to 500ms
+    // Create intersection markers after a delay
     setTimeout(() => this.createIntersectionMarkers(), 500);
 
     this.activateAnimation();
@@ -866,6 +878,7 @@ class WindAnimation {
     );
     mainStop1.setAttribute("offset", "0%");
     mainStop1.setAttribute("stop-color", "#A0D8FF");
+    mainStop1.setAttribute("class", "animated-gradient-start");
 
     const mainStop2 = document.createElementNS(
       "http://www.w3.org/2000/svg",
@@ -873,6 +886,7 @@ class WindAnimation {
     );
     mainStop2.setAttribute("offset", "100%");
     mainStop2.setAttribute("stop-color", "#0000CD");
+    mainStop2.setAttribute("class", "animated-gradient-end");
 
     mainGradient.appendChild(mainStop1);
     mainGradient.appendChild(mainStop2);
@@ -895,6 +909,7 @@ class WindAnimation {
     );
     branchStop1.setAttribute("offset", "0%");
     branchStop1.setAttribute("stop-color", "#87CEFA");
+    branchStop1.setAttribute("class", "animated-gradient-start");
 
     const branchStop2 = document.createElementNS(
       "http://www.w3.org/2000/svg",
@@ -902,6 +917,7 @@ class WindAnimation {
     );
     branchStop2.setAttribute("offset", "100%");
     branchStop2.setAttribute("stop-color", "#00008B");
+    branchStop2.setAttribute("class", "animated-gradient-end");
 
     branchGradient.appendChild(branchStop1);
     branchGradient.appendChild(branchStop2);
@@ -915,6 +931,9 @@ class WindAnimation {
   regeneratePaths() {
     if (!this.svg) return;
 
+    // Hide existing paths before removing them
+    this.hidePaths();
+
     // Clean up any existing intersection markers
     this.intersectionMarkers.forEach((marker) => {
       if (marker && marker.parentNode) {
@@ -923,68 +942,90 @@ class WindAnimation {
     });
     this.intersectionMarkers = [];
 
-    this.svg.innerHTML = "";
-    this.pendingRegeneration.clear();
+    // Clear the svg with a slight delay to ensure transitions have completed
+    setTimeout(() => {
+      this.svg.innerHTML = "";
+      this.pendingRegeneration.clear();
 
-    // Recreate gradient defs
-    this.createGradientDefs();
+      // Recreate gradient defs
+      this.createGradientDefs();
 
-    // Generate new tree of paths
-    const pathData = this.pathTree.generatePaths();
+      // Generate new tree of paths
+      const pathData = this.pathTree.generatePaths();
 
-    // Create new SVG paths
-    pathData.forEach((d, index) => {
-      const path = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path"
-      );
-      path.setAttribute("class", "wind-path");
-      path.setAttribute("d", d);
-      path.setAttribute("stroke-width", "2.5");
-      path.setAttribute("fill", "none"); // Ensure paths are not filled
+      // Create new SVG paths
+      pathData.forEach((d, index) => {
+        const path = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+        path.setAttribute("class", "wind-path");
+        path.setAttribute("d", d);
 
-      // Initially hide paths
-      path.style.opacity = "0";
+        // Explicitly set both attribute and style to zero
+        path.setAttribute("stroke-width", "0");
+        path.style.strokeWidth = "0";
+        path.setAttribute("fill", "none");
+        path.style.opacity = "0";
 
-      if (index === 0) {
-        path.classList.add("main-path");
-        path.setAttribute("stroke", "url(#mainGradient)");
-      } else {
-        path.classList.add("branch-path");
-        path.setAttribute("stroke", "url(#branchGradient)");
-      }
+        if (index === 0) {
+          path.classList.add("main-path");
+          path.setAttribute("stroke", "url(#mainGradient)");
+        } else {
+          path.classList.add("branch-path");
+          path.setAttribute("stroke", "url(#branchGradient)");
+        }
 
-      this.svg.appendChild(path);
-    });
+        this.svg.appendChild(path);
+      });
 
-    this.paths = Array.from(this.svg.querySelectorAll(".wind-path"));
+      this.paths = Array.from(this.svg.querySelectorAll(".wind-path"));
+
+      // Make sure paths are properly initialized with complete invisibility
+      this.paths.forEach((path) => {
+        const length = path.getTotalLength();
+        path.setAttribute("data-length", length);
+        path.setAttribute("data-progress", "0");
+        path.setAttribute("data-phase", "appearing");
+
+        // Double ensure paths are fully invisible
+        path.style.opacity = "0";
+        path.style.strokeWidth = "0";
+        path.setAttribute("stroke-width", "0");
+        path.style.transition = "none";
+
+        // Set up for reverse animation (start to end)
+        const visibleLength = length * 0.15;
+        path.style.strokeDasharray = `${visibleLength}, ${length}`;
+        path.style.strokeDashoffset = 0; // Start from the start
+        path.style.setProperty("--path-length", length);
+      });
+
+      // Create intersection markers after a short delay
+      setTimeout(() => this.createIntersectionMarkers(), 500);
+
+      // Add a slight delay before showing new paths
+      setTimeout(() => {
+        this.paths.forEach((path) => {
+          path.style.opacity = "0.7";
+          path.style.strokeWidth = "2.5";
+          path.style.transition = "opacity 0.3s ease, stroke-width 0.3s ease";
+          path.classList.add("visible");
+        });
+      }, 100);
+    }, 100); // Short delay to ensure paths are fully hidden before rebuilding
+  }
+
+  hidePaths() {
+    if (!this.paths || this.paths.length === 0) return;
 
     this.paths.forEach((path) => {
-      const length = path.getTotalLength();
-      path.setAttribute("data-length", length);
-      path.setAttribute("data-progress", "0");
-      path.setAttribute("data-phase", "appearing");
-
+      path.style.transition = "opacity 0.2s ease, stroke-width 0.2s ease";
       path.style.opacity = "0";
-      path.style.transition = "none";
-
-      // Set up for reverse animation (start to end)
-      const visibleLength = length * 0.15;
-      path.style.strokeDasharray = `${visibleLength}, ${length}`;
-      path.style.strokeDashoffset = 0; // Start from the start
-      path.style.setProperty("--path-length", length);
+      path.style.strokeWidth = "0";
+      path.setAttribute("stroke-width", "0");
+      path.classList.remove("visible");
     });
-
-    // Create intersection markers sooner - reduced from 1000ms to 500ms
-    setTimeout(() => this.createIntersectionMarkers(), 500);
-
-    // Add a slight delay before showing new paths
-    setTimeout(() => {
-      this.paths.forEach((path) => {
-        path.style.opacity = "1";
-        path.style.transition = "opacity 0.3s ease-in";
-      });
-    }, 100);
   }
 
   createIntersectionMarkers() {
@@ -1137,11 +1178,13 @@ class WindAnimation {
       this.progress = 0;
       this.lastTimestamp = performance.now();
 
-      // Slight delay before showing paths
+      // Shorter delay before showing paths (reduced from 300ms to 100ms)
       setTimeout(() => {
         this.paths.forEach((path) => {
-          path.style.opacity = "1";
-          path.style.transition = "opacity 0.3s ease-in";
+          path.style.opacity = "0.7";
+          path.style.strokeWidth = "2.5";
+          path.style.transition = "opacity 0.3s ease, stroke-width 0.3s ease";
+          path.classList.add("visible");
         });
       }, 100);
 
@@ -1163,9 +1206,13 @@ class WindAnimation {
       path.setAttribute("data-phase", "appearing");
       path.setAttribute("data-visible-time", "0");
 
+      path.classList.remove("visible");
       path.style.transition = "none";
-      // Start hidden
+
+      // Ensure complete invisibility
       path.style.opacity = "0";
+      path.style.strokeWidth = "0";
+      path.setAttribute("stroke-width", "0");
 
       // Set up for reverse animation (start to end)
       const visibleLength = length * 0.15;
@@ -1191,7 +1238,20 @@ class WindAnimation {
     // Check if any path needs regeneration
     for (const [path, timeToRegenerate] of this.pendingRegeneration.entries()) {
       if (timestamp >= timeToRegenerate) {
-        this.regeneratePaths();
+        // Immediately hide all paths before regeneration starts
+        this.paths.forEach((p) => {
+          p.style.opacity = "0";
+          p.style.strokeWidth = "0";
+          p.setAttribute("stroke-width", "0");
+        });
+
+        // Add a small delay before regenerating paths to ensure they're hidden
+        setTimeout(() => {
+          this.regeneratePaths();
+        }, 50);
+
+        // Clear pending regeneration to prevent multiple calls
+        this.pendingRegeneration.clear();
         break;
       }
     }
@@ -1251,7 +1311,15 @@ class WindAnimation {
           pathProgress - 0.3
         );
 
-        if (pathProgress === 1 && !this.pendingRegeneration.has(path)) {
+        // Hide paths earlier - when they're 90% done disappearing instead of 100%
+        if (pathProgress >= 0.9) {
+          // Hide the path completely before it's fully disappeared
+          path.style.opacity = "0";
+          path.style.strokeWidth = "0";
+          path.setAttribute("stroke-width", "0");
+        }
+
+        if (pathProgress === 1) {
           path.setAttribute("data-status", "completed");
           if (!this.pendingRegeneration.size) {
             this.pendingRegeneration.set(
