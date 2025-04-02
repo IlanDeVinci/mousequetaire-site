@@ -1,7 +1,7 @@
 "use client";
 
 class PathTree {
-  constructor(viewWidth, viewHeight) {
+  constructor(viewWidth, viewHeight, direction = "right") {
     this.viewWidth = viewWidth;
     this.viewHeight = viewHeight;
     this.nodes = new Set();
@@ -11,6 +11,7 @@ class PathTree {
     this.minX = 0;
     this.commonLength = 0;
     this.pathSegments = 10 + Math.floor(Math.random() * 5); // 10-14 segments per path
+    this.direction = direction; // 'right' or 'left'
 
     // Fixed grid settings
     this.gridSize = 25; // Changed from 50 to 25 to make the tree about half the size
@@ -34,7 +35,8 @@ class PathTree {
     this.pathDirectionsAtPoint = {}; // Track direction taken by paths at specific points
 
     // Force distinct path behavior with varying initial segment lengths
-    this.forcedInitialDirections = ["up", "down", "up", "down", "up", "down"]; // Pre-assign initial directions
+    // Randomize the initial directions - ensure first turn has equal chance of being up or down
+    this.forcedInitialDirections = this.getRandomizedDirections();
     this.forcedYOffsets = [60, -60, 120, -120, 180, -180]; // Ensure vertical spacing
     this.initialSegmentCounts = [4, 2, 5, 3, 6, 2]; // How many horizontal segments before first turn
 
@@ -47,19 +49,55 @@ class PathTree {
     this.curveRadiusAtCoordinates = {}; // Track curve radius at specific points
 
     // Constrain path extension to prevent overflow
-    this.maxRightExtension = viewWidth * 0.98; // Increased from 0.95 to 0.98 to allow for more extension
-
-    // Strictly prevent any leftward movement
-    this.allowedDirections = ["right", "up", "down"]; // Never allow left direction
+    if (direction === "right") {
+      this.maxExtension = viewWidth * 0.98; // Right extension limit
+      this.allowedDirections = ["right", "up", "down"]; // Never allow left direction
+    } else {
+      this.maxExtension = viewWidth * 0.02; // Left extension limit
+      this.allowedDirections = ["left", "up", "down"]; // Never allow right direction
+    }
 
     // Store intersection points
     this.intersectionPoints = [];
 
-    // Higher probability for right movement after first turn
-    this.rightMovementProbability = 0.75; // 75% chance to favor right movement
+    // Higher probability for horizontal movement after first turn
+    this.horizontalMovementProbability = 0.75; // 75% chance to favor horizontal movement
 
     // Add extra segments to ensure clean disappearing
     this.extraEndSegments = 2; // Add 2 extra segments at the end
+  }
+
+  // Improved randomization method to ensure better variety in directions
+  getRandomizedDirections() {
+    // Create a balanced set of directions
+    let directions = [];
+
+    // Ensure the first direction is randomly chosen with 50/50 chance
+    const firstDirection = Math.random() < 0.5 ? "up" : "down";
+    directions.push(firstDirection);
+
+    // Add remaining directions ensuring balance
+    const remainingCount = 5; // We want 6 total directions (1 first + 5 remaining)
+    const upCount =
+      firstDirection === "up" ? remainingCount / 2 - 1 : remainingCount / 2;
+    const downCount =
+      firstDirection === "down" ? remainingCount / 2 - 1 : remainingCount / 2;
+
+    // Add balanced remaining directions
+    for (let i = 0; i < Math.ceil(upCount); i++) directions.push("up");
+    for (let i = 0; i < Math.ceil(downCount); i++) directions.push("down");
+
+    // Shuffle all but the first element to maintain the randomly chosen first direction
+    const firstDir = directions[0];
+    const rest = directions.slice(1);
+
+    // Shuffle the remaining directions
+    for (let i = rest.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [rest[i], rest[j]] = [rest[j], rest[i]];
+    }
+
+    return [firstDir, ...rest];
   }
 
   generatePaths() {
@@ -76,8 +114,12 @@ class PathTree {
     this.turnTypesAtCoordinates = {}; // Reset turn types
     this.curveRadiusAtCoordinates = {}; // Reset curve radius tracking
 
-    // Move path tree 2/3 of the way to the right (updated from 1/2)
-    const startX = this.viewWidth * (2 / 3);
+    // Set starting position based on direction
+    const startX =
+      this.direction === "right"
+        ? this.viewWidth * (2 / 3) // 2/3 of the way to the right
+        : this.viewWidth * (1 / 3); // 1/3 of the way to the left
+
     this.minX = startX;
 
     const startY = this.viewHeight / 2;
@@ -118,7 +160,7 @@ class PathTree {
     for (let i = 0; i < Math.min(this.pathCount, yPositions.length); i++) {
       const targetY = yPositions[i];
       const offset = this.pathOffsets[i];
-      const pathId = `path-${i}`;
+      const pathId = `path-${i}-${this.direction}`;
 
       // Initialize tracking for this path
       this.lastTurnDirection[pathId] = "";
@@ -130,7 +172,7 @@ class PathTree {
         x: startX,
         y: startY,
         targetY: targetY, // Each path has a different targetY
-        direction: "right",
+        direction: this.direction, // Start in the configured direction
         pathData: `M${startX},${startY}`,
         segmentsCreated: 0,
         isMainPath: i === Math.floor(yPositions.length / 2),
@@ -143,8 +185,9 @@ class PathTree {
         pathIndex: i, // Store index for forced direction logic
       };
 
-      // Generate the path
-      const completePath = this.growDistinctPath(path);
+      // Generate the path - ensure new randomization for each tree instance
+      const pathDirectionIndex = i % this.forcedInitialDirections.length;
+      const completePath = this.growDistinctPath(path, pathDirectionIndex);
       tempPaths.push(completePath);
     }
 
@@ -177,7 +220,7 @@ class PathTree {
     // Now rebuild paths with adjusted lengths and guaranteed diversity
     for (let i = 0; i < tempPaths.length; i++) {
       const originalPath = tempPaths[i];
-      const pathId = `path-${i}`;
+      const pathId = `path-${i}-${this.direction}`;
 
       // Reset tracking for this path
       this.lastTurnDirection[pathId] = "";
@@ -189,7 +232,7 @@ class PathTree {
         x: startX,
         y: startY,
         targetY: yPositions[i], // Use the distinct Y from positions array
-        direction: "right",
+        direction: this.direction, // Start in the configured direction
         pathData: `M${startX},${startY}`,
         segmentsCreated: 0,
         isMainPath: originalPath.isMainPath,
@@ -204,8 +247,9 @@ class PathTree {
         forcedYOffset: this.forcedYOffsets[i % this.forcedYOffsets.length], // Assign a fixed vertical offset
       };
 
-      // Grow this path with guaranteed vertical movement
-      const completePath = this.growDistinctPath(path);
+      // Grow this path with guaranteed vertical movement - use path index for direction
+      const pathDirectionIndex = i % this.forcedInitialDirections.length;
+      const completePath = this.growDistinctPath(path, pathDirectionIndex);
 
       // Add the completed path to the collection
       if (completePath.isMainPath) {
@@ -220,7 +264,7 @@ class PathTree {
     return this.paths;
   }
 
-  growDistinctPath(path) {
+  growDistinctPath(path, directionIndex = path.pathIndex) {
     // Get initial segments for this path - some paths wait longer before turning
     const initialSegmentsForThisPath =
       this.initialSegmentCounts[
@@ -229,16 +273,16 @@ class PathTree {
 
     // First create initial horizontal segment (now varied based on path index)
     while (path.segmentsCreated < initialSegmentsForThisPath) {
-      path.direction = "right";
+      path.direction = this.direction; // Use the configured direction
       path = this.extendPath(path);
       path.segmentsCreated++;
     }
 
     // Force a vertical turn to happen after initial segments
+    // Use the directionIndex to get the specific direction for this path
     const forcedDirection =
-      this.forcedInitialDirections[
-        path.pathIndex % this.forcedInitialDirections.length
-      ];
+      this.forcedInitialDirections[directionIndex] ||
+      (Math.random() > 0.5 ? "up" : "down");
 
     // Use exact coordinates as key for turn consistency
     const turnKey = `${path.x},${path.y}:${forcedDirection}`;
@@ -297,7 +341,8 @@ class PathTree {
     }
 
     // Always turn back to horizontal after vertical segment
-    const horizontalTurnKey = `${path.x},${path.y}:right`;
+    const horizontalDirection = this.direction; // Use the configured direction
+    const horizontalTurnKey = `${path.x},${path.y}:${horizontalDirection}`;
     let shouldCurveHorizontal;
     let horizontalCurveRadius = this.gridSize * this.curveRadiusGrid;
 
@@ -326,26 +371,30 @@ class PathTree {
     }
 
     if (shouldCurveHorizontal) {
-      path = this.createCurvedTurn(path, "right", horizontalCurveRadius);
+      path = this.createCurvedTurn(
+        path,
+        horizontalDirection,
+        horizontalCurveRadius
+      );
     } else {
-      path.direction = "right";
+      path.direction = horizontalDirection;
       path.lastTurnPoint = path.x;
-      path.actions.push(`turn-right-at-${path.x},${path.y}`);
+      path.actions.push(`turn-${horizontalDirection}-at-${path.x},${path.y}`);
     }
 
     // Continue generating path with normal rules but avoiding overlap
     while (path.segmentsCreated < this.pathSegments) {
       // Consider another turn later in the path
-      const distanceFromLastTurn = path.x - path.lastTurnPoint;
+      const distanceFromLastTurn = Math.abs(path.x - path.lastTurnPoint);
       const atTurnPoint = distanceFromLastTurn >= this.gridSize * 2;
 
       if (
-        path.direction === "right" &&
+        path.direction === this.direction &&
         atTurnPoint &&
         path.verticalGridsUsed < this.maxVerticalGrids
       ) {
-        // Reduced chance for another turn - higher probability of continuing right
-        if (Math.random() > this.rightMovementProbability) {
+        // Reduced chance for another turn - higher probability of continuing horizontal
+        if (Math.random() > this.horizontalMovementProbability) {
           // Choose a direction - must be different than the first turn to avoid repetitive up/down
           const newDirection =
             this.lastTurnDirection[path.id] === "up" ? "down" : "up";
@@ -409,7 +458,7 @@ class PathTree {
           }
 
           // Return to horizontal
-          const returnKey = `${path.x},${path.y}:right`;
+          const returnKey = `${path.x},${path.y}:${horizontalDirection}`;
           let shouldCurveReturn;
           let returnCurveRadius = this.gridSize * this.curveRadiusGrid;
 
@@ -433,11 +482,17 @@ class PathTree {
           }
 
           if (shouldCurveReturn) {
-            path = this.createCurvedTurn(path, "right", returnCurveRadius);
+            path = this.createCurvedTurn(
+              path,
+              horizontalDirection,
+              returnCurveRadius
+            );
           } else {
-            path.direction = "right";
+            path.direction = horizontalDirection;
             path.lastTurnPoint = path.x;
-            path.actions.push(`return-right-at-${path.x},${path.y}`);
+            path.actions.push(
+              `return-${horizontalDirection}-at-${path.x},${path.y}`
+            );
           }
         }
       }
@@ -447,9 +502,9 @@ class PathTree {
       path.segmentsCreated++;
     }
 
-    // Ensure path ends horizontally pointing right
-    if (path.direction !== "right") {
-      path.direction = "right";
+    // Ensure path ends horizontally pointing in the configured direction
+    if (path.direction !== this.direction) {
+      path.direction = this.direction;
       path = this.extendPath(path);
     }
 
@@ -469,11 +524,15 @@ class PathTree {
     let nextX = path.x;
     let nextY = path.y;
 
-    // Move in the current direction, ensuring we never go left
+    // Move in the current direction
     switch (path.direction) {
       case "right":
         nextX += segmentLength;
-        nextX = Math.min(nextX, this.maxRightExtension);
+        nextX = Math.min(nextX, this.maxExtension);
+        break;
+      case "left":
+        nextX -= segmentLength;
+        nextX = Math.max(nextX, this.maxExtension);
         break;
       case "up":
         nextY -= segmentLength;
@@ -484,9 +543,13 @@ class PathTree {
         nextY = Math.min(nextY, this.viewHeight - 30);
         break;
       default:
-        // Force right movement for any other direction
-        nextX += segmentLength;
-        path.direction = "right";
+        // Force configured direction movement for any other direction
+        if (this.direction === "right") {
+          nextX += segmentLength;
+        } else {
+          nextX -= segmentLength;
+        }
+        path.direction = this.direction;
         break;
     }
 
@@ -520,14 +583,24 @@ class PathTree {
       const maxExtension = this.gridSize * 6; // Increased from 4 to 6
       const actualExtension = Math.min(extraLength, maxExtension);
 
-      const extraX = path.x + actualExtension;
+      // Adjust X position based on direction
+      const extraX =
+        this.direction === "right"
+          ? path.x + actualExtension
+          : path.x - actualExtension;
+
       path.pathData += ` L${extraX},${path.y}`;
       path.x = extraX;
     }
 
     // Add additional segments to ensure clean disappearance
     for (let i = 0; i < this.extraEndSegments; i++) {
-      const extraX = path.x + this.gridSize;
+      // Adjust X position based on direction
+      const extraX =
+        this.direction === "right"
+          ? path.x + this.gridSize
+          : path.x - this.gridSize;
+
       path.pathData += ` L${extraX},${path.y}`;
       path.x = extraX;
     }
@@ -544,15 +617,20 @@ class PathTree {
     let endY = startY;
 
     // Calculate control points and end point based on current and new directions
-    if (path.direction === "right") {
-      // Turning from right to up/down
-      endX = startX + curveRadius;
+    if (path.direction === "right" || path.direction === "left") {
+      // Turning from horizontal to up/down
+      const horizontalOffset =
+        path.direction === "right" ? curveRadius : -curveRadius;
+      endX = startX + horizontalOffset;
       endY =
         newDirection === "up" ? startY - curveRadius : startY + curveRadius;
 
       // Create a quarter-circle bezier curve
       const controlDistance = curveRadius * 0.552;
-      const cp1x = startX + controlDistance;
+      const cp1x =
+        path.direction === "right"
+          ? startX + controlDistance
+          : startX - controlDistance;
       const cp1y = startY;
       const cp2x = endX;
       const cp2y =
@@ -562,8 +640,11 @@ class PathTree {
 
       curvePathData = `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
     } else {
-      // Turning from up/down to right
-      endX = startX + curveRadius;
+      // Turning from up/down to horizontal
+      const horizontalDirection = newDirection; // This will be either "right" or "left"
+      const horizontalOffset =
+        horizontalDirection === "right" ? curveRadius : -curveRadius;
+      endX = startX + horizontalOffset;
       endY =
         path.direction === "up" ? startY - curveRadius : startY + curveRadius;
 
@@ -574,7 +655,10 @@ class PathTree {
         path.direction === "up"
           ? startY - controlDistance
           : startY + controlDistance;
-      const cp2x = startX + controlDistance;
+      const cp2x =
+        horizontalDirection === "right"
+          ? startX + controlDistance
+          : startX - controlDistance;
       const cp2y = endY;
 
       curvePathData = `C ${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`;
@@ -614,7 +698,9 @@ class PathTree {
     this.intersectionPoints = [];
 
     // We need actual DOM elements to check intersections
-    const pathElements = document.querySelectorAll(".wind-path");
+    const pathElements = document.querySelectorAll(
+      `.wind-path[data-direction="${this.direction}"]`
+    );
     if (!pathElements || pathElements.length < 2) return [];
 
     // Prepare paths for processing
@@ -730,9 +816,11 @@ class WindAnimation {
     this.progress = 0;
     this.lastTimestamp = 0;
     this.paths = [];
+    this.leftPaths = []; // New array for left-facing paths
+    this.rightPaths = []; // Renamed from paths to rightPaths for clarity
     this.animate = this.animate.bind(this);
     this.pendingRegeneration = new Map();
-    this.regenerationDelay = 4000; // Increased from 2500 to 5000
+    this.regenerationDelay = 3000; // Increased from 2500 to 5000
     this.visibilityDuration = 2000; // Duration to keep path fully visible (in ms)
 
     this.config = {
@@ -762,7 +850,18 @@ class WindAnimation {
       window.addEventListener("resize", this.handleResize.bind(this));
     }
 
-    this.pathTree = new PathTree(this.config.viewWidth, this.config.viewHeight);
+    // Create two path trees - one on the right, one on the left
+    this.rightPathTree = new PathTree(
+      this.config.viewWidth,
+      this.config.viewHeight,
+      "right"
+    );
+    this.leftPathTree = new PathTree(
+      this.config.viewWidth,
+      this.config.viewHeight,
+      "left"
+    );
+
     this.init();
   }
 
@@ -798,17 +897,24 @@ class WindAnimation {
     // Create gradient definition
     this.createGradientDefs();
 
-    // Generate tree of paths
-    const pathData = this.pathTree.generatePaths();
+    // Generate right-facing tree of paths
+    this.rightPathTree.forcedInitialDirections =
+      this.rightPathTree.getRandomizedDirections();
+    const rightPathData = this.rightPathTree.generatePaths();
 
-    // Create SVG paths with distinct styles for better visibility
-    pathData.forEach((d, index) => {
+    // Generate left-facing tree of paths - use different randomization
+    this.leftPathTree.forcedInitialDirections =
+      this.leftPathTree.getRandomizedDirections();
+    const leftPathData = this.leftPathTree.generatePaths();
+
+    // Create SVG paths for right tree with distinct styles for better visibility
+    rightPathData.forEach((d, index) => {
       const path = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "path"
       );
-      path.setAttribute("class", "wind-path");
-      path.classList.add(`path-${index}`);
+      path.setAttribute("class", "wind-path right-path");
+      path.classList.add(`right-path-${index}`);
 
       if (index === 0) {
         path.classList.add("main-path");
@@ -826,12 +932,47 @@ class WindAnimation {
       path.style.opacity = "0";
       path.style.strokeWidth = "0";
       path.style.filter = "blur(0px)";
+      path.setAttribute("data-direction", "right");
 
       this.svg.appendChild(path);
     });
 
-    this.paths = Array.from(this.svg.querySelectorAll(".wind-path"));
+    // Create SVG paths for left tree with distinct styles for better visibility
+    leftPathData.forEach((d, index) => {
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path"
+      );
+      path.setAttribute("class", "wind-path left-path");
+      path.classList.add(`left-path-${index}`);
 
+      if (index === 0) {
+        path.classList.add("main-path");
+        path.setAttribute("stroke", "url(#mainGradientLeft)");
+      } else {
+        path.classList.add("branch-path");
+        path.setAttribute("stroke", "url(#branchGradientLeft)");
+      }
+
+      path.setAttribute("d", d);
+
+      // Explicitly set these attributes to zero for complete invisibility
+      path.setAttribute("stroke-width", "0");
+      path.setAttribute("fill", "none");
+      path.style.opacity = "0";
+      path.style.strokeWidth = "0";
+      path.style.filter = "blur(0px)";
+      path.setAttribute("data-direction", "left");
+
+      this.svg.appendChild(path);
+    });
+
+    // Store paths in separate arrays for easier management
+    this.rightPaths = Array.from(this.svg.querySelectorAll(".right-path"));
+    this.leftPaths = Array.from(this.svg.querySelectorAll(".left-path"));
+    this.paths = [...this.rightPaths, ...this.leftPaths]; // Combine for overall animation handling
+
+    // Initialize all paths
     this.paths.forEach((path) => {
       const length = path.getTotalLength();
       path.setAttribute("data-length", length);
@@ -843,7 +984,7 @@ class WindAnimation {
       path.style.strokeWidth = "0";
       path.style.transition = "none";
 
-      // Set up for reverse animation (start to end)
+      // Set up for animation
       const visibleLength = length * 0.15;
       path.style.strokeDasharray = `${visibleLength}, ${length}`;
       path.style.strokeDashoffset = 0;
@@ -860,7 +1001,7 @@ class WindAnimation {
     // Create gradient definitions for paths
     const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
-    // Create main path gradient (brighter blue)
+    // Create main path gradient (brighter blue) - RIGHT DIRECTION
     const mainGradient = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "linearGradient"
@@ -891,7 +1032,7 @@ class WindAnimation {
     mainGradient.appendChild(mainStop1);
     mainGradient.appendChild(mainStop2);
 
-    // Create branch path gradient (slightly darker blue)
+    // Create branch path gradient (slightly darker blue) - RIGHT DIRECTION
     const branchGradient = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "linearGradient"
@@ -922,8 +1063,72 @@ class WindAnimation {
     branchGradient.appendChild(branchStop1);
     branchGradient.appendChild(branchStop2);
 
+    // Create main path gradient (brighter blue) - LEFT DIRECTION (flipped)
+    const mainGradientLeft = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "linearGradient"
+    );
+    mainGradientLeft.setAttribute("id", "mainGradientLeft");
+    // Reverse gradient direction
+    mainGradientLeft.setAttribute("x1", "100%");
+    mainGradientLeft.setAttribute("y1", "0%");
+    mainGradientLeft.setAttribute("x2", "0%");
+    mainGradientLeft.setAttribute("y2", "0%");
+
+    const mainLeftStop1 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    mainLeftStop1.setAttribute("offset", "0%");
+    mainLeftStop1.setAttribute("stop-color", "#A0D8FF");
+    mainLeftStop1.setAttribute("class", "animated-gradient-start-left");
+
+    const mainLeftStop2 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    mainLeftStop2.setAttribute("offset", "100%");
+    mainLeftStop2.setAttribute("stop-color", "#0000CD");
+    mainLeftStop2.setAttribute("class", "animated-gradient-end-left");
+
+    mainGradientLeft.appendChild(mainLeftStop1);
+    mainGradientLeft.appendChild(mainLeftStop2);
+
+    // Create branch path gradient (slightly darker blue) - LEFT DIRECTION (flipped)
+    const branchGradientLeft = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "linearGradient"
+    );
+    branchGradientLeft.setAttribute("id", "branchGradientLeft");
+    // Reverse gradient direction
+    branchGradientLeft.setAttribute("x1", "100%");
+    branchGradientLeft.setAttribute("y1", "0%");
+    branchGradientLeft.setAttribute("x2", "0%");
+    branchGradientLeft.setAttribute("y2", "0%");
+
+    const branchLeftStop1 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    branchLeftStop1.setAttribute("offset", "0%");
+    branchLeftStop1.setAttribute("stop-color", "#87CEFA");
+    branchLeftStop1.setAttribute("class", "animated-gradient-start-left");
+
+    const branchLeftStop2 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "stop"
+    );
+    branchLeftStop2.setAttribute("offset", "100%");
+    branchLeftStop2.setAttribute("stop-color", "#00008B");
+    branchLeftStop2.setAttribute("class", "animated-gradient-end-left");
+
+    branchGradientLeft.appendChild(branchLeftStop1);
+    branchGradientLeft.appendChild(branchLeftStop2);
+
     defs.appendChild(mainGradient);
     defs.appendChild(branchGradient);
+    defs.appendChild(mainGradientLeft);
+    defs.appendChild(branchGradientLeft);
 
     this.svg.appendChild(defs);
   }
@@ -950,16 +1155,24 @@ class WindAnimation {
       // Recreate gradient defs
       this.createGradientDefs();
 
-      // Generate new tree of paths
-      const pathData = this.pathTree.generatePaths();
+      // Generate new tree of paths with new randomization - right side
+      this.rightPathTree.forcedInitialDirections =
+        this.rightPathTree.getRandomizedDirections();
+      const rightPathData = this.rightPathTree.generatePaths();
 
-      // Create new SVG paths
-      pathData.forEach((d, index) => {
+      // Generate new tree of paths with new randomization - left side
+      this.leftPathTree.forcedInitialDirections =
+        this.leftPathTree.getRandomizedDirections();
+      const leftPathData = this.leftPathTree.generatePaths();
+
+      // Create new SVG paths for right tree
+      rightPathData.forEach((d, index) => {
         const path = document.createElementNS(
           "http://www.w3.org/2000/svg",
           "path"
         );
-        path.setAttribute("class", "wind-path");
+        path.setAttribute("class", "wind-path right-path");
+        path.classList.add(`right-path-${index}`);
         path.setAttribute("d", d);
 
         // Explicitly set both attribute and style to zero
@@ -967,6 +1180,7 @@ class WindAnimation {
         path.style.strokeWidth = "0";
         path.setAttribute("fill", "none");
         path.style.opacity = "0";
+        path.setAttribute("data-direction", "right");
 
         if (index === 0) {
           path.classList.add("main-path");
@@ -979,7 +1193,38 @@ class WindAnimation {
         this.svg.appendChild(path);
       });
 
-      this.paths = Array.from(this.svg.querySelectorAll(".wind-path"));
+      // Create new SVG paths for left tree
+      leftPathData.forEach((d, index) => {
+        const path = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
+        );
+        path.setAttribute("class", "wind-path left-path");
+        path.classList.add(`left-path-${index}`);
+        path.setAttribute("d", d);
+
+        // Explicitly set both attribute and style to zero
+        path.setAttribute("stroke-width", "0");
+        path.style.strokeWidth = "0";
+        path.setAttribute("fill", "none");
+        path.style.opacity = "0";
+        path.setAttribute("data-direction", "left");
+
+        if (index === 0) {
+          path.classList.add("main-path");
+          path.setAttribute("stroke", "url(#mainGradientLeft)");
+        } else {
+          path.classList.add("branch-path");
+          path.setAttribute("stroke", "url(#branchGradientLeft)");
+        }
+
+        this.svg.appendChild(path);
+      });
+
+      // Store paths in separate arrays
+      this.rightPaths = Array.from(this.svg.querySelectorAll(".right-path"));
+      this.leftPaths = Array.from(this.svg.querySelectorAll(".left-path"));
+      this.paths = [...this.rightPaths, ...this.leftPaths];
 
       // Make sure paths are properly initialized with complete invisibility
       this.paths.forEach((path) => {
@@ -994,7 +1239,7 @@ class WindAnimation {
         path.setAttribute("stroke-width", "0");
         path.style.transition = "none";
 
-        // Set up for reverse animation (start to end)
+        // Set up for animation
         const visibleLength = length * 0.15;
         path.style.strokeDasharray = `${visibleLength}, ${length}`;
         path.style.strokeDashoffset = 0; // Start from the start
@@ -1037,17 +1282,61 @@ class WindAnimation {
     });
     this.intersectionMarkers = [];
 
-    // Find intersections using improved algorithm
-    const intersections = this.pathTree.findIntersections();
+    // Find intersections for both tree types
+    const rightIntersections = this.rightPathTree.findIntersections();
+    const leftIntersections = this.leftPathTree.findIntersections();
 
-    // Remove markers that are too close to each other
+    // Filter and sort each set of intersections independently
+    const filteredRightIntersections =
+      this.filterIntersections(rightIntersections);
+    const filteredLeftIntersections =
+      this.filterIntersections(leftIntersections);
+
+    // Sort right intersections from left to right (lowest X to highest X)
+    filteredRightIntersections.sort((a, b) => a.x - b.x);
+
+    // Sort left intersections from right to left (highest X to lowest X)
+    filteredLeftIntersections.sort((a, b) => b.x - a.x);
+
+    // Apply random filtering to both sides
+    let selectedRightIntersections = filteredRightIntersections
+      .filter(() => Math.random() < 0.5)
+      .slice(0, 6); // Maximum 6 per side
+
+    let selectedLeftIntersections = filteredLeftIntersections
+      .filter(() => Math.random() < 0.5)
+      .slice(0, 6); // Maximum 6 per side
+
+    // Add direction information to each intersection
+    selectedRightIntersections = selectedRightIntersections.map((point) => ({
+      ...point,
+      direction: "right",
+    }));
+
+    selectedLeftIntersections = selectedLeftIntersections.map((point) => ({
+      ...point,
+      direction: "left",
+    }));
+
+    console.log(
+      `Right tree: Found ${rightIntersections.length} intersections, filtered to ${filteredRightIntersections.length}, showing ${selectedRightIntersections.length}`
+    );
+    console.log(
+      `Left tree: Found ${leftIntersections.length} intersections, filtered to ${filteredLeftIntersections.length}, showing ${selectedLeftIntersections.length}`
+    );
+
+    // Create markers for right intersections (indexed from left to right)
+    this.createMarkersForIntersections(selectedRightIntersections, "right");
+
+    // Create markers for left intersections (indexed from right to left)
+    this.createMarkersForIntersections(selectedLeftIntersections, "left");
+  }
+
+  filterIntersections(intersections) {
     const filteredIntersections = [];
     const minimumDistance = 20; // Minimum distance between markers in pixels
 
-    // Sort intersections by x position first to prioritize leftmost markers
-    const sortedIntersections = [...intersections].sort((a, b) => a.x - b.x);
-
-    for (const point of sortedIntersections) {
+    for (const point of intersections) {
       let tooClose = false;
 
       // Check if this point is too close to any already filtered point
@@ -1068,38 +1357,20 @@ class WindAnimation {
       }
     }
 
-    // Get a maximum of 6 intersections
-    let selectedIntersections = filteredIntersections
-      .filter(() => Math.random() < 0.5)
-      // Ensure they're sorted by X position for sequential animation
-      .sort((a, b) => a.x - b.x);
+    return filteredIntersections;
+  }
 
-    // Limit to maximum 6 markers
-    if (selectedIntersections.length > 6) {
-      // If we have more than 6, take a distributed sample to cover the width
-      const step = Math.floor(selectedIntersections.length / 6);
-      const limitedIntersections = [];
-
-      // Take markers at regular intervals to cover full range
-      for (let i = 0; i < 6; i++) {
-        const index = Math.min(i * step, selectedIntersections.length - 1);
-        limitedIntersections.push(selectedIntersections[index]);
-      }
-      selectedIntersections = limitedIntersections;
-    }
-
-    console.log(
-      `Found ${intersections.length} intersections, filtered to ${filteredIntersections.length}, showing ${selectedIntersections.length} in sequence (max 6)`
-    );
+  createMarkersForIntersections(intersections, direction) {
+    if (intersections.length === 0) return;
 
     // Get min and max X positions for proportional delays
-    const xValues = selectedIntersections.map((point) => point.x);
+    const xValues = intersections.map((point) => point.x);
     const minX = Math.min(...xValues);
     const maxX = Math.max(...xValues);
     const xRange = maxX - minX || 1; // Avoid division by zero
 
-    // Create marker for each selected intersection
-    selectedIntersections.forEach((point, index) => {
+    // Create marker for each intersection
+    intersections.forEach((point, index) => {
       const marker = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "circle"
@@ -1111,8 +1382,9 @@ class WindAnimation {
       marker.setAttribute("fill", this.markerColors.fill);
       marker.setAttribute("stroke", this.markerColors.stroke);
       marker.setAttribute("stroke-width", 2);
-      marker.setAttribute("class", "intersection-marker");
+      marker.setAttribute("class", `intersection-marker ${direction}-marker`);
       marker.setAttribute("data-x-position", point.x);
+      marker.setAttribute("data-direction", direction);
       marker.setAttribute("data-index", index.toString()); // Store display order index
 
       // Initially set opacity to 0
@@ -1121,8 +1393,16 @@ class WindAnimation {
       this.svg.appendChild(marker);
       this.intersectionMarkers.push(marker);
 
-      // Simplified sequential timing based purely on x position
-      const xPositionRatio = (point.x - minX) / xRange; // 0 to 1 based on position
+      // Calculate delay based on position
+      let xPositionRatio;
+      if (direction === "right") {
+        // For right tree: leftmost (lowest X) appears first
+        xPositionRatio = (point.x - minX) / xRange;
+      } else {
+        // For left tree: rightmost (highest X) appears first
+        xPositionRatio = (maxX - point.x) / xRange;
+      }
+
       const baseDelay = 50; // minimum delay
       const maxAdditionalDelay = 1000; // maximum additional delay
       const sequentialDelay = baseDelay + xPositionRatio * maxAdditionalDelay;
@@ -1140,28 +1420,55 @@ class WindAnimation {
     if (pathDisappearProgress <= 0) return;
 
     if (pathDisappearProgress > 0) {
-      // Sort markers by their index to ensure they fade out in the same order they appeared (left to right)
-      const sortedMarkers = [...this.intersectionMarkers].sort((a, b) => {
+      // Get markers by direction
+      const rightMarkers = this.intersectionMarkers.filter(
+        (marker) => marker.getAttribute("data-direction") === "right"
+      );
+
+      const leftMarkers = this.intersectionMarkers.filter(
+        (marker) => marker.getAttribute("data-direction") === "left"
+      );
+
+      // Sort right markers by index (left to right)
+      const sortedRightMarkers = [...rightMarkers].sort((a, b) => {
         const indexA = parseInt(a.getAttribute("data-index") || "0");
         const indexB = parseInt(b.getAttribute("data-index") || "0");
         return indexA - indexB;
       });
 
-      // Use longer sequential delays between markers
-      sortedMarkers.forEach((marker, index) => {
-        if (marker && marker.parentNode) {
-          // More time between each marker (200ms per marker)
-          const fadeDelay = index * 150;
+      // Sort left markers by index (right to left order maintained by index)
+      const sortedLeftMarkers = [...leftMarkers].sort((a, b) => {
+        const indexA = parseInt(a.getAttribute("data-index") || "0");
+        const indexB = parseInt(b.getAttribute("data-index") || "0");
+        return indexA - indexB;
+      });
 
+      // Fade out right markers
+      sortedRightMarkers.forEach((marker, index) => {
+        if (marker && marker.parentNode) {
+          const fadeDelay = index * 150;
           setTimeout(() => {
             marker.style.opacity = "0";
-
-            // Remove from DOM after transition completes
             setTimeout(() => {
               if (marker.parentNode) {
                 marker.parentNode.removeChild(marker);
               }
-            }, 550); // Slightly longer than the 0.5s CSS transition
+            }, 550);
+          }, fadeDelay);
+        }
+      });
+
+      // Fade out left markers
+      sortedLeftMarkers.forEach((marker, index) => {
+        if (marker && marker.parentNode) {
+          const fadeDelay = index * 150;
+          setTimeout(() => {
+            marker.style.opacity = "0";
+            setTimeout(() => {
+              if (marker.parentNode) {
+                marker.parentNode.removeChild(marker);
+              }
+            }, 550);
           }, fadeDelay);
         }
       });
@@ -1308,7 +1615,7 @@ class WindAnimation {
         anyPathDisappearing = true;
         maxDisappearProgress = Math.max(
           maxDisappearProgress,
-          pathProgress - 0.3
+          pathProgress - 0.1
         );
 
         // Hide paths earlier - when they're 90% done disappearing instead of 100%
