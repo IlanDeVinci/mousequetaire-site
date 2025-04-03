@@ -95,80 +95,8 @@ const portfolioItems = [
   },
   {
     id: 15,
-    title: "Product Design",
+    title: "Marketing Zeubi",
     image: "/images/project15.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 16,
-    title: "Interactive Installation",
-    image: "/images/project1.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 17,
-    title: "3D Modeling",
-    image: "/images/project2.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 18,
-    title: "Packaging Design",
-    image: "/images/project3.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 19,
-    title: "Game UI Design",
-    image: "/images/project4.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 20,
-    title: "Augmented Reality App",
-    image: "/images/project5.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 21,
-    title: "Editorial Design",
-    image: "/images/project6.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 22,
-    title: "Virtual Reality Experience",
-    image: "/images/project7.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 23,
-    title: "Data Visualization",
-    image: "/images/project8.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 24,
-    title: "Illustration Series",
-    image: "/images/project9.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 25,
-    title: "E-learning Platform",
-    image: "/images/project10.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 26,
-    title: "Wayfinding System",
-    image: "/images/project11.jpg",
-    importance: Math.floor(Math.random() * 4) + 1,
-  },
-  {
-    id: 27,
-    title: "Wearable Technology",
-    image: "/images/project12.jpg",
     importance: Math.floor(Math.random() * 4) + 1,
   },
 ];
@@ -314,100 +242,188 @@ export default function Portfolio() {
 
         // Keep creating pattern rows until we run out of items
         while (remainingItems.length > 0) {
-          // Pattern Row 1: Three 1x1 items
-          if (remainingItems.length >= 3) {
+          // Check remaining items and plan accordingly
+          const itemsLeft = remainingItems.length;
+          // Pattern Row 1: Adaptive first row based on remaining items
+          if (itemsLeft === 4) {
+            // For exactly 4 items, use pattern: 2x1, 1x1, 1x1, 2x1
+            displayItems.push(getNextItem(2, 1, 3)); // First 2x1
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            displayItems.push(getNextItem(2, 1, 3)); // Second 2x1
+            log(
+              "Created row pattern: 2×1, 1×1, 1×1, 2×1 (for exactly 4 items)"
+            );
+          } else if (itemsLeft >= 3) {
             for (let i = 0; i < 3 && remainingItems.length > 0; i++) {
               displayItems.push(getNextItem(1, 1, 1)); // Prefer importance 1
             }
             log("Created row pattern: Three 1×1 items");
-          } else if (remainingItems.length === 2) {
-            // Only 2 items left - use them both as 1x1
+          } else if (itemsLeft === 2) {
             displayItems.push(getNextItem(1, 1, 1));
             displayItems.push(getNextItem(2, 1, 3)); // Make the second one wider
-            log(
-              "Created row pattern: 1×1, 2×1 (fallback for insufficient items)"
-            );
-          } else if (remainingItems.length === 1) {
-            // Only 1 item left - make it take the whole row
-            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
-            log("Created row pattern: 3×1 (fallback for one item)");
+            log("Created row pattern: 1×1, 2×1 (for 2 remaining items)");
+          } else if (itemsLeft === 1) {
+            // For last item, make it a 2x1 instead of 3x1
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
+            log("Created row pattern: 2×1 (for final item)");
           }
 
           if (remainingItems.length === 0) break;
 
-          // Pattern Row 2: One 1x1, one 2x2 spanning columns 2-3, one 1x1
-          if (remainingItems.length >= 3) {
-            displayItems.push(getNextItem(1, 1, 1)); // First 1x1
-            displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
-            displayItems.push(getNextItem(1, 1, 1)); // Another 1x1
-            log("Created row pattern: 1×1, 2×2, 1×1 items");
+          // Pattern Row 2: Check if we need to adjust layout based on remaining items
+          if (remainingItems.length <= 5) {
+            // If we're getting low on items
+            // Create a layout that will work well for few remaining items
+            if (remainingItems.length === 4) {
+              // Special pattern for exactly 4 items
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              log(
+                "Created adjusted row pattern: 1×1, 2×1, 2×1, 1×1 (for exactly 4 items)"
+              );
+            } else if (remainingItems.length === 3) {
+              // For exactly 3 items, use three 1x1 items
+              for (let i = 0; i < 3; i++) {
+                displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              }
+              log(
+                "Created adjusted row pattern: Three 1×1 items (for exactly 3 items)"
+              );
+            } else if (remainingItems.length >= 2) {
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              log(
+                "Created adjusted row pattern: 2×1, 1×1 (for few remaining items)"
+              );
+            } else if (remainingItems.length === 1) {
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1 for last item
+              log("Created adjusted row pattern: 2×1 (for final item)");
+            }
+          } else {
+            // Standard pattern: One 1x1, one 2x2 spanning columns 2-3, one 1x1
+            if (remainingItems.length >= 3) {
+              displayItems.push(getNextItem(1, 1, 1)); // First 1x1
+              displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
+              displayItems.push(getNextItem(1, 1, 1)); // Another 1x1
+              log("Created row pattern: 1×1, 2×2, 1×1 items");
+            } else if (remainingItems.length === 2) {
+              displayItems.push(getNextItem(1, 1, 1));
+              displayItems.push(getNextItem(2, 1, 3));
+              log("Created row pattern: 1×1, 2×1 (for 2 remaining items)");
+            } else if (remainingItems.length === 1) {
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
+              log("Created row pattern: 2×1 (for final item)");
+            }
+          }
+
+          if (remainingItems.length === 0) break;
+
+          // Pattern Row 3: Look ahead to optimize
+          if (remainingItems.length === 4) {
+            // If exactly 4 items remain, create balanced pattern
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            log(
+              "Created row pattern: 1×1, 2×1, 2×1, 1×1 (for exactly 4 items)"
+            );
+          } else if (remainingItems.length === 3) {
+            // If exactly 3 items remain, use 3 1x1 items to complete the grid
+            for (let i = 0; i < 3; i++) {
+              displayItems.push(getNextItem(1, 1, 1));
+            }
+            log("Created row pattern: Three 1×1 items (for final 3 items)");
           } else if (remainingItems.length === 2) {
-            // Only 2 items, skip the 2x2 pattern
-            displayItems.push(getNextItem(1, 1, 1));
-            displayItems.push(getNextItem(2, 1, 3));
-            log(
-              "Created row pattern: 1×1, 2×1 (fallback for insufficient items)"
-            );
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            log("Created row pattern: 2×1, 1×1 (for final 2 items)");
           } else if (remainingItems.length === 1) {
-            // Only 1 item, skip the 2x2 pattern
-            displayItems.push(getNextItem(3, 1, 3));
-            log("Created row pattern: 3×1 (fallback for one item)");
-          }
-
-          if (remainingItems.length === 0) break;
-
-          // Pattern Row 3: 2x1 and 1x1
-          if (remainingItems.length >= 2) {
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
+            log("Created row pattern: 2×1 (for final item)");
+          } else {
+            // Standard pattern for more items
             displayItems.push(getNextItem(2, 1, 3)); // 2x1 (prefer importance 3)
             displayItems.push(getNextItem(1, 1, 1)); // 1x1
             log("Created row pattern: 2×1, 1×1 items");
-          } else if (remainingItems.length === 1) {
-            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
-            log("Created row pattern: 3×1 (fallback for one item)");
           }
 
           if (remainingItems.length === 0) break;
 
-          // Pattern Row 4: 1x1 followed by 2x1
-          if (remainingItems.length >= 2) {
+          // Pattern Row 4: Look ahead to optimize
+          if (remainingItems.length <= 3) {
+            // If 3 or fewer items remain
+            // Use them all in a balanced way
+            if (remainingItems.length === 3) {
+              for (let i = 0; i < 3; i++) {
+                displayItems.push(getNextItem(1, 1, 1));
+              }
+              log("Created balanced row: Three 1×1 items (for final 3 items)");
+            } else if (remainingItems.length === 2) {
+              displayItems.push(getNextItem(1, 1, 1));
+              displayItems.push(getNextItem(2, 1, 3));
+              log("Created balanced row: 1×1, 2×1 (for final 2 items)");
+            } else {
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1 for last item
+              log("Created final item row: 2×1 (for final item)");
+            }
+          } else {
+            // Standard pattern: 1x1 followed by 2x1
             displayItems.push(getNextItem(1, 1, 1)); // 1x1
             displayItems.push(getNextItem(2, 1, 3)); // 2x1 (prefer importance 3)
             log("Created row pattern: 1×1, 2×1 items");
-          } else if (remainingItems.length === 1) {
-            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
-            log("Created row pattern: 3×1 (fallback for one item)");
           }
 
           if (remainingItems.length === 0) break;
 
-          // Pattern Row 5: 2x2 followed by two 1x1
-          if (remainingItems.length >= 3) {
+          // Pattern Row 5: 2x2 followed by two 1x1 - or adaptive pattern
+          if (remainingItems.length <= 4) {
+            // If we're in the final items
+            // Create a pattern that uses remaining items effectively
+            if (remainingItems.length === 4) {
+              // Two 2x1 items
+              displayItems.push(getNextItem(2, 1, 3));
+              displayItems.push(getNextItem(1, 1, 1));
+              displayItems.push(getNextItem(1, 1, 1));
+              displayItems.push(getNextItem(2, 1, 3));
+
+              log(
+                "Created adaptive row: 2×1, 1×1 and 2×1, 1×1 (for final 4 items)"
+              );
+            } else if (remainingItems.length === 3) {
+              for (let i = 0; i < 3; i++) {
+                displayItems.push(getNextItem(1, 1, 1));
+              }
+              log("Created adaptive row: Three 1×1 items (for final 3 items)");
+            } else if (remainingItems.length === 2) {
+              displayItems.push(getNextItem(2, 1, 3));
+              displayItems.push(getNextItem(1, 1, 1));
+              log("Created adaptive row: 2×1, 1×1 (for final 2 items)");
+            } else {
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1 for last item
+              log("Created adaptive row: 2×1 (for final item)");
+            }
+          } else {
+            // Standard pattern if we have enough items
             displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
             displayItems.push(getNextItem(1, 1, 1)); // 1x1
             displayItems.push(getNextItem(1, 1, 1)); // 1x1
             log("Created row pattern: 2×2, 1×1, 1×1 items");
-          } else if (remainingItems.length === 2) {
-            // Skip the 2x2 pattern with only 2 items
-            displayItems.push(getNextItem(2, 1, 3));
-            displayItems.push(getNextItem(1, 1, 1));
-            log(
-              "Created row pattern: 2×1, 1×1 (fallback for insufficient items)"
-            );
-          } else if (remainingItems.length === 1) {
-            // Skip the 2x2 pattern with only 1 item
-            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
-            log("Created row pattern: 3×1 (fallback for one item)");
           }
 
           if (remainingItems.length === 0) break;
-          // Pattern Row 6: Final row with flexible sizing
+
+          // Pattern Row 6: Final row with adaptive sizing
+          // Use different patterns based on exact number of items remaining
           if (remainingItems.length === 3) {
-            // If we have exactly 3 items left, use three 1x1 items
-            for (let i = 0; i < 3 && remainingItems.length > 0; i++) {
-              displayItems.push(getNextItem(1, 1, 1)); // Prefer importance 1
+            for (let i = 0; i < 3; i++) {
+              displayItems.push(getNextItem(1, 1, 1));
             }
+            log("Created final row: Three 1×1 items");
           } else if (remainingItems.length === 2) {
-            // If we have 2 items left, make one of them 2x1 if possible
             const preferLargeItem =
               remainingItems.findIndex(
                 (item) => item.originalImportance >= 3
@@ -419,16 +435,28 @@ export default function Portfolio() {
               displayItems.push(getNextItem(1, 1, 1)); // 1x1 item
               displayItems.push(getNextItem(2, 1, 3)); // 2x1 item
             }
+            log("Created final row: 2×1, 1×1 or 1×1, 2×1 items");
           } else if (remainingItems.length === 1) {
-            // If we have 1 item left, make it a 2x1
-            displayItems.push(getNextItem(3, 1, 3));
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
+            log("Created final row: 2×1 (for final item)");
           } else {
-            // For any other number of items, use 1x1 followed by 2x1
-            displayItems.push(getNextItem(1, 1, 1)); // One 1x1 item
-            displayItems.push(getNextItem(2, 1, 3)); // One 2x1 item
+            // Create a pattern for remaining items
+            if (remainingItems.length === 4) {
+              // For exactly 4 items, create a balanced row: 1x1, 2x1, 2x1, 1x1
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              log(
+                "Created balanced row: 1×1, 2×1, 2×1, 1×1 (for exactly 4 items)"
+              );
+            } else {
+              // Standard pattern for other cases
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1
+              log("Created standard row: 1×1, 2×1 items");
+            }
           }
-
-          log("Created row pattern: Three 1×1 items (final row)");
         }
 
         return displayItems;
