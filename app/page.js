@@ -152,7 +152,7 @@ export default function Home() {
 
             <TypeWriter
               text="Transformation digitale. Innovation technologique. Création d'identité numérique."
-              className="text-base md:text-lg text-white mb-12 font-light tracking-wide"
+              className="text-base md:text-lg text-white opacity-70 mb-12 font-light tracking-wide"
               speed={50}
             />
           </div>
