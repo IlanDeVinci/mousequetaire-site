@@ -528,9 +528,9 @@ export default function Portfolio() {
   }, []);
 
   return (
-    <div className="bg-[#050610] min-h-screen p-8 text-white font-sans">
-      <h1 className="text-center text-4xl mb-8 uppercase tracking-widest">
-        Our Portfolio
+    <div className="bg-[#050610] min-h-screen p-4 text-white font-sans">
+      <h1 className="text-center text-4xl mb-8 mt-12">
+        Quelques unes de nos créations
       </h1>
 
       {error && (
@@ -539,10 +539,10 @@ export default function Portfolio() {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto mb-6 flex justify-between items-center">
+      <div className="mx-auto mb-6 flex justify-between items-center">
         <button
           onClick={() => setShowDebug(!showDebug)}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors hidden"
         >
           {showDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
@@ -561,7 +561,7 @@ export default function Portfolio() {
         )}
       </div>
 
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-6">
         <div className="grid grid-cols-3 gap-4 auto-rows-[minmax(300px,auto)]">
           {gridItems.map((item) => (
             <Link
