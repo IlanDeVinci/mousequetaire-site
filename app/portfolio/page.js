@@ -6,88 +6,170 @@ import Image from "next/image";
 // Enhanced portfolio items with importance representing layout size:
 // 4: 2x2 grid (takes 4 spaces)
 // 3: 2x1 grid (takes 2 spaces horizontally)
-// 2: 1x2 grid (takes 2 spaces vertically)
+// 2: 1x2 grid (takes 2 spaces vertically) - NO LONGER USED
 // 1: 1x1 grid (takes 1 space)
 const portfolioItems = [
   {
     id: 1,
     title: "Featured Project",
     image: "/images/project1.jpg",
-    importance: 1,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
-  { id: 2, title: "Web Design", image: "/images/project2.jpg", importance: 1 },
-  { id: 3, title: "Mobile App", image: "/images/project3.jpg", importance: 4 },
+  {
+    id: 2,
+    title: "Web Design",
+    image: "/images/project2.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 3,
+    title: "Mobile App",
+    image: "/images/project3.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
   {
     id: 4,
     title: "UI/UX Design",
     image: "/images/project4.jpg",
-    importance: 1,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 5,
     title: "Brand Identity",
     image: "/images/project5.jpg",
-    importance: 3,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 6,
     title: "E-commerce Solution",
     image: "/images/project6.jpg",
-    importance: 1,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 7,
     title: "Product Photography",
     image: "/images/project7.jpg",
-    importance: 2,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 8,
     title: "Social Media Campaign",
     image: "/images/project8.jpg",
-    importance: 4,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 9,
     title: "Motion Graphics",
     image: "/images/project9.jpg",
-    importance: 1,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 10,
     title: "Logo Design",
     image: "/images/project10.jpg",
-    importance: 1,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 11,
     title: "Print Design",
     image: "/images/project11.jpg",
-    importance: 2,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 12,
     title: "Website Redesign",
     image: "/images/project12.jpg",
-    importance: 4,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 13,
     title: "App Interface",
     image: "/images/project13.jpg",
-    importance: 2,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
     id: 14,
     title: "Marketing Material",
     image: "/images/project14.jpg",
-    importance: 1,
+    importance: Math.floor(Math.random() * 4) + 1,
   },
   {
-    id: 15, // Changed from 14 to 15 to fix duplicate key issue
+    id: 15,
     title: "Product Design",
     image: "/images/project15.jpg",
-    importance: 3,
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 16,
+    title: "Interactive Installation",
+    image: "/images/project1.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 17,
+    title: "3D Modeling",
+    image: "/images/project2.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 18,
+    title: "Packaging Design",
+    image: "/images/project3.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 19,
+    title: "Game UI Design",
+    image: "/images/project4.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 20,
+    title: "Augmented Reality App",
+    image: "/images/project5.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 21,
+    title: "Editorial Design",
+    image: "/images/project6.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 22,
+    title: "Virtual Reality Experience",
+    image: "/images/project7.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 23,
+    title: "Data Visualization",
+    image: "/images/project8.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 24,
+    title: "Illustration Series",
+    image: "/images/project9.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 25,
+    title: "E-learning Platform",
+    image: "/images/project10.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 26,
+    title: "Wayfinding System",
+    image: "/images/project11.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
+  },
+  {
+    id: 27,
+    title: "Wearable Technology",
+    image: "/images/project12.jpg",
+    importance: Math.floor(Math.random() * 4) + 1,
   },
 ];
 
@@ -97,8 +179,10 @@ export default function Portfolio() {
   const [showDebug, setShowDebug] = useState(false);
   const [debugInfo, setDebugInfo] = useState({
     totalCells: 0,
+    totalWidth: 0,
     cellsUsed: 0,
     placeholders: 0,
+    adjustments: [],
     debugLog: [],
   });
 
@@ -115,785 +199,284 @@ export default function Portfolio() {
   };
 
   useEffect(() => {
-    const adjustedItems = [...portfolioItems];
     const { log, getLog } = createDebugLogger();
+    const gridWidth = 3; // Our grid has 3 columns
+    const adjustments = [];
 
     try {
-      const virtualGrid = [];
-      const itemsBySize = {
-        "2x2": [...adjustedItems.filter((item) => item.importance === 4)],
-        "2x1": [...adjustedItems.filter((item) => item.importance === 3)],
-        "1x2": [...adjustedItems.filter((item) => item.importance === 2)],
-        "1x1": [...adjustedItems.filter((item) => item.importance === 1)],
-      };
-      const gridWidth = 3;
-      let debugCellsUsed = 0;
-      const displayItems = []; // Add missing displayItems array
-
-      log("Starting grid organization with width: " + gridWidth);
-
-      const getDimensions = (importance) => {
-        switch (importance) {
-          case 4:
-            return { width: 2, height: 2, label: "2×2" };
-          case 3:
-            return { width: 2, height: 1, label: "2×1" };
-          case 2:
-            return { width: 1, height: 2, label: "1×2" };
-          case 1:
-          default:
-            return { width: 1, height: 1, label: "1×1" };
-        }
-      };
-
-      const addRow = () => {
-        virtualGrid.push(Array(gridWidth).fill(null));
-        return virtualGrid.length - 1;
-      };
-
-      addRow(); // Initialize with one row
-
-      const visualizeCurrentGrid = (message) => {
-        let gridStr = "\n" + (message || "Current Grid State:") + "\n";
-        for (let r = 0; r < virtualGrid.length; r++) {
-          gridStr += `Row ${r}: ${virtualGrid[r]
-            .map((cell) => (cell !== null ? `Item ${cell}` : "Empty"))
-            .join(" | ")}\n`;
-        }
-        log(gridStr);
-      };
-
-      const isPositionAvailable = (row, col, width, height) => {
-        if (col + width > gridWidth) {
-          return false;
-        }
-
-        while (virtualGrid.length <= row + height - 1) {
-          addRow();
-        }
-
-        for (let r = row; r < row + height; r++) {
-          for (let c = col; c < col + width; c++) {
-            if (virtualGrid[r][c] !== null) {
-              return false;
-            }
-          }
-        }
-
-        return true;
-      };
-
-      const placeItem = (item, row, col, width, height, reason) => {
-        for (let r = row; r < row + height; r++) {
-          while (virtualGrid.length <= r) {
-            addRow();
-          }
-          for (let c = col; c < col + width; c++) {
-            virtualGrid[r][c] = item.id;
-          }
-        }
-
-        log(
-          `Placed item ${item.id} (${item.title}) at [${row},${col}] with size ${width}x${height}. Reason: ${reason}`
-        );
-
-        const cellsUsed = width * height;
-        debugCellsUsed += cellsUsed;
-
+      // First prepare all items with 1x1 dimensions by default
+      let allItems = portfolioItems.map((item, index) => {
         return {
           ...item,
+          originalImportance: item.importance,
           gridStyle: {
+            gridRow: `span 1`,
+            gridColumn: `span 1`,
+          },
+          debugDimensions: { width: 1, height: 1, label: "1×1" },
+          uniqueKey: `item-${item.id}`,
+          index: index, // Store original index for sorting later
+        };
+      });
+
+      log(`Prepared ${allItems.length} items with default 1×1 size`);
+
+      // Sort items by importance for better assignment
+      allItems.sort((a, b) => b.originalImportance - a.originalImportance);
+      log(`Sorted items by importance (highest first)`);
+
+      // Create a predefined pattern layout
+      const createLayoutPattern = () => {
+        const displayItems = [];
+        const remainingItems = [...allItems];
+
+        // Helper function to find items by importance
+        const findItemsByImportance = (importance, count = 1) => {
+          const result = [];
+          for (
+            let i = 0;
+            i < remainingItems.length && result.length < count;
+            i++
+          ) {
+            if (remainingItems[i].originalImportance === importance) {
+              result.push(remainingItems.splice(i, 1)[0]);
+              i--; // Adjust index since we removed an item
+            }
+          }
+          return result;
+        };
+
+        // Function to get next item with preferred importance
+        const getNextItem = (width, height, preferredImportance) => {
+          if (remainingItems.length === 0) return null;
+
+          let item;
+
+          // Try to find an item with matching importance
+          if (preferredImportance) {
+            const matches = findItemsByImportance(preferredImportance, 1);
+            if (matches.length > 0) {
+              item = matches[0];
+              log(
+                `Found item with correct importance (${preferredImportance}) for ${width}×${height}`
+              );
+            }
+          }
+
+          // If no match found, just take next item
+          if (!item) {
+            item = remainingItems.shift();
+            log(
+              `Using next available item for ${width}×${height} (preferred importance: ${preferredImportance})`
+            );
+          }
+
+          // Set dimensions based on parameters
+          item.debugDimensions = { width, height, label: `${width}×${height}` };
+          item.gridStyle = {
             gridRow: `span ${height}`,
             gridColumn: `span ${width}`,
-          },
-          debugDimensions: {
-            width,
-            height,
-            label: `${width}×${height}`,
-            cellsUsed,
-            position: { row, col },
-          },
-          placementReason: reason,
-          importance: item.originalImportance || item.importance,
-          displayOrder: row * 100 + col,
-          uniqueKey: `${item.id}-${row}-${col}-${Date.now()}-${Math.random()
-            .toString(36)
-            .substr(2, 5)}`,
-        };
-      };
-
-      const checkGridFill = () => {
-        let emptyCount = 0;
-        let unevenRows = [];
-
-        for (let r = 0; r < virtualGrid.length; r++) {
-          const emptyInRow = virtualGrid[r].filter(
-            (cell) => cell === null
-          ).length;
-          if (emptyInRow > 0) {
-            emptyCount += emptyInRow;
-            unevenRows.push({ row: r, empties: emptyInRow });
-          }
-        }
-
-        return {
-          completelyFilled: emptyCount === 0,
-          emptyCount,
-          unevenRows,
-        };
-      };
-
-      const optimizeGrid = () => {
-        log("=== OPTIMIZING GRID TO ELIMINATE EMPTY CELLS ===");
-
-        const gridStatus = checkGridFill();
-        if (gridStatus.completelyFilled) {
-          log("Grid is already completely filled - no optimization needed.");
-          return;
-        }
-
-        log(`Found ${gridStatus.emptyCount} empty cells. Optimizing layout...`);
-
-        const placedItems = [...displayItems];
-        const rowsToFix = [...gridStatus.unevenRows].sort(
-          (a, b) => b.empties - a.empties
-        );
-
-        // Function to modify an item's dimensions to help fill gaps
-        const modifyItemFormat = (item, newImportance, reason) => {
-          const oldImportance = item.importance;
-          const oldPos = { ...item.debugDimensions.position };
-          const oldSize = { ...item.debugDimensions };
-
-          // Clear the item from virtual grid first
-          for (let r = oldPos.row; r < oldPos.row + oldSize.height; r++) {
-            for (let c = oldPos.col; c < oldPos.col + oldSize.width; c++) {
-              virtualGrid[r][c] = null;
-            }
-          }
-
-          // Create new dimensions based on new importance
-          const newDimensions = getDimensions(newImportance);
-
-          // Store original importance if not already stored
-          if (!item.originalImportance) {
-            item.originalImportance = oldImportance;
-          }
-
-          // Create a new item with modified dimensions
-          const newItem = {
-            ...item,
-            importance: newImportance,
-            gridStyle: {
-              gridRow: `span ${newDimensions.height}`,
-              gridColumn: `span ${newDimensions.width}`,
-            },
-            debugDimensions: {
-              ...newDimensions,
-              position: oldPos, // Keep the same position initially
-              cellsUsed: newDimensions.width * newDimensions.height,
-            },
-            placementReason: reason,
-            uniqueKey: `${item.id}-modified-${Date.now()}-${Math.random()
-              .toString(36)
-              .substr(2, 5)}`,
           };
 
-          // Remove old item from display items
-          const itemIndex = placedItems.findIndex(
-            (i) =>
-              i.debugDimensions.position.row === oldPos.row &&
-              i.debugDimensions.position.col === oldPos.col &&
-              i.id === item.id
-          );
-
-          if (itemIndex !== -1) {
-            placedItems.splice(itemIndex, 1);
+          // Record adjustment if dimensions differ from original importance
+          const newImportance =
+            width === 2 && height === 2
+              ? 4
+              : width === 2 && height === 1
+              ? 3
+              : 1;
+          if (item.originalImportance !== newImportance) {
+            adjustments.push({
+              itemId: item.id,
+              title: item.title,
+              from: getOriginalSizeLabel(item.originalImportance),
+              to: `${width}×${height}`,
+              reason: `Assigned to ${width}×${height} based on layout pattern`,
+            });
           }
 
-          log(
-            `Modified item ${item.id} from importance ${oldImportance} to ${newImportance}`
-          );
-          return newItem;
+          return item;
         };
 
-        for (const { row, empties } of rowsToFix) {
-          log(`Fixing row ${row} with ${empties} empty cells`);
+        const getOriginalSizeLabel = (importance) => {
+          switch (importance) {
+            case 4:
+              return "2×2";
+            case 3:
+              return "2×1";
+            case 2:
+              return "1×2";
+            case 1:
+            default:
+              return "1×1";
+          }
+        };
 
-          // Handle completely empty rows
-          if (empties === gridWidth) {
-            log(`Row ${row} is completely empty and can be removed`);
-            const itemsBelow = placedItems.filter(
-              (item) => item.debugDimensions.position.row > row
+        // Keep creating pattern rows until we run out of items
+        while (remainingItems.length > 0) {
+          // Pattern Row 1: Three 1x1 items
+          if (remainingItems.length >= 3) {
+            for (let i = 0; i < 3 && remainingItems.length > 0; i++) {
+              displayItems.push(getNextItem(1, 1, 1)); // Prefer importance 1
+            }
+            log("Created row pattern: Three 1×1 items");
+          } else if (remainingItems.length === 2) {
+            // Only 2 items left - use them both as 1x1
+            displayItems.push(getNextItem(1, 1, 1));
+            displayItems.push(getNextItem(2, 1, 3)); // Make the second one wider
+            log(
+              "Created row pattern: 1×1, 2×1 (fallback for insufficient items)"
             );
-
-            if (itemsBelow.length > 0) {
-              log(
-                `Moving ${itemsBelow.length} items up from rows below ${row}`
-              );
-
-              for (const item of itemsBelow) {
-                const oldPos = { ...item.debugDimensions.position };
-                const newRow = oldPos.row - 1;
-
-                const { width, height } = item.debugDimensions;
-                for (let r = oldPos.row; r < oldPos.row + height; r++) {
-                  for (let c = oldPos.col; c < oldPos.col + width; c++) {
-                    if (r < virtualGrid.length && c < gridWidth) {
-                      virtualGrid[r][c] = null;
-                    }
-                  }
-                }
-
-                item.debugDimensions.position.row = newRow;
-
-                for (let r = newRow; r < newRow + height; r++) {
-                  for (let c = oldPos.col; c < oldPos.col + width; c++) {
-                    if (r < virtualGrid.length && c < gridWidth) {
-                      virtualGrid[r][c] = item.id;
-                    }
-                  }
-                }
-
-                log(
-                  `Moved item ${item.id} from [${oldPos.row},${oldPos.col}] to [${newRow},${oldPos.col}]`
-                );
-              }
-            }
-
-            continue;
+          } else if (remainingItems.length === 1) {
+            // Only 1 item left - make it take the whole row
+            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
+            log("Created row pattern: 3×1 (fallback for one item)");
           }
 
-          // For partially empty rows
-          const emptyCells = [];
-          for (let c = 0; c < gridWidth; c++) {
-            if (virtualGrid[row][c] === null) {
-              emptyCells.push(c);
-            }
-          }
+          if (remainingItems.length === 0) break;
 
-          if (emptyCells.length > 0) {
-            // First try to move small items to fill gaps
-            const smallItemsBelow = placedItems.filter(
-              (item) =>
-                item.debugDimensions.width === 1 &&
-                item.debugDimensions.height === 1 &&
-                item.debugDimensions.position.row > row
+          // Pattern Row 2: One 1x1, one 2x2 spanning columns 2-3, one 1x1
+          if (remainingItems.length >= 3) {
+            displayItems.push(getNextItem(1, 1, 1)); // First 1x1
+            displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
+            displayItems.push(getNextItem(1, 1, 1)); // Another 1x1
+            log("Created row pattern: 1×1, 2×2, 1×1 items");
+          } else if (remainingItems.length === 2) {
+            // Only 2 items, skip the 2x2 pattern
+            displayItems.push(getNextItem(1, 1, 1));
+            displayItems.push(getNextItem(2, 1, 3));
+            log(
+              "Created row pattern: 1×1, 2×1 (fallback for insufficient items)"
             );
-
-            // Check if we can expand existing 1x1 items in this row that are adjacent to empty cells
-            for (let c = 0; c < gridWidth - 1; c++) {
-              if (virtualGrid[row][c] !== null && emptyCells.includes(c + 1)) {
-                const itemId = virtualGrid[row][c];
-                const itemToExpand = placedItems.find(
-                  (item) =>
-                    item.id === itemId &&
-                    item.debugDimensions.width === 1 &&
-                    item.debugDimensions.height === 1 &&
-                    item.debugDimensions.position.row === row &&
-                    item.debugDimensions.position.col === c
-                );
-
-                if (itemToExpand) {
-                  log(
-                    `Found 1x1 item ${
-                      itemToExpand.id
-                    } at [${row},${c}] that can expand to 2x1 to fill empty cell at [${row},${
-                      c + 1
-                    }]`
-                  );
-
-                  // Modify to 2x1 (importance 3)
-                  const modifiedItem = modifyItemFormat(
-                    itemToExpand,
-                    3,
-                    `Modified from 1x1 to 2x1 to fill empty cell at [${row},${
-                      c + 1
-                    }]`
-                  );
-
-                  // Place the expanded item
-                  const placedModifiedItem = placeItem(
-                    modifiedItem,
-                    row,
-                    c,
-                    2,
-                    1,
-                    `Expanded item to fill gap at [${row},${c + 1}]`
-                  );
-                  displayItems.push(placedModifiedItem);
-
-                  // Remove the empty cell we just filled
-                  emptyCells.splice(emptyCells.indexOf(c + 1), 1);
-                }
-              }
-              // Check for empty cell followed by 1x1 item (expand leftward)
-              else if (
-                emptyCells.includes(c) &&
-                c + 1 < gridWidth &&
-                virtualGrid[row][c + 1] !== null
-              ) {
-                const itemId = virtualGrid[row][c + 1];
-                const itemToExpand = placedItems.find(
-                  (item) =>
-                    item.id === itemId &&
-                    item.debugDimensions.width === 1 &&
-                    item.debugDimensions.height === 1 &&
-                    item.debugDimensions.position.row === row &&
-                    item.debugDimensions.position.col === c + 1
-                );
-
-                if (itemToExpand) {
-                  log(
-                    `Found 1x1 item ${itemToExpand.id} at [${row},${
-                      c + 1
-                    }] that can expand to 2x1 to fill empty cell at [${row},${c}]`
-                  );
-
-                  // Modify to 2x1 (importance 3)
-                  const modifiedItem = modifyItemFormat(
-                    itemToExpand,
-                    3,
-                    `Modified from 1x1 to 2x1 to fill empty cell at [${row},${c}]`
-                  );
-
-                  // Place the expanded item at the empty cell position
-                  const placedModifiedItem = placeItem(
-                    modifiedItem,
-                    row,
-                    c, // Start at the empty cell
-                    2,
-                    1,
-                    `Expanded item to fill gap at [${row},${c}]`
-                  );
-                  displayItems.push(placedModifiedItem);
-
-                  // Remove the empty cell we just filled
-                  emptyCells.splice(emptyCells.indexOf(c), 1);
-                }
-              }
-            }
-
-            // Process remaining empty cells
-            for (const emptyCol of emptyCells) {
-              if (smallItemsBelow.length > 0) {
-                const itemToMove = smallItemsBelow.shift();
-                const oldPos = { ...itemToMove.debugDimensions.position };
-
-                virtualGrid[oldPos.row][oldPos.col] = null;
-
-                itemToMove.debugDimensions.position = { row, col: emptyCol };
-
-                virtualGrid[row][emptyCol] = itemToMove.id;
-
-                log(
-                  `Moved small item ${itemToMove.id} from [${oldPos.row},${oldPos.col}] to [${row},${emptyCol}]`
-                );
-              } else {
-                log(
-                  `No available 1x1 items to move to [${row},${emptyCol}]. Looking for items to resize...`
-                );
-
-                // Check if we have two adjacent empty cells that can fit a 2x1
-                if (
-                  emptyCells.includes(0) &&
-                  emptyCells.includes(1) &&
-                  emptyCells.length >= 2
-                ) {
-                  // Try to find a 1x1 item to expand to a 2x1
-                  const smallItemToExpand = placedItems.find(
-                    (item) =>
-                      item.debugDimensions.width === 1 &&
-                      item.debugDimensions.height === 1 &&
-                      item.debugDimensions.position.row > row
-                  );
-
-                  if (smallItemToExpand) {
-                    log(
-                      `Found 1x1 item ${smallItemToExpand.id} that can be expanded to 2x1`
-                    );
-
-                    // Clear its original position
-                    const oldPos = {
-                      ...smallItemToExpand.debugDimensions.position,
-                    };
-                    virtualGrid[oldPos.row][oldPos.col] = null;
-
-                    // Modify to 2x1 (importance 3)
-                    const modifiedItem = modifyItemFormat(
-                      smallItemToExpand,
-                      3,
-                      `Modified from 1x1 to 2x1 to fill empty cells at row ${row}`
-                    );
-
-                    // Place the expanded item
-                    const placedModifiedItem = placeItem(
-                      modifiedItem,
-                      row,
-                      0, // Start at the beginning of the row
-                      2,
-                      1,
-                      `Placed expanded item to fill row ${row}`
-                    );
-                    displayItems.push(placedModifiedItem);
-
-                    // Remove these columns from emptyCells since we've filled them
-                    emptyCells.splice(emptyCells.indexOf(0), 1);
-                    emptyCells.splice(emptyCells.indexOf(1), 1);
-                    continue;
-                  }
-                }
-
-                // Try to find 2-wide items we can split or resize to fill the gap
-                if (
-                  emptyCol === 2 &&
-                  virtualGrid[row][0] === virtualGrid[row][1]
-                ) {
-                  const itemId = virtualGrid[row][0];
-                  const wideItem = placedItems.find(
-                    (item) =>
-                      item.id === itemId &&
-                      item.debugDimensions.width === 2 &&
-                      item.debugDimensions.height === 1
-                  );
-
-                  if (wideItem) {
-                    log(
-                      `Found 2x1 item ${wideItem.id} at start of row ${row} that can be converted to 1x1`
-                    );
-
-                    const modifiedItem = modifyItemFormat(
-                      wideItem,
-                      1,
-                      `Modified from 2x1 to 1x1 to eliminate empty cell at [${row},${emptyCol}]`
-                    );
-
-                    const placedModifiedItem = placeItem(
-                      modifiedItem,
-                      row,
-                      0,
-                      1,
-                      1,
-                      `Placed resized item to help fill row ${row}`
-                    );
-                    displayItems.push(placedModifiedItem);
-
-                    const smallItemToUse = placedItems.find(
-                      (item) =>
-                        item.debugDimensions.width === 1 &&
-                        item.debugDimensions.height === 1 &&
-                        item.debugDimensions.position.row > row
-                    );
-
-                    if (smallItemToUse) {
-                      const oldPos = {
-                        ...smallItemToUse.debugDimensions.position,
-                      };
-                      virtualGrid[oldPos.row][oldPos.col] = null;
-                      smallItemToUse.debugDimensions.position = {
-                        row,
-                        col: emptyCol,
-                      };
-                      virtualGrid[row][emptyCol] = smallItemToUse.id;
-                      log(
-                        `Moved small item ${smallItemToUse.id} to [${row},${emptyCol}] after resizing another item`
-                      );
-                    }
-                  }
-                }
-              }
-            }
+          } else if (remainingItems.length === 1) {
+            // Only 1 item, skip the 2x2 pattern
+            displayItems.push(getNextItem(3, 1, 3));
+            log("Created row pattern: 3×1 (fallback for one item)");
           }
+
+          if (remainingItems.length === 0) break;
+
+          // Pattern Row 3: 2x1 and 1x1
+          if (remainingItems.length >= 2) {
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1 (prefer importance 3)
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            log("Created row pattern: 2×1, 1×1 items");
+          } else if (remainingItems.length === 1) {
+            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
+            log("Created row pattern: 3×1 (fallback for one item)");
+          }
+
+          if (remainingItems.length === 0) break;
+
+          // Pattern Row 4: 1x1 followed by 2x1
+          if (remainingItems.length >= 2) {
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            displayItems.push(getNextItem(2, 1, 3)); // 2x1 (prefer importance 3)
+            log("Created row pattern: 1×1, 2×1 items");
+          } else if (remainingItems.length === 1) {
+            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
+            log("Created row pattern: 3×1 (fallback for one item)");
+          }
+
+          if (remainingItems.length === 0) break;
+
+          // Pattern Row 5: 2x2 followed by two 1x1
+          if (remainingItems.length >= 3) {
+            displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            displayItems.push(getNextItem(1, 1, 1)); // 1x1
+            log("Created row pattern: 2×2, 1×1, 1×1 items");
+          } else if (remainingItems.length === 2) {
+            // Skip the 2x2 pattern with only 2 items
+            displayItems.push(getNextItem(2, 1, 3));
+            displayItems.push(getNextItem(1, 1, 1));
+            log(
+              "Created row pattern: 2×1, 1×1 (fallback for insufficient items)"
+            );
+          } else if (remainingItems.length === 1) {
+            // Skip the 2x2 pattern with only 1 item
+            displayItems.push(getNextItem(3, 1, 3)); // Make it span full row
+            log("Created row pattern: 3×1 (fallback for one item)");
+          }
+
+          if (remainingItems.length === 0) break;
+          // Pattern Row 6: Final row with flexible sizing
+          if (remainingItems.length === 3) {
+            // If we have exactly 3 items left, use three 1x1 items
+            for (let i = 0; i < 3 && remainingItems.length > 0; i++) {
+              displayItems.push(getNextItem(1, 1, 1)); // Prefer importance 1
+            }
+          } else if (remainingItems.length === 2) {
+            // If we have 2 items left, make one of them 2x1 if possible
+            const preferLargeItem =
+              remainingItems.findIndex(
+                (item) => item.originalImportance >= 3
+              ) !== -1;
+            if (preferLargeItem) {
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1 item
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1 item
+            } else {
+              displayItems.push(getNextItem(1, 1, 1)); // 1x1 item
+              displayItems.push(getNextItem(2, 1, 3)); // 2x1 item
+            }
+          } else if (remainingItems.length === 1) {
+            // If we have 1 item left, make it a 2x1
+            displayItems.push(getNextItem(3, 1, 3));
+          } else {
+            // For any other number of items, use 1x1 followed by 2x1
+            displayItems.push(getNextItem(1, 1, 1)); // One 1x1 item
+            displayItems.push(getNextItem(2, 1, 3)); // One 2x1 item
+          }
+
+          log("Created row pattern: Three 1×1 items (final row)");
         }
 
-        const newGridStatus = checkGridFill();
-        if (newGridStatus.completelyFilled) {
-          log("SUCCESS: Grid optimization complete - all cells filled!");
-        } else {
-          log(
-            `AFTER OPTIMIZATION: ${newGridStatus.emptyCount} empty cells remain`
-          );
-        }
-
-        visualizeCurrentGrid("Grid after optimization");
+        return displayItems;
       };
 
-      const fillGrid = () => {
-        let placeOnRight = false;
+      const finalItems = createLayoutPattern();
 
-        for (const item of itemsBySize["2x2"]) {
-          const { width, height } = getDimensions(item.importance);
-          let placed = false;
+      log(`Created layout with ${finalItems.length} items`);
+      log(`Made ${adjustments.length} size adjustments to fit pattern`);
 
-          if (placeOnRight) {
-            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-              const rightCol = gridWidth - width;
-              if (isPositionAvailable(r, rightCol, width, height)) {
-                displayItems.push(
-                  placeItem(
-                    item,
-                    r,
-                    rightCol,
-                    width,
-                    height,
-                    `Placed 2x2 at right side [${r},${rightCol}]`
-                  )
-                );
-                placed = true;
-              }
-            }
-          } else {
-            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-              if (isPositionAvailable(r, 0, width, height)) {
-                displayItems.push(
-                  placeItem(
-                    item,
-                    r,
-                    0,
-                    width,
-                    height,
-                    `Placed 2x2 at left side [${r},0]`
-                  )
-                );
-                placed = true;
-              }
-            }
-          }
+      setGridItems(finalItems);
 
-          if (!placed) {
-            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-              for (let c = 0; c <= gridWidth - width && !placed; c++) {
-                if (isPositionAvailable(r, c, width, height)) {
-                  displayItems.push(
-                    placeItem(
-                      item,
-                      r,
-                      c,
-                      width,
-                      height,
-                      `Placed 2x2 at [${r},${c}] (fallback)`
-                    )
-                  );
-                  placed = true;
-                }
-              }
-            }
-          }
+      // Calculate final metrics for debug info
+      let totalCells = 0;
+      let totalWidth = 0;
 
-          placeOnRight = !placeOnRight;
-        }
+      finalItems.forEach((item) => {
+        const width = item.debugDimensions.width;
+        const height = item.debugDimensions.height;
 
-        visualizeCurrentGrid("After placing 2x2 items");
-
-        placeOnRight = false;
-
-        for (const item of itemsBySize["2x1"]) {
-          const { width, height } = getDimensions(item.importance);
-          let placed = false;
-
-          if (placeOnRight) {
-            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-              const rightCol = gridWidth - width;
-              if (isPositionAvailable(r, rightCol, width, height)) {
-                displayItems.push(
-                  placeItem(
-                    item,
-                    r,
-                    rightCol,
-                    width,
-                    height,
-                    `Placed 2x1 at right side [${r},${rightCol}]`
-                  )
-                );
-                placed = true;
-              }
-            }
-          } else {
-            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-              if (isPositionAvailable(r, 0, width, height)) {
-                displayItems.push(
-                  placeItem(
-                    item,
-                    r,
-                    0,
-                    width,
-                    height,
-                    `Placed 2x1 at left side [${r},0]`
-                  )
-                );
-                placed = true;
-              }
-            }
-          }
-
-          if (!placed) {
-            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-              for (let c = 0; c <= gridWidth - width && !placed; c++) {
-                if (isPositionAvailable(r, c, width, height)) {
-                  displayItems.push(
-                    placeItem(
-                      item,
-                      r,
-                      c,
-                      width,
-                      height,
-                      `Placed 2x1 at [${r},${c}] (fallback)`
-                    )
-                  );
-                  placed = true;
-                }
-              }
-            }
-          }
-
-          placeOnRight = !placeOnRight;
-        }
-
-        visualizeCurrentGrid("After placing 2x1 items");
-
-        for (const item of itemsBySize["1x2"]) {
-          const { width, height } = getDimensions(item.importance);
-          let placed = false;
-
-          for (let r = 0; r < virtualGrid.length && !placed; r++) {
-            for (let c = 0; c < gridWidth && !placed; c++) {
-              if (isPositionAvailable(r, c, width, height)) {
-                displayItems.push(
-                  placeItem(
-                    item,
-                    r,
-                    c,
-                    width,
-                    height,
-                    `Placed 1x2 at [${r},${c}]`
-                  )
-                );
-                placed = true;
-              }
-            }
-          }
-        }
-
-        visualizeCurrentGrid("After placing 1x2 items");
-
-        for (const item of itemsBySize["1x1"]) {
-          const { width, height } = getDimensions(item.importance);
-          let placed = false;
-
-          for (let r = 0; r < virtualGrid.length && !placed; r++) {
-            for (let c = 0; c < gridWidth && !placed; c++) {
-              if (isPositionAvailable(r, c, width, height)) {
-                displayItems.push(
-                  placeItem(
-                    item,
-                    r,
-                    c,
-                    width,
-                    height,
-                    `Placed 1x1 at [${r},${c}]`
-                  )
-                );
-                placed = true;
-              }
-            }
-          }
-
-          if (!placed) {
-            const r = virtualGrid.length;
-            const c = 0;
-            displayItems.push(
-              placeItem(
-                item,
-                r,
-                c,
-                width,
-                height,
-                `Placed 1x1 at new row [${r},${c}]`
-              )
-            );
-          }
-        }
-
-        visualizeCurrentGrid("After placing all items");
-      };
-
-      fillGrid();
-      optimizeGrid();
-
-      const gridStatus = checkGridFill();
-
-      if (!gridStatus.completelyFilled) {
-        log(
-          `WARNING: Found ${gridStatus.emptyCount} empty cells in the grid after optimization!`
-        );
-      } else {
-        log("SUCCESS: Grid completely filled with no empty cells!");
-      }
-
-      log("=== SORTING ITEMS FOR DISPLAY ===");
-
-      displayItems.sort((a, b) => {
-        const aRow = a.debugDimensions.position.row;
-        const bRow = b.debugDimensions.position.row;
-
-        if (aRow !== bRow) {
-          return aRow - bRow;
-        }
-        return a.debugDimensions.position.col - b.debugDimensions.position.col;
+        totalCells += width * height;
+        totalWidth += width;
       });
-
-      log("Final display order (sorted by position):");
-      displayItems.forEach((item) => {
-        const pos = item.debugDimensions.position;
-        log(
-          `Item ${item.id} (${item.title}): [${pos.row},${pos.col}] - ${item.debugDimensions.label}`
-        );
-      });
-
-      visualizeCurrentGrid("FINAL GRID LAYOUT");
 
       setDebugInfo({
-        totalCells: virtualGrid.length * gridWidth,
-        cellsUsed: debugCellsUsed,
+        totalCells,
+        totalWidth,
+        cellsUsed: totalCells,
         placeholders: 0,
-        emptyCount: gridStatus.emptyCount,
-        gridDimensions: `${virtualGrid.length} rows × ${gridWidth} columns`,
+        adjustments,
+        gridWidth,
+        widthRemainder: totalWidth % gridWidth,
+        cellsRemainder: totalCells % gridWidth,
         debugLog: getLog(),
       });
-
-      setGridItems(displayItems);
     } catch (err) {
       setError(err.message);
       console.error("Grid error:", err);
 
+      // Fallback to simple grid
       const simpleGrid = portfolioItems.map((item) => {
-        const dimensions = (() => {
-          switch (item.importance) {
-            case 4:
-              return { width: 2, height: 2, label: "2×2" };
-            case 3:
-              return { width: 2, height: 1, label: "2×1" };
-            case 2:
-              return { width: 1, height: 2, label: "1×2" };
-            case 1:
-            default:
-              return { width: 1, height: 1, label: "1×1" };
-          }
-        })();
-
         return {
           ...item,
           gridStyle: {
-            gridRow: `span ${dimensions.height}`,
-            gridColumn: `span ${dimensions.width}`,
+            gridRow: `span 1`,
+            gridColumn: `span 1`,
           },
-          debugDimensions: {
-            width: dimensions.width,
-            height: dimensions.height,
-            label: dimensions.label,
-            cellsUsed: dimensions.width * dimensions.height,
-            position: { row: -1, col: -1 },
-          },
+          debugDimensions: { width: 1, height: 1, label: "1×1" },
           uniqueKey: `simple-${item.id}`,
         };
       });
@@ -901,15 +484,6 @@ export default function Portfolio() {
       setGridItems(simpleGrid);
     }
   }, []);
-
-  const getGridClasses = (item) => {
-    const { width, height } = item.debugDimensions;
-
-    let columnClass = width === 2 ? "col-span-2" : "col-span-1";
-    let rowClass = height === 2 ? "row-span-2" : "row-span-1";
-
-    return `${columnClass} ${rowClass}`;
-  };
 
   return (
     <div className="bg-black min-h-screen p-8 text-white font-sans">
@@ -934,88 +508,81 @@ export default function Portfolio() {
         {showDebug && (
           <div className="text-xs bg-gray-800 p-4 rounded">
             <h3 className="font-bold mb-2">Grid Stats</h3>
-            <p>Layout: {debugInfo.gridDimensions}</p>
-            <p>Total Grid Cells: {debugInfo.totalCells}</p>
-            <p>Cells Used by Items: {debugInfo.cellsUsed}</p>
-            <p>Placeholder Cells: {debugInfo.placeholders}</p>
+            <p>Total Cells Used: {debugInfo.cellsUsed}</p>
+            <p>Total Width Used: {debugInfo.totalWidth || "N/A"}</p>
+            <p>Grid Width: {debugInfo.gridWidth || 3}</p>
+            <p>Items: {gridItems.length}</p>
+            {debugInfo.adjustments && debugInfo.adjustments.length > 0 && (
+              <p>Adjustments: {debugInfo.adjustments.length}</p>
+            )}
           </div>
         )}
       </div>
 
       <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-3 gap-4 auto-rows-auto">
+        <div className="grid grid-cols-3 gap-4 auto-rows-[minmax(300px,auto)]">
           {gridItems.map((item) => (
             <div
               key={item.uniqueKey || item.id}
-              className={`relative overflow-hidden rounded-lg transition-all duration-300 ${getGridClasses(
-                item
-              )}`}
+              className={`relative overflow-hidden rounded-lg transition-all duration-300`}
               style={{
-                minHeight: item.debugDimensions.height > 1 ? "800px" : "400px",
-                gridRowStart: item.debugDimensions.position.row + 1,
-                gridColumnStart: item.debugDimensions.position.col + 1,
+                minHeight: item.debugDimensions.height > 1 ? "600px" : "300px",
+                gridRow: `span ${item.debugDimensions.height}`,
+                gridColumn: `span ${item.debugDimensions.width}`,
               }}
             >
-              {!item.isPlaceholder && (
-                <>
-                  <div className="absolute inset-0">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-500 hover:scale-105"
-                    />
-                  </div>
-                  <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4">
-                    <h3 className="text-lg font-semibold">{item.title}</h3>
-                    {showDebug && (
-                      <p className="text-xs mt-1">
-                        Position: R{item.debugDimensions.position.row}, C
-                        {item.debugDimensions.position.col}
-                      </p>
-                    )}
-                  </div>
-
-                  {showDebug && (
-                    <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white p-2 text-center">
-                      <p className="font-bold text-lg">
-                        {item.debugDimensions.label}
-                      </p>
-                      <p className="text-xs">ID: {item.id}</p>
-                      <p className="text-xs">
-                        Position: R{item.debugDimensions.position.row}, C
-                        {item.debugDimensions.position.col}
-                      </p>
-                      <p className="text-xs">
-                        Cells: {item.debugDimensions.cellsUsed}
-                      </p>
-                      <p className="text-xs">Classes: {getGridClasses(item)}</p>
-                      <p className="text-xs">Reason: {item.placementReason}</p>
-                      {item.originalImportance && (
-                        <p className="text-xs text-yellow-400">
-                          Original size:{" "}
-                          {item.originalImportance === 1
-                            ? "1×1"
-                            : item.originalImportance === 2
-                            ? "1×2"
-                            : item.originalImportance === 3
-                            ? "2×1"
-                            : "2×2"}
-                        </p>
-                      )}
-                    </div>
+              <div className="absolute inset-0">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4">
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                {showDebug &&
+                  item.originalImportance !==
+                    (item.debugDimensions.width === 2 &&
+                    item.debugDimensions.height === 2
+                      ? 4
+                      : item.debugDimensions.width === 2 &&
+                        item.debugDimensions.height === 1
+                      ? 3
+                      : 1) && (
+                    <span className="text-xs bg-yellow-600 px-1 rounded ml-2">
+                      Adjusted
+                    </span>
                   )}
-                </>
-              )}
+              </div>
 
-              {item.isPlaceholder && showDebug && (
-                <div className="absolute inset-0 bg-red-900/50 flex items-center justify-center">
-                  <p className="text-xs text-white text-center">
-                    Placeholder
-                    <br />
-                    (for grid balance)
+              {showDebug && (
+                <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white p-2 text-center">
+                  <p className="font-bold text-lg">
+                    {item.debugDimensions.label}
                   </p>
+                  <p className="text-xs">ID: {item.id}</p>
+                  <p className="text-xs">
+                    Grid: {item.debugDimensions.width}×
+                    {item.debugDimensions.height}
+                  </p>
+                  <p className="text-xs">
+                    Cells:{" "}
+                    {item.debugDimensions.width * item.debugDimensions.height}
+                  </p>
+                  {item.originalImportance !==
+                    (item.debugDimensions.width === 2 &&
+                    item.debugDimensions.height === 2
+                      ? 4
+                      : item.debugDimensions.width === 2 &&
+                        item.debugDimensions.height === 1
+                      ? 3
+                      : 1) && (
+                    <p className="text-xs text-yellow-400 mt-2">
+                      Adjusted from original size
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -1028,27 +595,71 @@ export default function Portfolio() {
           <div className="max-w-6xl mx-auto mt-8 p-4 bg-gray-800 rounded">
             <h3 className="font-bold mb-2">Item Breakdown</h3>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-              {gridItems
-                .filter((item) => !item.isPlaceholder)
-                .map((item) => (
-                  <div
-                    key={item.uniqueKey || item.id}
-                    className="bg-gray-700 p-2 rounded text-xs"
-                  >
-                    <p>
-                      <strong>Item {item.id}:</strong> {item.title}
+              {gridItems.map((item) => (
+                <div
+                  key={item.uniqueKey || item.id}
+                  className={`bg-gray-700 p-2 rounded text-xs ${
+                    item.originalImportance !==
+                    (item.debugDimensions.width === 2 &&
+                    item.debugDimensions.height === 2
+                      ? 4
+                      : item.debugDimensions.width === 2 &&
+                        item.debugDimensions.height === 1
+                      ? 3
+                      : 1)
+                      ? "border border-yellow-500"
+                      : ""
+                  }`}
+                >
+                  <p>
+                    <strong>Item {item.id}:</strong> {item.title}
+                  </p>
+                  <p>Size: {item.debugDimensions.label}</p>
+                  {item.originalImportance !==
+                    (item.debugDimensions.width === 2 &&
+                    item.debugDimensions.height === 2
+                      ? 4
+                      : item.debugDimensions.width === 2 &&
+                        item.debugDimensions.height === 1
+                      ? 3
+                      : 1) && (
+                    <p className="text-yellow-400">
+                      Originally:{" "}
+                      {item.originalImportance === 1
+                        ? "1×1"
+                        : item.originalImportance === 2
+                        ? "1×2"
+                        : item.originalImportance === 3
+                        ? "2×1"
+                        : "2×2"}
                     </p>
-                    <p>
-                      Size: {item.debugDimensions.label} (Importance:{" "}
-                      {item.importance})
-                    </p>
-                  </div>
-                ))}
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
+          {debugInfo.adjustments && debugInfo.adjustments.length > 0 && (
+            <div className="max-w-6xl mx-auto mt-4 p-4 bg-gray-800 rounded">
+              <h3 className="font-bold mb-2">Grid Adjustments</h3>
+              <div className="text-xs">
+                {debugInfo.adjustments.map((adj, i) => (
+                  <div key={i} className="bg-yellow-900/50 p-2 mb-1 rounded">
+                    <p>
+                      <strong>Item {adj.itemId}:</strong> {adj.title}
+                    </p>
+                    <p>
+                      Changed from {adj.from} to {adj.to}
+                    </p>
+                    <p>Reason: {adj.reason}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="max-w-6xl mx-auto mt-4 p-4 bg-gray-800 rounded">
-            <h3 className="font-bold mb-2">Placement Log</h3>
+            <h3 className="font-bold mb-2">Log</h3>
             <div className="text-xs max-h-60 overflow-y-auto">
               {debugInfo.debugLog &&
                 debugInfo.debugLog.map((msg, i) => (

@@ -142,6 +142,11 @@ body {
   }
 }
 
+/* Add new utility class for grid auto flow dense */
+.grid-auto-flow-dense {
+  grid-auto-flow: dense;
+}
+
 /* Rest of utility classes */
 @layer utilities {
   .animate-fade-in {
