@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 // Enhanced portfolio items with importance representing layout size:
 // 4: 2x2 grid (takes 4 spaces)
@@ -12,20 +13,33 @@ const portfolioItems = [
   {
     id: 1,
     title: "Featured Project",
+    description:
+      "A showcase of our best work with cutting-edge design and functionality.",
     image: "/images/project1.jpg",
     importance: Math.floor(Math.random() * 4) + 1,
+    technologies: ["React", "NextJS", "TailwindCSS"],
+    client: "Major Tech Corp",
+    year: "2023",
   },
   {
     id: 2,
     title: "Web Design",
+    description: "Modern and responsive web design focused on user experience.",
     image: "/images/project2.jpg",
     importance: Math.floor(Math.random() * 4) + 1,
+    technologies: ["Figma", "HTML5", "CSS3"],
+    client: "Fashion Brand",
+    year: "2023",
   },
   {
     id: 3,
     title: "Mobile App",
+    description: "Cross-platform mobile application with seamless performance.",
     image: "/images/project3.jpg",
     importance: Math.floor(Math.random() * 4) + 1,
+    technologies: ["React Native", "Firebase", "Redux"],
+    client: "Health Startup",
+    year: "2022",
   },
   {
     id: 4,
@@ -516,7 +530,7 @@ export default function Portfolio() {
   return (
     <div className="bg-black min-h-screen p-8 text-white font-sans">
       <h1 className="text-center text-4xl mb-8 uppercase tracking-widest">
-        My Portfolio
+        Our Portfolio
       </h1>
 
       {error && (
@@ -550,9 +564,14 @@ export default function Portfolio() {
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-3 gap-4 auto-rows-[minmax(300px,auto)]">
           {gridItems.map((item) => (
-            <div
+            <Link
+              href={`/portfolio/${item.id}`}
               key={item.uniqueKey || item.id}
-              className={`relative overflow-hidden rounded-lg transition-all duration-300`}
+              className={`
+                relative overflow-hidden rounded-lg transition-all duration-300
+                group cursor-pointer
+                hover:shadow-lg hover:shadow-blue-500/20
+              `}
               style={{
                 minHeight: item.debugDimensions.height > 1 ? "600px" : "300px",
                 gridRow: `span ${item.debugDimensions.height}`,
@@ -565,24 +584,28 @@ export default function Portfolio() {
                   alt={item.title}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 hover:scale-105"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4">
-                <h3 className="text-lg font-semibold">{item.title}</h3>
-                {showDebug &&
-                  item.originalImportance !==
-                    (item.debugDimensions.width === 2 &&
-                    item.debugDimensions.height === 2
-                      ? 4
-                      : item.debugDimensions.width === 2 &&
-                        item.debugDimensions.height === 1
-                      ? 3
-                      : 1) && (
-                    <span className="text-xs bg-yellow-600 px-1 rounded ml-2">
-                      Adjusted
-                    </span>
-                  )}
+              <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
+                <h3 className="text-lg font-semibold text-blue-300">
+                  {item.title}
+                </h3>
+                <p className="text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity delay-100 duration-300">
+                  {portfolioItems
+                    .find((p) => p.id === item.id)
+                    ?.description?.slice(0, 100)}
+                  {portfolioItems.find((p) => p.id === item.id)?.description
+                    ?.length > 100
+                    ? "..."
+                    : ""}
+                </p>
+                <div className="flex items-center mt-3">
+                  <span className="text-xs px-3 py-1 bg-blue-800/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity delay-200 duration-300">
+                    View Project
+                  </span>
+                </div>
               </div>
 
               {showDebug && (
@@ -613,7 +636,7 @@ export default function Portfolio() {
                   )}
                 </div>
               )}
-            </div>
+            </Link>
           ))}
         </div>
       </div>

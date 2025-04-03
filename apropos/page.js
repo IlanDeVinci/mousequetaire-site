@@ -1,10 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 import { useState } from "react";
-
 
 function DiscoverElement() {
   const [phase, setPhase] = useState(0);
@@ -28,7 +25,9 @@ function DiscoverElement() {
         onClick={handleClick}
         className="w-full max-w-3xl h-64 flex text-center items-center justify-center bg-gray-100 cursor-pointer rounded-full shadow-md"
       >
-        <span className="text-2xl font-bold text-black">Cliquez ici pour <br/> découvrir notre histoire</span>
+        <span className="text-2xl font-bold text-black">
+          Cliquez ici pour <br /> découvrir notre histoire
+        </span>
       </div>
     );
   }
@@ -116,8 +115,7 @@ function DiscoverElement() {
   );
 }
 
-
-    // Partie Équipe :
+// Partie Équipe :
 
 const teamMembers = [
   {
@@ -173,18 +171,15 @@ function TeamMember({ image, name, role, description, reverse }) {
   );
 }
 
-    // Fin partie Équipe
+// Fin partie Équipe
 
-
-
-    // Code de la page :
+// Code de la page :
 
 export default function Equipe() {
   const [hovered, setHovered] = useState(false);
 
   return (
     <>
-      <Navbar />
       <main className="pt-20">
         <header className="p-24 text-center">
           <h1 className="text-5xl pb-8">Qui sommes nous ?</h1>
@@ -244,8 +239,6 @@ export default function Equipe() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </>
   );
 }
