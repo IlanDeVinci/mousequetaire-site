@@ -75,16 +75,6 @@ export default function Contact() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [circlePosition, setCirclePosition] = useState(null);
 
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape" && !isAnimating && activeModal !== null) {
-        closeModal();
-      }
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [isAnimating, activeModal, closeModal]);
-
   const handleCircleClick = useCallback(
     (e, index) => {
       if (isAnimating) return;
@@ -132,7 +122,15 @@ export default function Contact() {
       document.body.style.overflow = "auto";
     }, 300);
   }, [isAnimating]);
-
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape" && !isAnimating && activeModal !== null) {
+        closeModal();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isAnimating, activeModal, closeModal]);
   return (
     <>
       <main className="pt-24 pb-16 bg-[#002132] min-h-screen">
