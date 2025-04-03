@@ -9,7 +9,9 @@ function DiscoverElement() {
 
   // Use effect to trigger the fade-in animation after component mount
   useEffect(() => {
-    setIsLoaded(true);
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 500);
   }, []);
 
   const handleClick = () => {
@@ -59,17 +61,17 @@ function DiscoverElement() {
       case 1:
         return {
           title: "Ambitions",
-          text: "Ambitieux et plein d'idées, nous voulions tous, un jour, pouvoir entreprendre et créer notre entreprise pour concevoir dans le digital.",
+          text: "Ambitieux et pleins d'idées, nous voulions tous, un jour, pouvoir entreprendre et créer notre entreprise pour concevoir dans le digital.",
         };
       case 2:
         return {
           title: "Rencontre",
-          text: "Nous nous sommes donc rencontré en école supérieur, ou nous avons pratiqué création web et Digital multimédia.",
+          text: "Nous nous sommes donc rencontrés en école supérieure, où nous avons pratiqué création web et Digital multimédia.",
         };
       case 3:
         return {
           title: "Collaboration",
-          text: "Nous avons donc eu l’idée de nous lancez dans cette aventure qui ne fera que de rendre le monde du web meilleur.",
+          text: "Nous avons donc eu l’idée de nous lancer dans cette aventure qui ne fera que de rendre le monde du web meilleur.",
         };
       default:
         return {
@@ -103,7 +105,7 @@ function DiscoverElement() {
         <div
           className={`${getSliderColor()} rounded-full px-8 py-4 shadow-lg h-full transition-all duration-700`}
         >
-          <div className="flex flex-col h-full justify-center text-center">
+          <div className="flex flex-col h-full justify-center text-center font-montserrat">
             <h3 className="text-2xl font-bold mb-4 text-white ">
               {getContent().title}
             </h3>
