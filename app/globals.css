@@ -92,6 +92,56 @@ body {
   animation: animateGradientDark 4s ease-in-out infinite;
 }
 
+/* Portfolio specific styles */
+.portfolio-item {
+  aspect-ratio: 1 / 1;
+  height: 100%;
+}
+
+.portfolio-overlay {
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.portfolio-item:hover .portfolio-overlay {
+  transform: translateY(0);
+}
+
+/* Debug styles */
+.debug-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.debug-panel {
+  background: rgba(30, 30, 30, 0.9);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-family: monospace;
+}
+
+/* Portfolio responsive styles */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .portfolio-item {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+    aspect-ratio: 16 / 9;
+  }
+}
+
 /* Rest of utility classes */
 @layer utilities {
   .animate-fade-in {
