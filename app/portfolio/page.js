@@ -13,7 +13,7 @@ const portfolioItems = [
     id: 1,
     title: "Featured Project",
     image: "/images/project1.jpg",
-    importance: 3,
+    importance: 1,
   },
   { id: 2, title: "Web Design", image: "/images/project2.jpg", importance: 1 },
   { id: 3, title: "Mobile App", image: "/images/project3.jpg", importance: 4 },
@@ -21,7 +21,7 @@ const portfolioItems = [
     id: 4,
     title: "UI/UX Design",
     image: "/images/project4.jpg",
-    importance: 2,
+    importance: 1,
   },
   {
     id: 5,
@@ -51,7 +51,7 @@ const portfolioItems = [
     id: 9,
     title: "Motion Graphics",
     image: "/images/project9.jpg",
-    importance: 3,
+    importance: 1,
   },
   {
     id: 10,
@@ -146,105 +146,6 @@ export default function Portfolio() {
         }
       };
 
-      const calculateTotalCells = () => {
-        let totalCells = 0;
-        portfolioItems.forEach((item) => {
-          const { width, height } = getDimensions(item.importance);
-          totalCells += width * height;
-        });
-
-        log(`Total cells needed by all items: ${totalCells}`);
-
-        if (totalCells % gridWidth !== 0) {
-          const remainder = totalCells % gridWidth;
-          const cellsNeeded = gridWidth - remainder;
-          log(
-            `Need to add ${cellsNeeded} more cell(s) to make total a multiple of ${gridWidth}`
-          );
-          return { totalCells, needsAdjustment: true, cellsNeeded };
-        }
-
-        return { totalCells, needsAdjustment: false };
-      };
-
-      const { totalCells, needsAdjustment, cellsNeeded } =
-        calculateTotalCells();
-
-      if (needsAdjustment) {
-        log("=== PHASE 0: Adjusting items to ensure complete rows ===");
-
-        if (cellsNeeded === 1) {
-          const candidate = adjustedItems.find((item) => item.importance === 1);
-          if (candidate) {
-            log(
-              `Promoting item ${candidate.id} (${candidate.title}) from 1x1 to 1x2 to balance the grid`
-            );
-            candidate.importance = 2;
-            candidate.originalImportance = 1;
-          } else {
-            log(
-              "WARNING: Couldn't find a 1x1 item to promote for grid balance"
-            );
-          }
-        } else if (cellsNeeded === 2) {
-          const candidates = adjustedItems
-            .filter((item) => item.importance === 1)
-            .slice(0, 2);
-          if (candidates.length === 2) {
-            candidates.forEach((candidate) => {
-              log(
-                `Promoting item ${candidate.id} (${candidate.title}) from 1x1 to 1x2 to balance the grid`
-              );
-              candidate.importance = 2;
-              candidate.originalImportance = 1;
-            });
-          } else if (candidates.length === 1) {
-            const wideCandidate = adjustedItems.find(
-              (item) => item.importance === 3
-            );
-            if (wideCandidate) {
-              log(
-                `Promoting item ${wideCandidate.id} (${wideCandidate.title}) from 2x1 to 2x2 to balance the grid`
-              );
-              wideCandidate.importance = 4;
-              wideCandidate.originalImportance = 3;
-            } else {
-              log(
-                "WARNING: Couldn't find suitable items to promote for grid balance"
-              );
-            }
-          } else {
-            log("WARNING: Not enough 1x1 items for grid adjustment");
-          }
-        }
-
-        let adjustedTotal = 0;
-        adjustedItems.forEach((item) => {
-          const { width, height } = getDimensions(item.importance);
-          adjustedTotal += width * height;
-        });
-
-        log(
-          `After adjustment: Total cells: ${adjustedTotal} (should be multiple of ${gridWidth}: ${
-            adjustedTotal % gridWidth === 0 ? "YES" : "NO"
-          })`
-        );
-
-        // Update itemsBySize after adjustments
-        itemsBySize["2x2"] = [
-          ...adjustedItems.filter((item) => item.importance === 4),
-        ];
-        itemsBySize["2x1"] = [
-          ...adjustedItems.filter((item) => item.importance === 3),
-        ];
-        itemsBySize["1x2"] = [
-          ...adjustedItems.filter((item) => item.importance === 2),
-        ];
-        itemsBySize["1x1"] = [
-          ...adjustedItems.filter((item) => item.importance === 1),
-        ];
-      }
-
       const addRow = () => {
         virtualGrid.push(Array(gridWidth).fill(null));
         return virtualGrid.length - 1;
@@ -315,7 +216,9 @@ export default function Portfolio() {
           placementReason: reason,
           importance: item.originalImportance || item.importance,
           displayOrder: row * 100 + col,
-          uniqueKey: `${item.id}-${row}-${col}`,
+          uniqueKey: `${item.id}-${row}-${col}-${Date.now()}-${Math.random()
+            .toString(36)
+            .substr(2, 5)}`,
         };
       };
 
@@ -340,87 +243,514 @@ export default function Portfolio() {
         };
       };
 
-      log("=== REVISED GRID FILLING ALGORITHM WITH IMPROVED PLACEMENT ===");
-      log(
-        `Item counts: 2x2=${itemsBySize["2x2"].length}, 2x1=${itemsBySize["2x1"].length}, 1x2=${itemsBySize["1x2"].length}, 1x1=${itemsBySize["1x1"].length}`
-      );
+      const optimizeGrid = () => {
+        log("=== OPTIMIZING GRID TO ELIMINATE EMPTY CELLS ===");
 
-      // Improved grid filling algorithm
+        const gridStatus = checkGridFill();
+        if (gridStatus.completelyFilled) {
+          log("Grid is already completely filled - no optimization needed.");
+          return;
+        }
+
+        log(`Found ${gridStatus.emptyCount} empty cells. Optimizing layout...`);
+
+        const placedItems = [...displayItems];
+        const rowsToFix = [...gridStatus.unevenRows].sort(
+          (a, b) => b.empties - a.empties
+        );
+
+        // Function to modify an item's dimensions to help fill gaps
+        const modifyItemFormat = (item, newImportance, reason) => {
+          const oldImportance = item.importance;
+          const oldPos = { ...item.debugDimensions.position };
+          const oldSize = { ...item.debugDimensions };
+
+          // Clear the item from virtual grid first
+          for (let r = oldPos.row; r < oldPos.row + oldSize.height; r++) {
+            for (let c = oldPos.col; c < oldPos.col + oldSize.width; c++) {
+              virtualGrid[r][c] = null;
+            }
+          }
+
+          // Create new dimensions based on new importance
+          const newDimensions = getDimensions(newImportance);
+
+          // Store original importance if not already stored
+          if (!item.originalImportance) {
+            item.originalImportance = oldImportance;
+          }
+
+          // Create a new item with modified dimensions
+          const newItem = {
+            ...item,
+            importance: newImportance,
+            gridStyle: {
+              gridRow: `span ${newDimensions.height}`,
+              gridColumn: `span ${newDimensions.width}`,
+            },
+            debugDimensions: {
+              ...newDimensions,
+              position: oldPos, // Keep the same position initially
+              cellsUsed: newDimensions.width * newDimensions.height,
+            },
+            placementReason: reason,
+            uniqueKey: `${item.id}-modified-${Date.now()}-${Math.random()
+              .toString(36)
+              .substr(2, 5)}`,
+          };
+
+          // Remove old item from display items
+          const itemIndex = placedItems.findIndex(
+            (i) =>
+              i.debugDimensions.position.row === oldPos.row &&
+              i.debugDimensions.position.col === oldPos.col &&
+              i.id === item.id
+          );
+
+          if (itemIndex !== -1) {
+            placedItems.splice(itemIndex, 1);
+          }
+
+          log(
+            `Modified item ${item.id} from importance ${oldImportance} to ${newImportance}`
+          );
+          return newItem;
+        };
+
+        for (const { row, empties } of rowsToFix) {
+          log(`Fixing row ${row} with ${empties} empty cells`);
+
+          // Handle completely empty rows
+          if (empties === gridWidth) {
+            log(`Row ${row} is completely empty and can be removed`);
+            const itemsBelow = placedItems.filter(
+              (item) => item.debugDimensions.position.row > row
+            );
+
+            if (itemsBelow.length > 0) {
+              log(
+                `Moving ${itemsBelow.length} items up from rows below ${row}`
+              );
+
+              for (const item of itemsBelow) {
+                const oldPos = { ...item.debugDimensions.position };
+                const newRow = oldPos.row - 1;
+
+                const { width, height } = item.debugDimensions;
+                for (let r = oldPos.row; r < oldPos.row + height; r++) {
+                  for (let c = oldPos.col; c < oldPos.col + width; c++) {
+                    if (r < virtualGrid.length && c < gridWidth) {
+                      virtualGrid[r][c] = null;
+                    }
+                  }
+                }
+
+                item.debugDimensions.position.row = newRow;
+
+                for (let r = newRow; r < newRow + height; r++) {
+                  for (let c = oldPos.col; c < oldPos.col + width; c++) {
+                    if (r < virtualGrid.length && c < gridWidth) {
+                      virtualGrid[r][c] = item.id;
+                    }
+                  }
+                }
+
+                log(
+                  `Moved item ${item.id} from [${oldPos.row},${oldPos.col}] to [${newRow},${oldPos.col}]`
+                );
+              }
+            }
+
+            continue;
+          }
+
+          // For partially empty rows
+          const emptyCells = [];
+          for (let c = 0; c < gridWidth; c++) {
+            if (virtualGrid[row][c] === null) {
+              emptyCells.push(c);
+            }
+          }
+
+          if (emptyCells.length > 0) {
+            // First try to move small items to fill gaps
+            const smallItemsBelow = placedItems.filter(
+              (item) =>
+                item.debugDimensions.width === 1 &&
+                item.debugDimensions.height === 1 &&
+                item.debugDimensions.position.row > row
+            );
+
+            // Check if we can expand existing 1x1 items in this row that are adjacent to empty cells
+            for (let c = 0; c < gridWidth - 1; c++) {
+              if (virtualGrid[row][c] !== null && emptyCells.includes(c + 1)) {
+                const itemId = virtualGrid[row][c];
+                const itemToExpand = placedItems.find(
+                  (item) =>
+                    item.id === itemId &&
+                    item.debugDimensions.width === 1 &&
+                    item.debugDimensions.height === 1 &&
+                    item.debugDimensions.position.row === row &&
+                    item.debugDimensions.position.col === c
+                );
+
+                if (itemToExpand) {
+                  log(
+                    `Found 1x1 item ${
+                      itemToExpand.id
+                    } at [${row},${c}] that can expand to 2x1 to fill empty cell at [${row},${
+                      c + 1
+                    }]`
+                  );
+
+                  // Modify to 2x1 (importance 3)
+                  const modifiedItem = modifyItemFormat(
+                    itemToExpand,
+                    3,
+                    `Modified from 1x1 to 2x1 to fill empty cell at [${row},${
+                      c + 1
+                    }]`
+                  );
+
+                  // Place the expanded item
+                  const placedModifiedItem = placeItem(
+                    modifiedItem,
+                    row,
+                    c,
+                    2,
+                    1,
+                    `Expanded item to fill gap at [${row},${c + 1}]`
+                  );
+                  displayItems.push(placedModifiedItem);
+
+                  // Remove the empty cell we just filled
+                  emptyCells.splice(emptyCells.indexOf(c + 1), 1);
+                }
+              }
+              // Check for empty cell followed by 1x1 item (expand leftward)
+              else if (
+                emptyCells.includes(c) &&
+                c + 1 < gridWidth &&
+                virtualGrid[row][c + 1] !== null
+              ) {
+                const itemId = virtualGrid[row][c + 1];
+                const itemToExpand = placedItems.find(
+                  (item) =>
+                    item.id === itemId &&
+                    item.debugDimensions.width === 1 &&
+                    item.debugDimensions.height === 1 &&
+                    item.debugDimensions.position.row === row &&
+                    item.debugDimensions.position.col === c + 1
+                );
+
+                if (itemToExpand) {
+                  log(
+                    `Found 1x1 item ${itemToExpand.id} at [${row},${
+                      c + 1
+                    }] that can expand to 2x1 to fill empty cell at [${row},${c}]`
+                  );
+
+                  // Modify to 2x1 (importance 3)
+                  const modifiedItem = modifyItemFormat(
+                    itemToExpand,
+                    3,
+                    `Modified from 1x1 to 2x1 to fill empty cell at [${row},${c}]`
+                  );
+
+                  // Place the expanded item at the empty cell position
+                  const placedModifiedItem = placeItem(
+                    modifiedItem,
+                    row,
+                    c, // Start at the empty cell
+                    2,
+                    1,
+                    `Expanded item to fill gap at [${row},${c}]`
+                  );
+                  displayItems.push(placedModifiedItem);
+
+                  // Remove the empty cell we just filled
+                  emptyCells.splice(emptyCells.indexOf(c), 1);
+                }
+              }
+            }
+
+            // Process remaining empty cells
+            for (const emptyCol of emptyCells) {
+              if (smallItemsBelow.length > 0) {
+                const itemToMove = smallItemsBelow.shift();
+                const oldPos = { ...itemToMove.debugDimensions.position };
+
+                virtualGrid[oldPos.row][oldPos.col] = null;
+
+                itemToMove.debugDimensions.position = { row, col: emptyCol };
+
+                virtualGrid[row][emptyCol] = itemToMove.id;
+
+                log(
+                  `Moved small item ${itemToMove.id} from [${oldPos.row},${oldPos.col}] to [${row},${emptyCol}]`
+                );
+              } else {
+                log(
+                  `No available 1x1 items to move to [${row},${emptyCol}]. Looking for items to resize...`
+                );
+
+                // Check if we have two adjacent empty cells that can fit a 2x1
+                if (
+                  emptyCells.includes(0) &&
+                  emptyCells.includes(1) &&
+                  emptyCells.length >= 2
+                ) {
+                  // Try to find a 1x1 item to expand to a 2x1
+                  const smallItemToExpand = placedItems.find(
+                    (item) =>
+                      item.debugDimensions.width === 1 &&
+                      item.debugDimensions.height === 1 &&
+                      item.debugDimensions.position.row > row
+                  );
+
+                  if (smallItemToExpand) {
+                    log(
+                      `Found 1x1 item ${smallItemToExpand.id} that can be expanded to 2x1`
+                    );
+
+                    // Clear its original position
+                    const oldPos = {
+                      ...smallItemToExpand.debugDimensions.position,
+                    };
+                    virtualGrid[oldPos.row][oldPos.col] = null;
+
+                    // Modify to 2x1 (importance 3)
+                    const modifiedItem = modifyItemFormat(
+                      smallItemToExpand,
+                      3,
+                      `Modified from 1x1 to 2x1 to fill empty cells at row ${row}`
+                    );
+
+                    // Place the expanded item
+                    const placedModifiedItem = placeItem(
+                      modifiedItem,
+                      row,
+                      0, // Start at the beginning of the row
+                      2,
+                      1,
+                      `Placed expanded item to fill row ${row}`
+                    );
+                    displayItems.push(placedModifiedItem);
+
+                    // Remove these columns from emptyCells since we've filled them
+                    emptyCells.splice(emptyCells.indexOf(0), 1);
+                    emptyCells.splice(emptyCells.indexOf(1), 1);
+                    continue;
+                  }
+                }
+
+                // Try to find 2-wide items we can split or resize to fill the gap
+                if (
+                  emptyCol === 2 &&
+                  virtualGrid[row][0] === virtualGrid[row][1]
+                ) {
+                  const itemId = virtualGrid[row][0];
+                  const wideItem = placedItems.find(
+                    (item) =>
+                      item.id === itemId &&
+                      item.debugDimensions.width === 2 &&
+                      item.debugDimensions.height === 1
+                  );
+
+                  if (wideItem) {
+                    log(
+                      `Found 2x1 item ${wideItem.id} at start of row ${row} that can be converted to 1x1`
+                    );
+
+                    const modifiedItem = modifyItemFormat(
+                      wideItem,
+                      1,
+                      `Modified from 2x1 to 1x1 to eliminate empty cell at [${row},${emptyCol}]`
+                    );
+
+                    const placedModifiedItem = placeItem(
+                      modifiedItem,
+                      row,
+                      0,
+                      1,
+                      1,
+                      `Placed resized item to help fill row ${row}`
+                    );
+                    displayItems.push(placedModifiedItem);
+
+                    const smallItemToUse = placedItems.find(
+                      (item) =>
+                        item.debugDimensions.width === 1 &&
+                        item.debugDimensions.height === 1 &&
+                        item.debugDimensions.position.row > row
+                    );
+
+                    if (smallItemToUse) {
+                      const oldPos = {
+                        ...smallItemToUse.debugDimensions.position,
+                      };
+                      virtualGrid[oldPos.row][oldPos.col] = null;
+                      smallItemToUse.debugDimensions.position = {
+                        row,
+                        col: emptyCol,
+                      };
+                      virtualGrid[row][emptyCol] = smallItemToUse.id;
+                      log(
+                        `Moved small item ${smallItemToUse.id} to [${row},${emptyCol}] after resizing another item`
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        const newGridStatus = checkGridFill();
+        if (newGridStatus.completelyFilled) {
+          log("SUCCESS: Grid optimization complete - all cells filled!");
+        } else {
+          log(
+            `AFTER OPTIMIZATION: ${newGridStatus.emptyCount} empty cells remain`
+          );
+        }
+
+        visualizeCurrentGrid("Grid after optimization");
+      };
+
       const fillGrid = () => {
-        let currentRow = 0;
-        let currentCol = 0;
+        let placeOnRight = false;
 
-        // First place 2x2 items - they need the most space
         for (const item of itemsBySize["2x2"]) {
           const { width, height } = getDimensions(item.importance);
           let placed = false;
 
-          // Find the first available spot
-          for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-            for (let c = 0; c <= gridWidth - width && !placed; c++) {
-              if (isPositionAvailable(r, c, width, height)) {
+          if (placeOnRight) {
+            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
+              const rightCol = gridWidth - width;
+              if (isPositionAvailable(r, rightCol, width, height)) {
                 displayItems.push(
                   placeItem(
                     item,
                     r,
-                    c,
+                    rightCol,
                     width,
                     height,
-                    `Placed 2x2 at [${r},${c}]`
+                    `Placed 2x2 at right side [${r},${rightCol}]`
+                  )
+                );
+                placed = true;
+              }
+            }
+          } else {
+            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
+              if (isPositionAvailable(r, 0, width, height)) {
+                displayItems.push(
+                  placeItem(
+                    item,
+                    r,
+                    0,
+                    width,
+                    height,
+                    `Placed 2x2 at left side [${r},0]`
                   )
                 );
                 placed = true;
               }
             }
           }
+
+          if (!placed) {
+            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
+              for (let c = 0; c <= gridWidth - width && !placed; c++) {
+                if (isPositionAvailable(r, c, width, height)) {
+                  displayItems.push(
+                    placeItem(
+                      item,
+                      r,
+                      c,
+                      width,
+                      height,
+                      `Placed 2x2 at [${r},${c}] (fallback)`
+                    )
+                  );
+                  placed = true;
+                }
+              }
+            }
+          }
+
+          placeOnRight = !placeOnRight;
         }
 
         visualizeCurrentGrid("After placing 2x2 items");
 
-        // Place 2x1 items next
+        placeOnRight = false;
+
         for (const item of itemsBySize["2x1"]) {
           const { width, height } = getDimensions(item.importance);
           let placed = false;
 
-          // Try to place at start of rows for better organization
-          for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
-            if (isPositionAvailable(r, 0, width, height)) {
-              displayItems.push(
-                placeItem(
-                  item,
-                  r,
-                  0,
-                  width,
-                  height,
-                  `Placed 2x1 at start of row ${r}`
-                )
-              );
-              placed = true;
-              continue;
-            }
-
-            // If not at start, try other positions
-            for (let c = 1; c <= gridWidth - width && !placed; c++) {
-              if (isPositionAvailable(r, c, width, height)) {
+          if (placeOnRight) {
+            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
+              const rightCol = gridWidth - width;
+              if (isPositionAvailable(r, rightCol, width, height)) {
                 displayItems.push(
                   placeItem(
                     item,
                     r,
-                    c,
+                    rightCol,
                     width,
                     height,
-                    `Placed 2x1 at [${r},${c}]`
+                    `Placed 2x1 at right side [${r},${rightCol}]`
+                  )
+                );
+                placed = true;
+              }
+            }
+          } else {
+            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
+              if (isPositionAvailable(r, 0, width, height)) {
+                displayItems.push(
+                  placeItem(
+                    item,
+                    r,
+                    0,
+                    width,
+                    height,
+                    `Placed 2x1 at left side [${r},0]`
                   )
                 );
                 placed = true;
               }
             }
           }
+
+          if (!placed) {
+            for (let r = 0; r < virtualGrid.length + 1 && !placed; r++) {
+              for (let c = 0; c <= gridWidth - width && !placed; c++) {
+                if (isPositionAvailable(r, c, width, height)) {
+                  displayItems.push(
+                    placeItem(
+                      item,
+                      r,
+                      c,
+                      width,
+                      height,
+                      `Placed 2x1 at [${r},${c}] (fallback)`
+                    )
+                  );
+                  placed = true;
+                }
+              }
+            }
+          }
+
+          placeOnRight = !placeOnRight;
         }
 
         visualizeCurrentGrid("After placing 2x1 items");
 
-        // Place 1x2 items next
         for (const item of itemsBySize["1x2"]) {
           const { width, height } = getDimensions(item.importance);
           let placed = false;
@@ -446,7 +776,6 @@ export default function Portfolio() {
 
         visualizeCurrentGrid("After placing 1x2 items");
 
-        // Finally place 1x1 items to fill gaps
         for (const item of itemsBySize["1x1"]) {
           const { width, height } = getDimensions(item.importance);
           let placed = false;
@@ -470,7 +799,6 @@ export default function Portfolio() {
           }
 
           if (!placed) {
-            // If no space found, create a new row
             const r = virtualGrid.length;
             const c = 0;
             displayItems.push(
@@ -489,30 +817,21 @@ export default function Portfolio() {
         visualizeCurrentGrid("After placing all items");
       };
 
-      // Execute grid filling
       fillGrid();
+      optimizeGrid();
 
       const gridStatus = checkGridFill();
 
       if (!gridStatus.completelyFilled) {
-        log(`WARNING: Found ${gridStatus.emptyCount} empty cells in the grid!`);
-
-        const lastRowIndex = virtualGrid.length - 1;
-        const lastRowEmpty = virtualGrid[lastRowIndex].every(
-          (cell) => cell === null
+        log(
+          `WARNING: Found ${gridStatus.emptyCount} empty cells in the grid after optimization!`
         );
-
-        if (lastRowEmpty) {
-          log(`Removing empty last row ${lastRowIndex}`);
-          virtualGrid.pop();
-        }
       } else {
         log("SUCCESS: Grid completely filled with no empty cells!");
       }
 
       log("=== SORTING ITEMS FOR DISPLAY ===");
 
-      // Sort items by position for display
       displayItems.sort((a, b) => {
         const aRow = a.debugDimensions.position.row;
         const bRow = b.debugDimensions.position.row;
@@ -533,23 +852,6 @@ export default function Portfolio() {
 
       visualizeCurrentGrid("FINAL GRID LAYOUT");
 
-      // Check for duplicate IDs
-      const uniqueIds = new Set();
-      const duplicateIds = [];
-
-      displayItems.forEach((item) => {
-        if (uniqueIds.has(item.id)) {
-          duplicateIds.push(item.id);
-        } else {
-          uniqueIds.add(item.id);
-        }
-      });
-
-      if (duplicateIds.length > 0) {
-        log(`WARNING: Found duplicate IDs: ${duplicateIds.join(", ")}`);
-      }
-
-      // Set debug info
       setDebugInfo({
         totalCells: virtualGrid.length * gridWidth,
         cellsUsed: debugCellsUsed,
@@ -559,13 +861,11 @@ export default function Portfolio() {
         debugLog: getLog(),
       });
 
-      // Set the grid items for display
       setGridItems(displayItems);
     } catch (err) {
       setError(err.message);
       console.error("Grid error:", err);
 
-      // Fallback to simple grid if error
       const simpleGrid = portfolioItems.map((item) => {
         const dimensions = (() => {
           switch (item.importance) {
