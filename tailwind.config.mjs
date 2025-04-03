@@ -1,3 +1,5 @@
+import { Montserrat } from "next/font/google";
+
 /** @type {import('tailwindcss').Config} */
 const config = {
   content: [
@@ -10,6 +12,15 @@ const config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+      },
+      fontFamily: {
+        Montserrat: ["var(--font-montserrat)"],
+        MontserratBold: ["var(--font-montserrat-bold)"],
+        MontserratLight: ["var(--font-montserrat-light)"],
+        MontserratMedium: ["var(--font-montserrat-medium)"],
+        MontserratRegular: ["var(--font-montserrat-regular)"],
+        MontserratSemiBold: ["var(--font-montserrat-semibold)"],
+        MontserratThin: ["var(--font-montserrat-thin)"],
       },
     },
   },

@@ -133,7 +133,7 @@ export default function Contact() {
   }, [isAnimating, activeModal, closeModal]);
   return (
     <>
-      <main className="pt-24 pb-16 bg-[#002132] min-h-screen">
+      <main className="pt-24 pb-16 bg-[#050610] min-h-screen">
         <div className="container mx-auto px-4">
           <h1 className="text-5xl font-bold mb-6 text-center text-[#7DD4FF]">
             Contact

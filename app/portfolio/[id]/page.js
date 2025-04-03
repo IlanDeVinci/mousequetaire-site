@@ -365,7 +365,7 @@ export default function ProjectDetails() {
 
   if (loading) {
     return (
-      <div className="bg-black min-h-screen flex items-center justify-center">
+      <div className="bg-[#050610] min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-white">
           Loading project details...
         </div>
@@ -375,7 +375,7 @@ export default function ProjectDetails() {
 
   if (!project) {
     return (
-      <div className="bg-black min-h-screen p-8 text-white">
+      <div className="bg-[#050610] min-h-screen p-8 text-white">
         <div className="max-w-4xl mx-auto mt-20 text-center">
           <h1 className="text-3xl font-bold mb-4">Project Not Found</h1>
           <p className="mb-8">
@@ -393,7 +393,7 @@ export default function ProjectDetails() {
   }
 
   return (
-    <div className="bg-black min-h-screen text-white font-sans">
+    <div className="bg-[#050610] min-h-screen text-white font-sans">
       {/* Hero section with project image */}
       <div className="relative h-[50vh] md:h-[70vh]">
         <Image

@@ -73,7 +73,7 @@ export default function Services() {
 
   return (
     <>
-      <main className="pt-24 pb-16 bg-[#002132] min-h-screen px-48">
+      <main className="pt-24 pb-16 bg-[#050610] min-h-screen px-48">
         <div className="container mx-auto px-4">
           {/* Header Section */}
           <h1 className="text-5xl font-bold mt-16 mb-6 text-center text-[#7DD4FF]">

@@ -528,7 +528,7 @@ export default function Portfolio() {
   }, []);
 
   return (
-    <div className="bg-black min-h-screen p-8 text-white font-sans">
+    <div className="bg-[#050610] min-h-screen p-8 text-white font-sans">
       <h1 className="text-center text-4xl mb-8 uppercase tracking-widest">
         Our Portfolio
       </h1>
