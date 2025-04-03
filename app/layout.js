@@ -34,6 +34,7 @@ export default function RootLayout({ children }) {
           content="Mousequetaire - Next.js Application"
         />
         <link rel="icon" href="/favicon.ico" />
+        <title>Mousequetaire</title>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
