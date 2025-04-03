@@ -845,7 +845,7 @@ class PathTree {
 }
 
 class WindAnimation {
-  constructor() {
+  constructor(options = {}) {
     this.svg = document.querySelector(".wind-svg");
     this.active = false;
     this.progress = 0;
@@ -1162,7 +1162,7 @@ class WindAnimation {
       "http://www.w3.org/2000/svg",
       "feGaussianBlur"
     );
-    feGaussianBlur.setAttribute("stdDeviation", "10");
+    feGaussianBlur.setAttribute("stdDeviation", "20");
     feGaussianBlur.setAttribute("result", "blur");
 
     const feComposite = document.createElementNS(
@@ -1679,10 +1679,13 @@ class WindAnimation {
 export default function initWindAnimation() {
   if (typeof window !== "undefined") {
     setTimeout(() => {
-      // Check if wind animation already exists before creating a new one
-      if (!window.windAnimation) {
-        window.windAnimation = new WindAnimation();
+      // If an animation already exists, deactivate it first
+      if (window.windAnimation) {
+        window.windAnimation = null;
       }
+
+      // Create a new animation instance
+      window.windAnimation = new WindAnimation();
     }, 1000);
   }
 }
