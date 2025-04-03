@@ -794,6 +794,7 @@ class PathTree {
 
     const uniqueIntersections = [];
     const minDistance = 10;
+    const maxIntersections = 6;
 
     for (const point of this.intersectionPoints) {
       let isDuplicate = false;
@@ -809,7 +810,7 @@ class PathTree {
         }
       }
 
-      if (!isDuplicate) {
+      if (!isDuplicate && uniqueIntersections.length < maxIntersections) {
         uniqueIntersections.push(point);
       }
     }
