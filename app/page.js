@@ -57,6 +57,7 @@ export default function Home() {
 function TypeWriter({ text, className, speed = 50 }) {
   const [displayText, setDisplayText] = React.useState("");
   const [index, setIndex] = React.useState(0);
+  const [isComplete, setIsComplete] = React.useState(false);
 
   React.useEffect(() => {
     if (index < text.length) {
@@ -65,13 +66,15 @@ function TypeWriter({ text, className, speed = 50 }) {
         setIndex((prev) => prev + 1);
       }, speed);
       return () => clearTimeout(timer);
+    } else {
+      setIsComplete(true);
     }
   }, [index, text, speed]);
 
   return (
     <p className={className}>
       {displayText}
-      <span className="animate-blink">|</span>
+      {!isComplete && <span className="animate-blink">|</span>}
     </p>
   );
 }

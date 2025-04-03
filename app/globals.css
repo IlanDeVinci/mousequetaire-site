@@ -59,8 +59,8 @@ body {
   transform-origin: center center;
 }
 
-/* Animated gradient definitions */
-@keyframes animateGradient {
+/* Animated gradient definitions for right path tree (blue theme) */
+@keyframes animateGradientRight {
   0% {
     stop-color: #87cefa;
   }
@@ -72,7 +72,7 @@ body {
   }
 }
 
-@keyframes animateGradientDark {
+@keyframes animateGradientDarkRight {
   0% {
     stop-color: #00008b;
   }
@@ -84,12 +84,54 @@ body {
   }
 }
 
+/* Animated gradient definitions for left path tree (purple theme) */
+@keyframes animateGradientLeft {
+  0% {
+    stop-color: #87cefa;
+  }
+  50% {
+    stop-color: #1e90ff;
+  }
+  100% {
+    stop-color: #87cefa;
+  }
+}
+
+@keyframes animateGradientDarkLeft {
+  0% {
+    stop-color: #00008b;
+  }
+  50% {
+    stop-color: #0000cd;
+  }
+  100% {
+    stop-color: #00008b;
+  }
+}
+
+.animated-gradient-start-right {
+  animation: animateGradientRight 4s ease-in-out infinite;
+}
+
+.animated-gradient-end-right {
+  animation: animateGradientDarkRight 4s ease-in-out infinite;
+}
+
+.animated-gradient-start-left {
+  animation: animateGradientLeft 4s ease-in-out infinite;
+}
+
+.animated-gradient-end-left {
+  animation: animateGradientDarkLeft 4s ease-in-out infinite;
+}
+
+/* Legacy classes for backward compatibility */
 .animated-gradient-start {
-  animation: animateGradient 4s ease-in-out infinite;
+  animation: animateGradientRight 4s ease-in-out infinite;
 }
 
 .animated-gradient-end {
-  animation: animateGradientDark 4s ease-in-out infinite;
+  animation: animateGradientDarkRight 4s ease-in-out infinite;
 }
 
 /* Portfolio specific styles */

@@ -855,7 +855,7 @@ class WindAnimation {
     this.rightPaths = [];
     this.animate = this.animate.bind(this);
     this.pendingRegeneration = new Map();
-    this.regenerationDelay = 3000;
+    this.regenerationDelay = 2500;
     this.visibilityDuration = 2000;
 
     this.config = {
@@ -1029,6 +1029,7 @@ class WindAnimation {
   createGradientDefs() {
     const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
+    // Right path gradients (bright blue theme)
     const mainGradient = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "linearGradient"
@@ -1044,16 +1045,16 @@ class WindAnimation {
       "stop"
     );
     mainStop1.setAttribute("offset", "0%");
-    mainStop1.setAttribute("stop-color", "#A0D8FF");
-    mainStop1.setAttribute("class", "animated-gradient-start");
+    mainStop1.setAttribute("stop-color", "#40FFFF"); // Bright cyan blue
+    mainStop1.setAttribute("class", "animated-gradient-start-right");
 
     const mainStop2 = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "stop"
     );
     mainStop2.setAttribute("offset", "100%");
-    mainStop2.setAttribute("stop-color", "#0000CD");
-    mainStop2.setAttribute("class", "animated-gradient-end");
+    mainStop2.setAttribute("stop-color", "#0080FF"); // Bright medium blue
+    mainStop2.setAttribute("class", "animated-gradient-end-right");
 
     mainGradient.appendChild(mainStop1);
     mainGradient.appendChild(mainStop2);
@@ -1073,20 +1074,21 @@ class WindAnimation {
       "stop"
     );
     branchStop1.setAttribute("offset", "0%");
-    branchStop1.setAttribute("stop-color", "#87CEFA");
-    branchStop1.setAttribute("class", "animated-gradient-start");
+    branchStop1.setAttribute("stop-color", "#80FFFF"); // Light cyan blue
+    branchStop1.setAttribute("class", "animated-gradient-start-right");
 
     const branchStop2 = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "stop"
     );
     branchStop2.setAttribute("offset", "100%");
-    branchStop2.setAttribute("stop-color", "#00008B");
-    branchStop2.setAttribute("class", "animated-gradient-end");
+    branchStop2.setAttribute("stop-color", "#0040FF"); // Bright deep blue
+    branchStop2.setAttribute("class", "animated-gradient-end-right");
 
     branchGradient.appendChild(branchStop1);
     branchGradient.appendChild(branchStop2);
 
+    // Left path gradients (same bright blue theme)
     const mainGradientLeft = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "linearGradient"
@@ -1102,7 +1104,7 @@ class WindAnimation {
       "stop"
     );
     mainLeftStop1.setAttribute("offset", "0%");
-    mainLeftStop1.setAttribute("stop-color", "#A0D8FF");
+    mainLeftStop1.setAttribute("stop-color", "#40FFFF"); // Bright cyan blue
     mainLeftStop1.setAttribute("class", "animated-gradient-start-left");
 
     const mainLeftStop2 = document.createElementNS(
@@ -1110,7 +1112,7 @@ class WindAnimation {
       "stop"
     );
     mainLeftStop2.setAttribute("offset", "100%");
-    mainLeftStop2.setAttribute("stop-color", "#0000CD");
+    mainLeftStop2.setAttribute("stop-color", "#0080FF"); // Bright medium blue
     mainLeftStop2.setAttribute("class", "animated-gradient-end-left");
 
     mainGradientLeft.appendChild(mainLeftStop1);
@@ -1131,7 +1133,7 @@ class WindAnimation {
       "stop"
     );
     branchLeftStop1.setAttribute("offset", "0%");
-    branchLeftStop1.setAttribute("stop-color", "#87CEFA");
+    branchLeftStop1.setAttribute("stop-color", "#80FFFF"); // Light cyan blue
     branchLeftStop1.setAttribute("class", "animated-gradient-start-left");
 
     const branchLeftStop2 = document.createElementNS(
@@ -1139,18 +1141,56 @@ class WindAnimation {
       "stop"
     );
     branchLeftStop2.setAttribute("offset", "100%");
-    branchLeftStop2.setAttribute("stop-color", "#00008B");
+    branchLeftStop2.setAttribute("stop-color", "#0040FF"); // Bright deep blue
     branchLeftStop2.setAttribute("class", "animated-gradient-end-left");
 
     branchGradientLeft.appendChild(branchLeftStop1);
     branchGradientLeft.appendChild(branchLeftStop2);
+
+    // Add filter for glow effect
+    const glowFilter = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "filter"
+    );
+    glowFilter.setAttribute("id", "glow");
+    glowFilter.setAttribute("x", "-20%");
+    glowFilter.setAttribute("y", "-20%");
+    glowFilter.setAttribute("width", "140%");
+    glowFilter.setAttribute("height", "140%");
+
+    const feGaussianBlur = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "feGaussianBlur"
+    );
+    feGaussianBlur.setAttribute("stdDeviation", "10");
+    feGaussianBlur.setAttribute("result", "blur");
+
+    const feComposite = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "feComposite"
+    );
+    feComposite.setAttribute("in", "SourceGraphic");
+    feComposite.setAttribute("in2", "blur");
+    feComposite.setAttribute("operator", "over");
+
+    glowFilter.appendChild(feGaussianBlur);
+    glowFilter.appendChild(feComposite);
 
     defs.appendChild(mainGradient);
     defs.appendChild(branchGradient);
     defs.appendChild(mainGradientLeft);
     defs.appendChild(branchGradientLeft);
 
+    defs.appendChild(glowFilter);
+
     this.svg.appendChild(defs);
+
+    // Apply the filter to all paths when they appear
+    setTimeout(() => {
+      this.paths.forEach((path) => {
+        path.style.filter = "url(#glow)";
+      });
+    }, 100);
   }
 
   regeneratePaths() {
