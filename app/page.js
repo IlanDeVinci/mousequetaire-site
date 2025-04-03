@@ -32,13 +32,123 @@ export default function Home() {
                 &lt;mouse-quetaires/&gt;
               </span>
             </div>
-            <h1
-              className="text-4xl md:text-6xl font-light mb-6 animate-fade-in 
-                            bg-clip-text text-transparent bg-gradient-to-r from-blue-100 via-silver-200 to-gray-200
-                            [text-shadow:0_0_8px_rgba(255,255,255,0.3)] animate-shimmer-fast font-Montserrat"
-            >
-              Créons le Futur Numérique{" "}
-            </h1>
+            <div className="relative">
+              <h1
+                className="text-4xl md:text-6xl font-light mb-6 py-2 overflow-hidden opacity-0 font-Montserrat metal-text fade-in"
+                data-text="Créons le Futur Numérique"
+              >
+                Créons le Futur Numérique{" "}
+              </h1>
+            </div>
+
+            <style jsx global>{`
+              @keyframes fadeIn {
+                0% {
+                  opacity: 0;
+                }
+                100% {
+                  opacity: 1;
+                }
+              }
+
+              .fade-in {
+                opacity: 0;
+                animation: fadeIn 1.5s ease-in-out forwards;
+              }
+
+              .metal-text {
+                position: relative;
+                letter-spacing: 1px;
+                color: #777;
+                text-shadow: 0 0 2px rgba(255, 255, 255, 0.4),
+                  0 0 4px rgba(255, 255, 255, 0.2);
+                will-change: opacity;
+              }
+
+              /* Make sure this element doesn't inherit the fade-in opacity */
+              .metal-text.fade-in {
+                animation: fadeIn 1.5s ease-in-out forwards;
+              }
+
+              /* Main metal background */
+              .metal-text::before {
+                content: attr(data-text);
+                position: absolute;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                  to right,
+                  #777 0%,
+                  #999 48%,
+                  #fff 50%,
+                  #999 52%,
+                  #777 100%
+                );
+                background-size: 300% 100%;
+                color: transparent;
+                -webkit-background-clip: text;
+                background-clip: text;
+                z-index: -1;
+                animation: metalShine 6s linear infinite;
+              }
+
+              @keyframes metalShine {
+                0% {
+                  background-position: 100% 0;
+                }
+                100% {
+                  background-position: -200% 0;
+                }
+              }
+
+              /* Moving shine overlay */
+              .metal-text::after {
+                content: attr(data-text);
+                position: absolute;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                  90deg,
+                  transparent 0%,
+                  rgba(255, 255, 255, 0) 35%,
+                  rgba(255, 255, 255, 0.8) 48%,
+                  rgba(255, 255, 255, 0.9) 50%,
+                  rgba(255, 255, 255, 0.8) 52%,
+                  rgba(255, 255, 255, 0) 65%,
+                  transparent 100%
+                );
+                background-size: 200% 100%;
+                color: transparent;
+                -webkit-background-clip: text;
+                background-clip: text;
+                animation: shimmer 12s ease-in-out infinite;
+                z-index: 1;
+              }
+
+              @keyframes shimmer {
+                0% {
+                  background-position: 200% 0;
+                }
+                100% {
+                  background-position: -200% 0;
+                }
+              }
+
+              /* Subtle glow effect */
+              @keyframes subtleGlow {
+                0% {
+                  text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
+                }
+                50% {
+                  text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+                }
+                100% {
+                  text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
+                }
+              }
+            `}</style>
 
             <TypeWriter
               text="Transformation digitale. Innovation technologique. Création d'identité numérique."
