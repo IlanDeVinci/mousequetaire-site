@@ -358,6 +358,27 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Scroll to top button */}
+      <div className="fixed bottom-10 right-10 z-50">
+        <Link href="#top">
+          <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 text-[#060606]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M5 15l7-7 7 7"
+              />
+            </svg>
+          </button>
+        </Link>
+      </div>
     </>
   );
 }
