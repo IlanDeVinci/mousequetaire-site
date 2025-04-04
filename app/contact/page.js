@@ -1,9 +1,27 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
+import Image from "next/image";
 
 const contactOptions = [
   {
-    icon: "📧",
+    icon: "/images/instagram-icon.png",
+    title: "Instagram",
+    description: "Appelez-nous directement",
+    content: (
+      <div className="flex flex-col items-center gap-6">
+        <h3 className="text-3xl font-bold mb-4">Contact Téléphonique</h3>
+        <p className="text-lg mb-6">
+          Disponible du lundi au vendredi, de 9h à 18h
+        </p>
+        <a href="tel:+33123456789" className="text-2xl hover:text-[#7DD4FF]">
+          +33 1 23 45 67 89
+        </a>
+      </div>
+    ),
+    bgColor: "#002132",
+  },
+  {
+    icon: "/images/form-icon.png",
     title: "Email",
     description: "Contactez-nous par email",
     content: (
@@ -30,27 +48,10 @@ const contactOptions = [
         </form>
       </div>
     ),
-    bgColor: "#004165",
+    bgColor: "#70C7F2",
   },
   {
-    icon: "📞",
-    title: "Téléphone",
-    description: "Appelez-nous directement",
-    content: (
-      <div className="flex flex-col items-center gap-6">
-        <h3 className="text-3xl font-bold mb-4">Contact Téléphonique</h3>
-        <p className="text-lg mb-6">
-          Disponible du lundi au vendredi, de 9h à 18h
-        </p>
-        <a href="tel:+33123456789" className="text-2xl hover:text-[#7DD4FF]">
-          +33 1 23 45 67 89
-        </a>
-      </div>
-    ),
-    bgColor: "#005180",
-  },
-  {
-    icon: "💬",
+    icon: "/images/chat-icon.png",
     title: "Chat",
     description: "Discutez en direct",
     content: (
@@ -172,15 +173,16 @@ export default function Contact() {
                   >
                     {/* Circle Content */}
                     <div
-                      className={`flex flex-col items-center transition-opacity duration-700
+                      className={`flex w-[70%] flex-col items-center transition-opacity duration-700
 											${!isExpanded ? "opacity-100" : "opacity-0"}`}
                     >
-                      <span className="text-6xl text-white mb-4">
-                        {option.icon}
-                      </span>
-                      <div className="text-center text-white">
-                        <h3 className="text-2xl font-bold">{option.title}</h3>
-                        <p className="text-sm">{option.description}</p>
+                      <div className="text-6xl text-white relative w-full aspect-[1]">
+                        <Image
+                          src={option.icon}
+                          alt={option.title}
+                          fill
+                          style={{ objectFit: "contain" }}
+                        />
                       </div>
                     </div>
                   </div>
