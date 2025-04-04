@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -78,7 +77,7 @@ const Navbar = () => {
                 }}
                 className="relative px-4 py-2 transition-all duration-300 rounded-full group"
               >
-                <span className="relative z-10 text-white font-medium">
+                <span className="relative z-10 text-white font-medium font-montserrat">
                   {item}
                 </span>
                 <span

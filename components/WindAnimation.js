@@ -118,7 +118,10 @@ class PathTree {
 
     this.minX = startX;
 
-    const startY = this.viewHeight / 2;
+    const startY =
+      this.direction === "right"
+        ? this.viewHeight * (1 / 3)
+        : this.viewHeight * (2 / 3);
 
     this.pathPositions.add(`${startX},${startY}`);
 
