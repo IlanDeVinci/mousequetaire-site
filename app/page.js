@@ -8,7 +8,7 @@ import WindAnimation from "../components/WindAnimation";
 export default function Home() {
   return (
     <>
-      <section className="relative min-h-[90vh] flex items-center justify-center bg-[050610] overflow-hidden font-montserrat">
+      <section className="relative min-h-[90vh] -mt-16 flex items-center justify-center bg-[050610] overflow-hidden font-montserrat">
         <div className="absolute inset-0 bg-gradient-to-br from-[#050610]/90 to-[#050610]/20 z-10" />
         {/* Wind Animation SVG - make it responsive and contained */}
         <WindAnimation />
@@ -233,7 +233,7 @@ export default function Home() {
           </div>
         </div>
         <div className="mt-12 text-center">
-          <Link href="/contact">
+          <Link href="/apropos">
             <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto">
               <span className="text-[#060606] text-lg font-montserrat">
                 En savoir plus
@@ -336,7 +336,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-12 text-center">
-            <Link href="/contact">
+            <Link href="/portfolio">
               <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto">
                 <span className="text-[#060606] text-lg font-montserrat">
                   En savoir plus

@@ -42,7 +42,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
       >
         <Navbar />
-        <main className="container mx-auto py-16  bg-[#050610] min-h-screen">
+        <main className="container mx-auto py-16 mt-16 bg-[#050610] min-h-screen">
           {children}
         </main>
         <Footer />
