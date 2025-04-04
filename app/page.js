@@ -50,7 +50,7 @@ export default function Home() {
                 letter-spacing: 1px;
                 color: #888;
 
-                text-shadow: 0 0 2px rgba(255, 255, 255, 0.3),
+                text-shadow: 0 0 2px rgba(255, 255, 255, 0.25),
                   0 0 4px rgba(255, 255, 255, 0.15);
                 animation: subtleGlow 1.5s ease-in-out infinite;
                 will-change: opacity;
