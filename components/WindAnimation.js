@@ -1,5 +1,7 @@
 "use client";
 
+import React, { useEffect, useRef } from "react";
+
 class PathTree {
   constructor(viewWidth, viewHeight, direction = "right") {
     this.viewWidth = viewWidth;
@@ -1692,4 +1694,11 @@ export default function initWindAnimation() {
       window.windAnimation = new WindAnimation();
     }, 1000);
   }
+  return (
+    <svg
+      className="wind-svg absolute inset-0 w-full h-full overflow-hidden"
+      preserveAspectRatio="xMidYMid slice"
+      style={{ maxWidth: "100vw" }}
+    ></svg>
+  );
 }

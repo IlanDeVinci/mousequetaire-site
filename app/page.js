@@ -2,14 +2,8 @@
 
 import Image from "next/image";
 import React from "react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-
-// Import the wind animation with no SSR since it uses browser APIs
-const WindAnimationInitializer = dynamic(
-  () => import("../components/WindAnimation"),
-  { ssr: false }
-);
+import WindAnimation from "../components/WindAnimation";
 
 export default function Home() {
   return (
@@ -17,11 +11,8 @@ export default function Home() {
       <section className="relative min-h-[90vh] flex items-center justify-center bg-[050610] overflow-hidden font-montserrat">
         <div className="absolute inset-0 bg-gradient-to-br from-[#050610]/90 to-[#050610]/20 z-10" />
         {/* Wind Animation SVG - make it responsive and contained */}
-        <svg
-          className="wind-svg absolute inset-0 w-full h-full overflow-hidden"
-          preserveAspectRatio="xMidYMid slice"
-          style={{ maxWidth: "100vw" }}
-        ></svg>
+        <WindAnimation />
+
         {/* Logo in top left */}
         <div className="container mx-auto px-4 relative z-20">
           <div className="max-w-4xl mx-auto text-center">
@@ -155,7 +146,6 @@ export default function Home() {
             />
           </div>
         </div>
-        <WindAnimationInitializer />
       </section>
       {/* Services Section */}
       <section className="py-16 mx-24">
@@ -183,7 +173,7 @@ export default function Home() {
             ].map((service, index) => (
               <div
                 key={index}
-                className="bg-[#48B1E5] rounded-lg p-6 m-6 transition-all duration-300 aspect-square hover:shadow-lg hover:shadow-blue-500/20 flex text-center items-center justify-center flex-col relative group overflow-hidden"
+                className="bg-[#48B1E5] rounded-2xl p-6 m-6 transition-all duration-300 aspect-square hover:shadow-lg hover:shadow-blue-500/20 flex text-center items-center justify-center flex-col relative group overflow-hidden"
               >
                 <h3 className="text-2xl md:text-3xl font-medium text-white mb-3 z-10 transition-all duration-300 group-hover:transform group-hover:translate-y-[-10px] ">
                   {service.title}
