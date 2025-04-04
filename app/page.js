@@ -206,17 +206,17 @@ export default function Home() {
             {[
               {
                 name: "Samuel Alhadef",
-                role: "Développeur Full-Stack",
+                role: "CCO - Chief Claude Officer",
                 image: "/images/photo-samuel.jpg",
               },
               {
                 name: "Célestin Godefroy",
-                role: "Designer UX/UI",
+                role: "CBO - Chief Branleur Officer",
                 image: "/images/photo-célestin.jpg",
               },
               {
                 name: "Ilan Maouchi",
-                role: "Ingénieur Blockchain",
+                role: "CIO - Chief Information Officer",
                 image: "/images/photo-ilan.jpeg",
               },
             ].map((member, index) => (
