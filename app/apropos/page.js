@@ -100,16 +100,16 @@ function DiscoverElement() {
       className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
     >
       <div
-        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[85%] sm:w-[75%] md:w-[60%] lg:w-[45%] top-1/2 -translate-y-1/2 z-0`}
+        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[30%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
       >
         <div
           className={`${getSliderColor()} rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 shadow-lg h-full transition-all duration-700`}
         >
           <div className="flex flex-col h-full justify-center text-center font-montserrat">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 md:mb-4 text-white">
+            <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 md:mb-4 text-white">
               {getContent().title}
             </h3>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-2 sm:line-clamp-3">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-2 sm:line-clamp-3 sm:h-2/3 md:h-auto">
               {getContent().text}
             </p>
           </div>
@@ -144,7 +144,7 @@ function DiscoverElement() {
         alt="Our growth"
         width={300}
         height={300}
-        className={`transition-all duration-700 ease-in-out z-10 absolute -left-6 sm:-left-8 md:-left-12 top-1/2 -translate-y-1/2 w-[45%] h-[85%] object-contain ${
+        className={`transition-all duration-700 ease-in-out z-10 absolute -left-10 sm:-left-10 md:-left-20 top-[60%] -translate-y-1/2 w-[45%] h-[85%] object-contain ${
           phase === 2
             ? "opacity-100"
             : "opacity-0 pointer-events-none translate-x-[100px]"
