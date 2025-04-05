@@ -1,7 +1,5 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-
 class PathTree {
   constructor(viewWidth, viewHeight, direction = "right") {
     this.viewWidth = viewWidth;

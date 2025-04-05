@@ -24,10 +24,12 @@ export default function Home() {
             </div>
             <div className="relative">
               <h1
-                className="text-4xl md:text-6xl font-light mb-6 py-2 overflow-hidden opacity-0 font-Montserrat metal-text fade-in"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light mb-6 overflow-hidden opacity-0 font-Montserrat metal-text fade-in max-w-full"
                 data-text="Créons le Futur Numérique"
               >
-                Créons le Futur Numérique{" "}
+                <span className="block text-center whitespace-normal px-2">
+                  Créons le Futur Numérique
+                </span>
               </h1>
             </div>
 
@@ -50,11 +52,16 @@ export default function Home() {
                 position: relative;
                 letter-spacing: 1px;
                 color: #888;
-
                 text-shadow: 0 0 2px rgba(255, 255, 255, 0.25),
                   0 0 4px rgba(255, 255, 255, 0.15);
                 animation: subtleGlow 1.5s ease-in-out infinite;
                 will-change: opacity;
+                line-height: 1.2;
+                overflow-wrap: break-word;
+                word-wrap: break-word;
+                -webkit-hyphens: auto;
+                -ms-hyphens: auto;
+                hyphens: auto;
               }
 
               /* Make sure this element doesn't inherit the fade-in opacity */
@@ -67,6 +74,7 @@ export default function Home() {
                 content: attr(data-text);
                 position: absolute;
                 left: 0;
+                top: 0;
                 width: 100%;
                 height: 100%;
                 background: linear-gradient(
@@ -85,19 +93,11 @@ export default function Home() {
                 animation: metalShine 6s linear infinite;
               }
 
-              @keyframes metalShine {
-                0% {
-                  background-position: 100% 0;
-                }
-                100% {
-                  background-position: -200% 0;
-                }
-              }
-
               /* Moving shine overlay */
               .metal-text::after {
                 content: attr(data-text);
                 position: absolute;
+                top: 0;
                 left: 0;
                 width: 100%;
                 height: 100%;
@@ -117,6 +117,27 @@ export default function Home() {
                 background-clip: text;
                 animation: shimmer 12s ease-in-out infinite;
                 z-index: 1;
+              }
+
+              /* Make the metal text responsive on smaller screens */
+              @media (max-width: 640px) {
+                .metal-text {
+                  letter-spacing: 0.5px;
+                }
+
+                .metal-text::before,
+                .metal-text::after {
+                  background-size: 400% 100%;
+                }
+              }
+
+              @keyframes metalShine {
+                0% {
+                  background-position: 100% 0;
+                }
+                100% {
+                  background-position: -200% 0;
+                }
               }
 
               @keyframes shimmer {
