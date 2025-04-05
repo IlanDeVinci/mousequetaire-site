@@ -280,38 +280,47 @@ export default function Home() {
       </section>
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-5xl font-light text-center mb-12 metal-text">
-              Les MouseQuetaires, notre ambition...{" "}
-            </h2>
-            <div className="space-y-6 text-gray-300">
-              <p>
-                Mouse-quetaires est né de la rencontre de trois passionnés de
-                technologie qui partagent une vision commune : rendre le
-                numérique accessible et innovant pour tous.
-              </p>
+          <h2 className="text-5xl font-light text-center mb-12 text-white">
+            Les MouseQuetaires, notre ambition...{" "}
+          </h2>
 
-              <p>
-                Fondée en 2020, notre entreprise s&apos;est rapidement imposée
-                comme un acteur innovant dans le domaine du développement web et
-                de l&apos;expérience utilisateur. Nous combinons expertise
-                technique et créativité pour répondre aux défis numériques de
-                nos clients.
-              </p>
+          <div className="max-w-5xl mx-auto space-y-12">
+            <div className="flex justify-start">
+              <div className="w-4/5 md:w-2/3 text-gray-300">
+                <p className="text-lg">
+                  Mouse-quetaires est né de la rencontre de trois passionnés de
+                  technologie qui partagent une vision commune : rendre le
+                  numérique accessible et innovant pour tous. Fondée en 2020,
+                  notre entreprise s&apos;est rapidement imposée comme un acteur
+                  innovant dans le domaine du développement web et de
+                  l&apos;expérience utilisateur.
+                </p>
+              </div>
+            </div>
 
-              <p>
-                Notre philosophie repose sur trois piliers : la qualité, la
-                créativité et la transparence. Nous croyons fermement que chaque
-                projet mérite une attention particulière et une approche
-                personnalisée.
-              </p>
+            <div className="flex justify-end">
+              <div className="w-4/5 md:w-2/3 text-gray-300">
+                <p className="text-lg">
+                  Notre philosophie repose sur trois piliers : la qualité, la
+                  créativité et la transparence. Nous croyons fermement que
+                  chaque projet mérite une attention particulière et une
+                  approche personnalisée. Nous combinons expertise technique et
+                  créativité pour répondre aux défis numériques de nos clients.
+                </p>
+              </div>
+            </div>
 
-              <p>
-                Aujourd&apos;hui, nous sommes fiers d&apos;accompagner des
-                entreprises de toutes tailles dans leur transformation digitale,
-                en créant des solutions sur mesure qui répondent à leurs besoins
-                spécifiques.
-              </p>
+            <div className="flex justify-start">
+              <div className="w-4/5 md:w-2/3 text-gray-300">
+                <p className="text-lg">
+                  Aujourd&apos;hui, nous sommes fiers d&apos;accompagner des
+                  entreprises de toutes tailles dans leur transformation
+                  digitale, en créant des solutions sur mesure qui répondent à
+                  leurs besoins spécifiques. Notre engagement est de continuer à
+                  innover et à repousser les limites du possible pour nos
+                  clients.
+                </p>
+              </div>
             </div>
           </div>
         </div>
