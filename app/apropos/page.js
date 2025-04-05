@@ -100,7 +100,7 @@ function DiscoverElement() {
       className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
     >
       <div
-        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[30%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
+        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[40%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
       >
         <div
           className={`${getSliderColor()} rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 shadow-lg h-full transition-all duration-700`}
@@ -109,7 +109,7 @@ function DiscoverElement() {
             <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 md:mb-4 text-white">
               {getContent().title}
             </h3>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-2 sm:line-clamp-3 sm:h-2/3 md:h-auto">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-5 sm:h-2/3 h-[52%] md:h-auto">
               {getContent().text}
             </p>
           </div>
@@ -199,30 +199,46 @@ const teamMembers = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     image: "/images/photo-ilan.jpeg",
   },
+  {
+    id: 4,
+    name: "Dorian Collet",
+    role: "UI/UX Designer",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image: "/images/photo-dorian.png",
+  },
+  {
+    id: 5,
+    name: "Xavier d'Andurain",
+    role: "UI/UX Designer",
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    image: "/images/photo-xavier.png",
+  },
 ];
 
 function TeamMember({ image, name, role, description, reverse }) {
   return (
     <article
-      className={`flex flex-col ${
-        reverse ? "md:flex-row-reverse" : "md:flex-row"
+      className={`flex ${
+        reverse ? "flex-row-reverse" : "flex-row"
       } items-center mb-8 md:mb-12`}
     >
       {/* Image du membre */}
-      <Image
-        src={image}
-        alt={`Photo de ${name}`}
-        width={200}
-        height={200}
-        className="rounded-full w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0"
-      />
+      <div className="rounded-full overflow-hidden flex-shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px]">
+        <Image
+          src={image}
+          alt={`Photo de ${name}`}
+          width={200}
+          height={200}
+          className="w-full h-full object-cover object-top"
+        />
+      </div>
       {/* Bloc de texte */}
       <div
         className={`${
-          reverse
-            ? "md:mr-6 lg:mr-12 md:text-right"
-            : "md:ml-6 lg:ml-12 md:text-left"
-        } text-center md:text-left text-lg px-4`}
+          reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
+        } ${reverse ? "text-right" : "text-left"} text-lg`}
       >
         <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
         <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
@@ -239,7 +255,9 @@ function TeamMember({ image, name, role, description, reverse }) {
 // Code de la page :
 
 export default function Equipe() {
-  const [hovered, setHovered] = useState(false);
+  const [hoveredValue1, setHoveredValue1] = useState(false);
+  const [hoveredValue2, setHoveredValue2] = useState(false);
+  const [hoveredValue3, setHoveredValue3] = useState(false);
 
   return (
     <>
@@ -253,7 +271,6 @@ export default function Equipe() {
             eiusmod tempor
           </p>
         </header>
-
         {/* Bloc de découverte */}
         <section className="flex justify-center mb-16 px-4">
           <DiscoverElement />
@@ -269,7 +286,7 @@ export default function Equipe() {
               name={member.name}
               role={member.role}
               description={member.description}
-              reverse={index === 1}
+              reverse={index % 2 === 1}
             />
           ))}
         </section>
@@ -278,29 +295,151 @@ export default function Equipe() {
         <section className="text-center my-12">
           <h1 className="text-3xl md:text-4xl my-8 md:m-24">Nos valeurs</h1>
 
+          {/* First value - Left side */}
           <div
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => setHovered(false)}
-            onClick={() => setHovered(!hovered)} // For touch devices
-            className={`flex items-center gap-4 p-4 md:p-8 mx-4 rounded-r-full bg-[#0091D9] text-white cursor-pointer 
-                    transition-all duration-300 ease-in-out
-                    ${hovered ? "w-[90vw]" : "w-[90%] md:w-[400px]"}`}
+            className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 mb-16"
+            onMouseEnter={() => setHoveredValue1(true)}
+            onMouseLeave={() => setHoveredValue1(false)}
+            onClick={() => setHoveredValue1(!hoveredValue1)}
           >
-            <div className="flex-shrink-0">
-              <Image
-                src="/images/photo-samuel.jpg"
-                alt="Icon Entraide"
-                width={100}
-                height={100}
-                className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
-              />
+            {/* Bottom rectangle */}
+            <div
+              className={`absolute rounded-r-full bg-[#003C59] text-white p-4 md:p-8 
+                      w-[90%]  h-[80px] md:h-[120px] left-0 z-10
+                      transition-all duration-300 ease-in-out max-w-none
+                      ${hoveredValue1 ? "w-[90vw]" : ""}`}
+            ></div>
+
+            {/* Middle rectangle */}
+            <div
+              className={`absolute rounded-r-full bg-[#007590] text-white p-4 md:p-8 
+                      w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
+                      transition-all duration-300 ease-in-out max-w-none
+                      ${hoveredValue1 ? "w-[90vw] left-[-40px]" : ""}`}
+            ></div>
+
+            {/* Top rectangle with content */}
+            <div
+              className={`absolute rounded-r-full bg-[#0091D9] text-white p-4 md:p-8 
+                      flex items-center gap-4 cursor-pointer 
+                      transition-all duration-300 ease-in-out max-w-none
+                      w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
+                      ${hoveredValue1 ? "w-[90vw] left-[-80px]" : ""}`}
+            >
+              <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
+                <Image
+                  src="/images/photo-samuel.jpg"
+                  alt="Icon Entraide"
+                  width={100}
+                  height={100}
+                  className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                />
+              </div>
+              {/* Le texte qui change au survol */}
+              <p className="whitespace-nowrap text-sm md:text-base">
+                {hoveredValue1
+                  ? "Collaboration et esprit d'entraide"
+                  : "Entraide Collaboration"}
+              </p>
             </div>
-            {/* Le texte qui change au survol */}
-            <p className="whitespace-nowrap text-sm md:text-base">
-              {hovered
-                ? "Collaboration et esprit d'entraide"
-                : "Entraide Collaboration"}
-            </p>
+          </div>
+
+          {/* Second value - Right side */}
+          <div
+            className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 ml-auto mb-16"
+            onMouseEnter={() => setHoveredValue2(true)}
+            onMouseLeave={() => setHoveredValue2(false)}
+            onClick={() => setHoveredValue2(!hoveredValue2)}
+          >
+            {/* Bottom rectangle */}
+            <div
+              className={`absolute rounded-l-full bg-[#003C59] text-white p-4 md:p-8 
+                      w-[90%] h-[80px] md:h-[120px] right-0 z-10
+                      transition-all duration-300 ease-in-out max-w-none
+                      ${hoveredValue2 ? "w-[90vw]" : ""}`}
+            ></div>
+
+            {/* Middle rectangle */}
+            <div
+              className={`absolute rounded-l-full bg-[#007590] text-white p-4 md:p-8 
+                      w-[90%] h-[80px] md:h-[120px] right-[-40px] z-20
+                      transition-all duration-300 ease-in-out max-w-none
+                      ${hoveredValue2 ? "w-[90vw] right-[-40px]" : ""}`}
+            ></div>
+
+            {/* Top rectangle with content */}
+            <div
+              className={`absolute rounded-l-full bg-[#0091D9] text-white p-4 md:p-8 
+                      flex items-center justify-end gap-4 cursor-pointer 
+                      transition-all duration-300 ease-in-out max-w-none
+                      w-[90%] h-[80px] md:h-[120px] right-[-80px] z-30
+                      ${hoveredValue2 ? "w-[90vw] right-[-80px]" : ""}`}
+            >
+              {/* Le texte qui change au survol */}
+              <p className="whitespace-nowrap text-sm md:text-base">
+                {hoveredValue2
+                  ? "Innovation et créativité sans limites"
+                  : "Innovation Créativité"}
+              </p>
+              <div className="flex-shrink-0 mr-[60px] md:mr-[80px]">
+                <Image
+                  src="/images/photo-ilan.jpeg"
+                  alt="Icon Innovation"
+                  width={100}
+                  height={100}
+                  className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Third value - Left side */}
+          <div
+            className="relative px-4 py-12 flex justify-center overflow-visible w-1/2"
+            onMouseEnter={() => setHoveredValue3(true)}
+            onMouseLeave={() => setHoveredValue3(false)}
+            onClick={() => setHoveredValue3(!hoveredValue3)}
+          >
+            {/* Bottom rectangle */}
+            <div
+              className={`absolute rounded-r-full bg-[#003C59] text-white p-4 md:p-8 
+                      w-[90%]  h-[80px] md:h-[120px] left-0 z-10
+                      transition-all duration-300 ease-in-out max-w-none
+                      ${hoveredValue3 ? "w-[90vw]" : ""}`}
+            ></div>
+
+            {/* Middle rectangle */}
+            <div
+              className={`absolute rounded-r-full bg-[#007590] text-white p-4 md:p-8 
+                      w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
+                      transition-all duration-300 ease-in-out max-w-none
+                      ${hoveredValue3 ? "w-[90vw] left-[-40px]" : ""}`}
+            ></div>
+
+            {/* Top rectangle with content */}
+            <div
+              className={`absolute rounded-r-full bg-[#0091D9] text-white p-4 md:p-8 
+                      flex items-center gap-4 cursor-pointer 
+                      transition-all duration-300 ease-in-out max-w-none
+                      w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
+                      ${hoveredValue3 ? "w-[90vw] left-[-80px]" : ""}`}
+            >
+              <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
+                <Image
+                  src="/images/photo-célestin.jpg"
+                  alt="Icon Excellence"
+                  width={100}
+                  height={100}
+                  className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                />
+              </div>
+              {/* Le texte qui change au survol */}
+              <p className="whitespace-nowrap text-sm md:text-base">
+                {hoveredValue3
+                  ? "Excellence et qualité dans chaque projet"
+                  : "Excellence Qualité"}
+              </p>
+            </div>
           </div>
         </section>
       </main>
