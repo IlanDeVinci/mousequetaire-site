@@ -66,6 +66,18 @@ export default function Services() {
     [isAnimating]
   );
 
+  // For touch devices - toggle active state
+  const handleClick = useCallback(
+    (index) => {
+      if (activeIndex === index) {
+        setActiveIndex(null);
+      } else {
+        setActiveIndex(index);
+      }
+    },
+    [activeIndex]
+  );
+
   const handleMouseLeave = useCallback(() => {
     lastIndex.current = null;
     setActiveIndex(null);
@@ -73,19 +85,62 @@ export default function Services() {
 
   return (
     <>
-      <main className="pt-24 pb-16 bg-[#050610] min-h-screen px-48">
-        <div className="container mx-auto px-4">
+      <main className="pt-24 pb-16 bg-[#050610] min-h-screen px-4 md:px-8 lg:px-48">
+        <div className="container mx-auto">
           {/* Header Section */}
-          <h1 className="text-5xl font-bold mt-16 mb-6 text-center text-[#7DD4FF]">
+          <h1 className="text-3xl md:text-5xl font-bold mt-16 mb-6 text-center text-[#7DD4FF]">
             Nos Services
           </h1>
-          <p className="text-white text-center max-w-2xl mx-auto mb-16 text-lg">
+          <p className="text-white text-center max-w-2xl mx-auto mb-16 text-base md:text-lg px-4">
             Découvrez notre gamme complète de services numériques conçus pour
             propulser votre entreprise vers le succès.
           </p>
-          {/* Interactive Circles */}
-          <div className="flex justify-center mb-24 relative h-72">
-            <div className="w-[1000px] relative">
+
+          {/* Mobile Services Layout */}
+          <div className="md:hidden flex flex-col gap-8 mb-16">
+            {services.map((service, index) => (
+              <div
+                key={index}
+                className={`rounded-2xl overflow-hidden transition-all duration-300 
+                ${activeIndex === index ? "h-72" : "h-32"}`}
+                style={{ backgroundColor: service.bgColor }}
+                onClick={() => handleClick(index)}
+              >
+                <div className="flex items-center p-4 h-32">
+                  <div className="relative h-20 w-20 flex-shrink-0">
+                    <Image
+                      src={service.icon}
+                      alt={service.title}
+                      fill
+                      className="object-contain p-1"
+                    />
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-xl text-white font-bold">
+                      {service.title}
+                    </h3>
+                    <p className="text-white/80">{service.description}</p>
+                  </div>
+                </div>
+                <div
+                  className={`p-4 ${
+                    activeIndex === index ? "block" : "hidden"
+                  }`}
+                >
+                  <p className="text-white">{service.description}</p>
+                  <p className="text-white mt-2">
+                    Notre équipe d&apos;experts est prête à vous accompagner
+                    dans vos projets numériques avec des solutions innovantes et
+                    personnalisées.
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Interactive Circles */}
+          <div className="hidden md:flex justify-center mb-24 relative h-72">
+            <div className="w-full max-w-[1000px] relative">
               {services.map((service, index) => (
                 <div
                   key={index}
@@ -96,7 +151,7 @@ export default function Services() {
                         ? index === 2
                           ? "calc(100% - 1012px)" // Adjusted: 1000px + 16px padding
                           : "0px"
-                        : `${index * 350}px`,
+                        : `${index * 33}%`,
                     zIndex: activeIndex === index ? 10 : 1,
                     width: "288px",
                     padding: "8px",
@@ -148,29 +203,32 @@ export default function Services() {
               ))}
             </div>
           </div>
-          {/* Alternating Sections */}
+
+          {/* Alternating Sections - Responsive */}
           {sections.map((section, index) => (
             <div
               key={index}
               className={`flex flex-col ${
                 section.isReversed ? "md:flex-row-reverse" : "md:flex-row"
-              } items-center gap-12 mb-24`}
+              } items-center gap-8 md:gap-12 mb-16 md:mb-24`}
             >
-              <div className="flex-1">
-                <div className="relative h-[400px] w-full rounded-xl overflow-hidden m-4">
+              <div className="flex-1 w-full">
+                <div className="relative h-[250px] md:h-[400px] w-full rounded-xl overflow-hidden">
                   <Image
                     src={section.image}
                     alt={section.title}
                     fill
-                    className="object-contain p-8"
+                    className="object-contain p-4 md:p-8"
                   />
                 </div>
               </div>
-              <div className="flex-1 text-white">
-                <h2 className="text-3xl font-bold mb-6 text-[#7DD4FF]">
+              <div className="flex-1 text-white px-4">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-[#7DD4FF]">
                   {section.title}
                 </h2>
-                <p className="text-lg leading-relaxed">{section.description}</p>
+                <p className="text-base md:text-lg leading-relaxed">
+                  {section.description}
+                </p>
               </div>
             </div>
           ))}

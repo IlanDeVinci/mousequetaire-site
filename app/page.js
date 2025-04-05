@@ -9,9 +9,10 @@ export default function Home() {
   return (
     <>
       <section className="relative min-h-[90vh] -mt-16 flex items-center justify-center bg-[050610] overflow-hidden font-montserrat">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#050610]/90 to-[#050610]/20 z-10" />
-        {/* Wind Animation SVG - make it responsive and contained */}
-        <WindAnimation />
+        {/* Wind Animation SVG - now with responsive sizing */}
+        <div className="absolute inset-0 h-full">
+          <WindAnimation />
+        </div>
 
         {/* Logo in top left */}
         <div className="container mx-auto px-4 relative z-20">

@@ -9,11 +9,16 @@ const contactOptions = [
     description: "Appelez-nous directement",
     content: (
       <div className="flex flex-col items-center gap-6">
-        <h3 className="text-3xl font-bold mb-4">Contact Téléphonique</h3>
-        <p className="text-lg mb-6">
+        <h3 className="text-2xl md:text-3xl font-bold mb-4">
+          Contact Téléphonique
+        </h3>
+        <p className="text-base md:text-lg mb-6">
           Disponible du lundi au vendredi, de 9h à 18h
         </p>
-        <a href="tel:+33123456789" className="text-2xl hover:text-[#7DD4FF]">
+        <a
+          href="tel:+33123456789"
+          className="text-xl md:text-2xl hover:text-[#7DD4FF]"
+        >
           +33 1 23 45 67 89
         </a>
       </div>
@@ -26,8 +31,10 @@ const contactOptions = [
     description: "Contactez-nous par email",
     content: (
       <div className="flex flex-col items-center gap-6">
-        <h3 className="text-3xl font-bold mb-4">Contact par Email</h3>
-        <p className="text-lg mb-6">
+        <h3 className="text-2xl md:text-3xl font-bold mb-4">
+          Contact par Email
+        </h3>
+        <p className="text-base md:text-lg mb-6">
           Envoyez-nous un message et nous vous répondrons dans les plus brefs
           délais
         </p>
@@ -56,8 +63,8 @@ const contactOptions = [
     description: "Discutez en direct",
     content: (
       <div className="flex flex-col items-center gap-6">
-        <h3 className="text-3xl font-bold mb-4">Chat en Direct</h3>
-        <p className="text-lg mb-6">
+        <h3 className="text-2xl md:text-3xl font-bold mb-4">Chat en Direct</h3>
+        <p className="text-base md:text-lg mb-6">
           Notre équipe est disponible pour répondre à vos questions
         </p>
         <button className="bg-[#7DD4FF] text-[#002132] font-bold py-3 px-6 rounded">
@@ -136,11 +143,39 @@ export default function Contact() {
     <>
       <main className="pt-24 pb-16 bg-[#050610] min-h-screen">
         <div className="container mx-auto px-4">
-          <p className="text-white text-center max-w-[400px] mx-auto  font-montserrat font-semibold mb-16 text-3xl">
+          <p className="text-white text-center max-w-[400px] mx-auto font-montserrat font-semibold mb-8 md:mb-16 text-xl md:text-3xl px-4">
             Contactez-nous via ces différents médias :
           </p>
 
-          <div className="flex justify-center mb-24 relative h-72">
+          {/* Mobile view - stack circles vertically */}
+          <div className="md:hidden flex flex-col items-center gap-8 mb-16">
+            {contactOptions.map((option, index) => (
+              <div key={index} className="w-[250px] h-[250px] relative">
+                <div
+                  onClick={(e) => !activeModal && handleCircleClick(e, index)}
+                  className={`w-full h-full rounded-full flex items-center justify-center 
+                  ${!activeModal ? "cursor-pointer hover:scale-105" : ""} 
+                  transition-all duration-700 ease-in-out`}
+                  style={{ backgroundColor: option.bgColor }}
+                >
+                  {/* Circle Content */}
+                  <div className="flex w-[70%] flex-col items-center">
+                    <div className="text-5xl text-white relative w-full aspect-[1]">
+                      <Image
+                        src={option.icon}
+                        alt={option.title}
+                        fill
+                        style={{ objectFit: "contain" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop view - horizontal layout */}
+          <div className="hidden md:flex justify-center mb-24 relative h-72">
             <div className="w-[1000px] relative">
               {contactOptions.map((option, index) => (
                 <div
@@ -151,7 +186,6 @@ export default function Contact() {
                     width: "288px",
                     opacity:
                       activeModal !== null && activeModal !== index ? 0 : 1,
-                    // Make non-selected circles fade out faster
                     transitionDuration:
                       activeModal !== null && activeModal !== index
                         ? "300ms"
@@ -191,19 +225,18 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Separate Modal Overlay */}
+          {/* Modal Overlay - responsive for all screens */}
           {activeModal !== null && (
             <div
               className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none
-							transition-opacity duration-300 ${
-                isExpanded && !isAnimating ? "opacity-100" : "opacity-0"
-              }`}
+							transition-opacity duration-300 px-4
+              ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
             >
               <div
-                className={`relative w-[90%] max-w-4xl pointer-events-auto
+                className={`relative w-full max-w-4xl pointer-events-auto
 								transition-all duration-300 ${isExpanded ? "scale-100" : "scale-95"}`}
               >
-                <div className="text-white">
+                <div className="text-white p-6">
                   {contactOptions[activeModal].content}
                 </div>
                 <button

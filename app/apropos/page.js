@@ -71,7 +71,7 @@ function DiscoverElement() {
       case 3:
         return {
           title: "Collaboration",
-          text: "Nous avons donc eu l’idée de nous lancer dans cette aventure qui ne fera que de rendre le monde du web meilleur.",
+          text: "Nous avons donc eu l'idée de nous lancer dans cette aventure qui ne fera que de rendre le monde du web meilleur.",
         };
       default:
         return {
@@ -84,7 +84,7 @@ function DiscoverElement() {
   const getSliderPosition = () => {
     switch (phase) {
       case 1:
-        return "left-[1%]"; // Reduced from 5% to bring closer to edge
+        return "left-[1%] md:left-[1%]"; // Reduced from 5% to bring closer to edge
       case 2:
         return "left-[50%] -translate-x-1/2";
       case 3:
@@ -97,19 +97,19 @@ function DiscoverElement() {
   return (
     <div
       onClick={handleClick}
-      className={`w-full max-w-5xl h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
+      className={`w-full max-w-5xl h-64 md:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
     >
       <div
-        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[95%] w-[45%] top-1/2 -translate-y-1/2 z-0`}
+        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[95%] w-[70%] md:w-[45%] top-1/2 -translate-y-1/2 z-0`}
       >
         <div
-          className={`${getSliderColor()} rounded-full px-8 py-4 shadow-lg h-full transition-all duration-700`}
+          className={`${getSliderColor()} rounded-full px-4 md:px-8 py-4 shadow-lg h-full transition-all duration-700`}
         >
           <div className="flex flex-col h-full justify-center text-center font-montserrat">
-            <h3 className="text-2xl font-bold mb-4 text-white ">
+            <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-white">
               {getContent().title}
             </h3>
-            <p className="text-lg text-white/90 line-clamp-3">
+            <p className="text-sm md:text-lg text-white/90 line-clamp-3">
               {getContent().text}
             </p>
           </div>
@@ -204,7 +204,9 @@ const teamMembers = [
 function TeamMember({ image, name, role, description, reverse }) {
   return (
     <article
-      className={`flex items-center mb-12 ${reverse ? "flex-row-reverse" : ""}`}
+      className={`flex flex-col ${
+        reverse ? "md:flex-row-reverse" : "md:flex-row"
+      } items-center mb-12`}
     >
       {/* Image du membre */}
       <Image
@@ -212,17 +214,17 @@ function TeamMember({ image, name, role, description, reverse }) {
         alt={`Photo de ${name}`}
         width={200}
         height={200}
-        className="rounded-full w-[200px] h-[200px]"
+        className="rounded-full w-[150px] h-[150px] md:w-[200px] md:h-[200px] mb-4 md:mb-0"
       />
       {/* Bloc de texte */}
       <div
         className={`${
-          reverse ? "mr-12 text-right" : "ml-12 text-left"
-        } text-lg`}
+          reverse ? "md:mr-12 md:text-right" : "md:ml-12 md:text-left"
+        } text-center md:text-left text-lg px-4`}
       >
-        <h2 className="text-3xl">{name}</h2>
-        <h3 className="text-[#87D7FF] my-2 text-xl">{role}</h3>
-        <p>{description}</p>
+        <h2 className="text-2xl md:text-3xl">{name}</h2>
+        <h3 className="text-[#87D7FF] my-2 text-lg md:text-xl">{role}</h3>
+        <p className="text-sm md:text-base">{description}</p>
       </div>
     </article>
   );
@@ -238,8 +240,10 @@ export default function Equipe() {
   return (
     <>
       <main className="pt-20">
-        <header className="p-24 text-center">
-          <h1 className="text-5xl pb-8">Qui sommes nous ?</h1>
+        <header className="p-4 md:p-24 text-center">
+          <h1 className="text-3xl md:text-5xl pb-4 md:pb-8">
+            Qui sommes nous ?
+          </h1>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor
@@ -247,14 +251,13 @@ export default function Equipe() {
         </header>
 
         {/* Bloc de découverte */}
-
-        <section className="flex justify-center mb-16">
+        <section className="flex justify-center mb-16 px-4">
           <DiscoverElement />
         </section>
 
         {/* Section équipe */}
-        <section className="text-center justify-center mb-16 px-44">
-          <h1 className="text-4xl mb-24">Notre équipe</h1>
+        <section className="text-center justify-center mb-16 px-4 md:px-12 lg:px-44">
+          <h1 className="text-3xl md:text-4xl mb-12 md:mb-24">Notre équipe</h1>
           {teamMembers.map((member, index) => (
             <TeamMember
               key={member.id}
@@ -268,16 +271,16 @@ export default function Equipe() {
         </section>
 
         {/* Section valeurs */}
-
         <section className="text-center my-12">
-          <h1 className="text-4xl m-24">Nos valeurs</h1>
+          <h1 className="text-3xl md:text-4xl my-8 md:m-24">Nos valeurs</h1>
 
           <div
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
-            className={`flex items-center gap-4 p-8 rounded-r-full bg-[#0091D9] text-white cursor-pointer 
+            onClick={() => setHovered(!hovered)} // For touch devices
+            className={`flex items-center gap-4 p-4 md:p-8 mx-4 rounded-r-full bg-[#0091D9] text-white cursor-pointer 
                     transition-all duration-300 ease-in-out
-                    ${hovered ? "w-[90vw]" : "w-[400px]"}`}
+                    ${hovered ? "w-[90vw]" : "w-[90%] md:w-[400px]"}`}
           >
             <div className="flex-shrink-0">
               <Image
@@ -285,12 +288,13 @@ export default function Equipe() {
                 alt="Icon Entraide"
                 width={100}
                 height={100}
+                className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
               />
             </div>
             {/* Le texte qui change au survol */}
-            <p className="whitespace-nowrap">
+            <p className="whitespace-nowrap text-sm md:text-base">
               {hovered
-                ? "Collaboration et esprit d’entraide"
+                ? "Collaboration et esprit d'entraide"
                 : "Entraide Collaboration"}
             </p>
           </div>

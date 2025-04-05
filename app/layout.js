@@ -23,18 +23,18 @@ const montserrat = Montserrat({
 
 export const metadata = {
   title: "Mousequetaire",
-  description: "Mousequetaire - Next.js Application",
+  description: "Mousequetaire - Agence de développement web & design",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className="bg-[#050610]">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta
-          name="description"
-          content="Mousequetaire - Next.js Application"
-        />
+        <meta name="description" content="Mousequetaire" />
         <link rel="icon" href="/favicon.ico" />
         <title>Mousequetaire</title>
       </head>

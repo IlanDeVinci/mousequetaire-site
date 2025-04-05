@@ -3,7 +3,7 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300">
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-6 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
             <h3 className="text-xl font-bold text-white mb-4">MouseQuetaire</h3>
@@ -12,7 +12,7 @@ const Footer = () => {
               droits réservés
             </p>
           </div>
-          <div>
+          <div className="mt-6 md:mt-0">
             <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
             <p className="mb-2 flex items-center">
               <svg
@@ -29,12 +29,12 @@ const Footer = () => {
                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 />
               </svg>
-              contact@mousequetaire.com
+              <span className="break-all">contact@mousequetaire.com</span>
             </p>
             <p className="mb-4 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2 text-gray-400"
+                className="h-5 w-5 mr-2 text-gray-400 flex-shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

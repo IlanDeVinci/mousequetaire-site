@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +19,17 @@ const Navbar = () => {
 
   const pathname = usePathname();
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  // Close mobile menu when clicking a link
+  const handleLinkClick = () => {
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   // Logo component positioned absolutely at top left
   const Logo = () => (
     <div className="absolute top-4 left-4 z-50">
@@ -27,10 +39,11 @@ const Navbar = () => {
           if (pathname === "/") {
             e.preventDefault();
           }
+          handleLinkClick();
         }}
         className="flex items-center transform hover:scale-105 transition-transform duration-300"
       >
-        <div className="relative w-[300px] h-[80px]">
+        <div className="relative w-[200px] md:w-[300px] h-[60px] md:h-[80px]">
           <Image
             src="/images/logoblanc.png"
             alt="Mousequetaire Logo Dark"
@@ -45,8 +58,70 @@ const Navbar = () => {
   return (
     <>
       <Logo />
+
+      {/* Mobile hamburger menu button */}
+      <button
+        className="fixed top-8 right-4 z-50 md:hidden bg-white rounded-full p-2 w-10 h-10"
+        onClick={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
+        <div
+          className={`w-6 h-0.5 bg-[#002132] mb-1.5 transition-all ${
+            mobileMenuOpen ? "transform rotate-45 translate-y-2" : ""
+          }`}
+        ></div>
+        <div
+          className={`w-6 h-0.5 bg-[#002132] mb-1.5 transition-all ${
+            mobileMenuOpen ? "opacity-0" : ""
+          }`}
+        ></div>
+        <div
+          className={`w-6 h-0.5 bg-[#002132] transition-all ${
+            mobileMenuOpen ? "transform -rotate-45 -translate-y-2" : ""
+          }`}
+        ></div>
+      </button>
+
+      {/* Mobile menu */}
+      <div
+        className={`fixed inset-0 bg-[#002132] z-40 md:hidden flex flex-col items-center justify-center transition-all duration-300 ${
+          mobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+      >
+        <nav className="flex flex-col items-center space-y-6">
+          {["Accueil", "Nos services", "A propos", "Portfolio", "Contact"].map(
+            (item) => {
+              const itemPath =
+                item === "Accueil"
+                  ? "/"
+                  : `/${item.toLowerCase().replace(" ", "")}`;
+              const isActive = pathname === itemPath;
+
+              return (
+                <Link
+                  key={item}
+                  href={itemPath}
+                  onClick={(e) => {
+                    if (item === "Accueil" && pathname === "/") {
+                      e.preventDefault();
+                    }
+                    handleLinkClick();
+                  }}
+                  className={`px-4 py-2 text-2xl font-montserrat ${
+                    isActive ? "text-[#7DD4FF]" : "text-white"
+                  }`}
+                >
+                  {item}
+                </Link>
+              );
+            }
+          )}
+        </nav>
+      </div>
+
+      {/* Desktop navbar */}
       <nav
-        className={`fixed w-full z-40 pt-12 px-4 flex justify-center transition-all duration-300 ${
+        className={`fixed w-full z-40 pt-12 px-4 hidden md:flex justify-center transition-all duration-300 ${
           scrolled ? "-top-10" : "top-6"
         }`}
       >
