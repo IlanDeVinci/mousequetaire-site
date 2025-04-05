@@ -85,29 +85,29 @@ export default function Services() {
 
   return (
     <>
-      <main className="pt-24 pb-16 bg-[#050610] min-h-screen px-4 md:px-8 lg:px-48">
+      <main className="pt-24 pb-16 bg-[#050610] min-h-screen px-3 sm:px-4 md:px-8 lg:px-12 xl:px-48">
         <div className="container mx-auto">
           {/* Header Section */}
-          <h1 className="text-3xl md:text-5xl font-bold mt-16 mb-6 text-center text-[#7DD4FF]">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mt-8 sm:mt-12 md:mt-16 mb-4 sm:mb-6 text-center text-[#7DD4FF]">
             Nos Services
           </h1>
-          <p className="text-white text-center max-w-2xl mx-auto mb-16 text-base md:text-lg px-4">
+          <p className="text-white text-center max-w-2xl mx-auto mb-8 sm:mb-12 md:mb-16 text-sm sm:text-base md:text-lg px-3 sm:px-4">
             Découvrez notre gamme complète de services numériques conçus pour
             propulser votre entreprise vers le succès.
           </p>
 
           {/* Mobile Services Layout */}
-          <div className="md:hidden flex flex-col gap-8 mb-16">
+          <div className="md:hidden flex flex-col gap-4 sm:gap-8 mb-12 sm:mb-16 px-2">
             {services.map((service, index) => (
               <div
                 key={index}
                 className={`rounded-2xl overflow-hidden transition-all duration-300 
-                ${activeIndex === index ? "h-72" : "h-32"}`}
+                ${activeIndex === index ? "h-64 sm:h-72" : "h-24 sm:h-32"}`}
                 style={{ backgroundColor: service.bgColor }}
                 onClick={() => handleClick(index)}
               >
-                <div className="flex items-center p-4 h-32">
-                  <div className="relative h-20 w-20 flex-shrink-0">
+                <div className="flex items-center p-3 sm:p-4 h-24 sm:h-32">
+                  <div className="relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0">
                     <Image
                       src={service.icon}
                       alt={service.title}
@@ -115,20 +115,24 @@ export default function Services() {
                       className="object-contain p-1"
                     />
                   </div>
-                  <div className="ml-4">
-                    <h3 className="text-xl text-white font-bold">
+                  <div className="ml-3 sm:ml-4">
+                    <h3 className="text-lg sm:text-xl text-white font-bold">
                       {service.title}
                     </h3>
-                    <p className="text-white/80">{service.description}</p>
+                    <p className="text-sm text-white/80">
+                      {service.description}
+                    </p>
                   </div>
                 </div>
                 <div
-                  className={`p-4 ${
+                  className={`p-3 sm:p-4 ${
                     activeIndex === index ? "block" : "hidden"
                   }`}
                 >
-                  <p className="text-white">{service.description}</p>
-                  <p className="text-white mt-2">
+                  <p className="text-sm sm:text-base text-white">
+                    {service.description}
+                  </p>
+                  <p className="text-sm sm:text-base text-white mt-2">
                     Notre équipe d&apos;experts est prête à vous accompagner
                     dans vos projets numériques avec des solutions innovantes et
                     personnalisées.
@@ -139,7 +143,7 @@ export default function Services() {
           </div>
 
           {/* Desktop Interactive Circles */}
-          <div className="hidden md:flex justify-center mb-24 relative h-72">
+          <div className="hidden md:flex justify-center mb-16 lg:mb-24 relative h-72">
             <div className="w-full max-w-[1000px] relative">
               {services.map((service, index) => (
                 <div
@@ -169,13 +173,13 @@ export default function Services() {
                     }}
                   >
                     <div
-                      className={`absolute transition-all duration-700 ease-in-out flex items-center gap-12 ${
+                      className={`absolute transition-all duration-700 ease-in-out flex items-center gap-6 md:gap-8 lg:gap-12 ${
                         index === 2
                           ? "right-3 flex-row-reverse" // Added flex-row-reverse for the right circle
                           : "left-3"
                       }`}
                     >
-                      <span className="text-6xl text-white shrink-0 w-64 h-64 relative">
+                      <span className="text-5xl md:text-6xl text-white shrink-0 w-56 md:w-64 h-56 md:h-64 relative">
                         <Image
                           src={service.icon}
                           alt={service.title}
@@ -190,10 +194,10 @@ export default function Services() {
                             : "opacity-0 delay-0"
                         }`}
                       >
-                        <h3 className="text-4xl font-bold mb-4">
+                        <h3 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">
                           {service.title}
                         </h3>
-                        <p className="whitespace-normal max-w-[600px] text-xl">
+                        <p className="whitespace-normal max-w-[500px] md:max-w-[600px] text-lg md:text-xl">
                           {service.description}
                         </p>
                       </div>
@@ -210,23 +214,23 @@ export default function Services() {
               key={index}
               className={`flex flex-col ${
                 section.isReversed ? "md:flex-row-reverse" : "md:flex-row"
-              } items-center gap-8 md:gap-12 mb-16 md:mb-24`}
+              } items-center gap-6 sm:gap-8 md:gap-12 mb-12 sm:mb-16 md:mb-24`}
             >
               <div className="flex-1 w-full">
-                <div className="relative h-[250px] md:h-[400px] w-full rounded-xl overflow-hidden">
+                <div className="relative h-[180px] sm:h-[220px] md:h-[300px] lg:h-[400px] w-full rounded-xl overflow-hidden">
                   <Image
                     src={section.image}
                     alt={section.title}
                     fill
-                    className="object-contain p-4 md:p-8"
+                    className="object-contain p-3 sm:p-4 md:p-8"
                   />
                 </div>
               </div>
-              <div className="flex-1 text-white px-4">
-                <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-[#7DD4FF]">
+              <div className="flex-1 text-white px-2 sm:px-4">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 md:mb-6 text-[#7DD4FF]">
                   {section.title}
                 </h2>
-                <p className="text-base md:text-lg leading-relaxed">
+                <p className="text-sm sm:text-base md:text-lg leading-relaxed">
                   {section.description}
                 </p>
               </div>

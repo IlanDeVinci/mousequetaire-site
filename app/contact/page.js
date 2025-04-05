@@ -176,7 +176,7 @@ export default function Contact() {
 
           {/* Desktop view - horizontal layout */}
           <div className="hidden md:flex justify-center mb-24 relative h-72">
-            <div className="w-[1000px] relative">
+            <div className="w-full max-w-[1000px] relative">
               {contactOptions.map((option, index) => (
                 <div
                   key={index}
@@ -195,8 +195,8 @@ export default function Contact() {
                   <div
                     onClick={(e) => !activeModal && handleCircleClick(e, index)}
                     className={`w-72 h-72 rounded-full flex items-center justify-center 
-											${!activeModal ? "cursor-pointer hover:scale-105" : ""} 
-											transition-all duration-700 ease-in-out`}
+                      ${!activeModal ? "cursor-pointer hover:scale-105" : ""} 
+                      transition-all duration-700 ease-in-out`}
                     style={{
                       backgroundColor: option.bgColor,
                       transform:
@@ -208,7 +208,7 @@ export default function Contact() {
                     {/* Circle Content */}
                     <div
                       className={`flex w-[70%] flex-col items-center transition-opacity duration-700
-											${!isExpanded ? "opacity-100" : "opacity-0"}`}
+                      ${!isExpanded ? "opacity-100" : "opacity-0"}`}
                     >
                       <div className="text-6xl text-white relative w-full aspect-[1]">
                         <Image
@@ -229,21 +229,24 @@ export default function Contact() {
           {activeModal !== null && (
             <div
               className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none
-							transition-opacity duration-300 px-4
-              ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
+                transition-opacity duration-300 px-4
+                ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
             >
               <div
                 className={`relative w-full max-w-4xl pointer-events-auto
-								transition-all duration-300 ${isExpanded ? "scale-100" : "scale-95"}`}
+                  transition-all duration-300 ${
+                    isExpanded ? "scale-100" : "scale-95"
+                  }
+                  bg-[#070b18]/95 rounded-2xl p-4 sm:p-6 md:p-8 m-2 sm:m-4 md:m-6 max-h-[90vh] overflow-y-auto`}
               >
-                <div className="text-white p-6">
+                <div className="text-white">
                   {contactOptions[activeModal].content}
                 </div>
                 <button
                   onClick={!isAnimating ? closeModal : undefined}
-                  className="absolute -top-2 -right-2 text-white text-xl 
-										hover:text-[#7DD4FF] transition-colors p-4 
-										hover:bg-black/10 rounded-full"
+                  className="absolute top-2 right-2 sm:-top-2 sm:-right-2 text-white text-xl 
+                    hover:text-[#7DD4FF] transition-colors p-2 sm:p-4
+                    hover:bg-black/10 rounded-full"
                   aria-label="Close modal"
                 >
                   ✕

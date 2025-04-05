@@ -97,19 +97,19 @@ function DiscoverElement() {
   return (
     <div
       onClick={handleClick}
-      className={`w-full max-w-5xl h-64 md:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
+      className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
     >
       <div
-        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[95%] w-[70%] md:w-[45%] top-1/2 -translate-y-1/2 z-0`}
+        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[85%] sm:w-[75%] md:w-[60%] lg:w-[45%] top-1/2 -translate-y-1/2 z-0`}
       >
         <div
-          className={`${getSliderColor()} rounded-full px-4 md:px-8 py-4 shadow-lg h-full transition-all duration-700`}
+          className={`${getSliderColor()} rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 shadow-lg h-full transition-all duration-700`}
         >
           <div className="flex flex-col h-full justify-center text-center font-montserrat">
-            <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-4 text-white">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 md:mb-4 text-white">
               {getContent().title}
             </h3>
-            <p className="text-sm md:text-lg text-white/90 line-clamp-3">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-2 sm:line-clamp-3">
               {getContent().text}
             </p>
           </div>
@@ -144,7 +144,7 @@ function DiscoverElement() {
         alt="Our growth"
         width={300}
         height={300}
-        className={`transition-all duration-700 ease-in-out z-10 absolute -left-12 top-48 -translate-y-1/2 w-[45%] h-[85%] object-contain ${
+        className={`transition-all duration-700 ease-in-out z-10 absolute -left-6 sm:-left-8 md:-left-12 top-1/2 -translate-y-1/2 w-[45%] h-[85%] object-contain ${
           phase === 2
             ? "opacity-100"
             : "opacity-0 pointer-events-none translate-x-[100px]"
@@ -155,7 +155,7 @@ function DiscoverElement() {
         alt="Our vision"
         width={300}
         height={300}
-        className={`transition-all duration-700 ease-in-out z-10 absolute left-4 top-1/2 -translate-y-1/2 w-[45%] h-[90%] object-contain ${
+        className={`transition-all duration-700 ease-in-out z-10 absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 w-[45%] h-[90%] object-contain ${
           phase === 3
             ? "opacity-100"
             : "opacity-0 pointer-events-none translate-x-[50px]"
@@ -206,7 +206,7 @@ function TeamMember({ image, name, role, description, reverse }) {
     <article
       className={`flex flex-col ${
         reverse ? "md:flex-row-reverse" : "md:flex-row"
-      } items-center mb-12`}
+      } items-center mb-8 md:mb-12`}
     >
       {/* Image du membre */}
       <Image
@@ -214,17 +214,21 @@ function TeamMember({ image, name, role, description, reverse }) {
         alt={`Photo de ${name}`}
         width={200}
         height={200}
-        className="rounded-full w-[150px] h-[150px] md:w-[200px] md:h-[200px] mb-4 md:mb-0"
+        className="rounded-full w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0"
       />
       {/* Bloc de texte */}
       <div
         className={`${
-          reverse ? "md:mr-12 md:text-right" : "md:ml-12 md:text-left"
+          reverse
+            ? "md:mr-6 lg:mr-12 md:text-right"
+            : "md:ml-6 lg:ml-12 md:text-left"
         } text-center md:text-left text-lg px-4`}
       >
-        <h2 className="text-2xl md:text-3xl">{name}</h2>
-        <h3 className="text-[#87D7FF] my-2 text-lg md:text-xl">{role}</h3>
-        <p className="text-sm md:text-base">{description}</p>
+        <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
+        <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
+          {role}
+        </h3>
+        <p className="text-xs sm:text-sm md:text-base">{description}</p>
       </div>
     </article>
   );

@@ -529,7 +529,30 @@ export default function Portfolio() {
 
   return (
     <div className="bg-[#050610] min-h-screen p-4 text-white font-sans">
-      <h1 className="text-center text-4xl mb-8 mt-12">
+      <style jsx>{`
+        .portfolio-grid {
+          display: grid;
+          --base-size: 31vw;
+          --grid-size: calc(var(--base-size) - 1rem);
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+          grid-auto-rows: var(--grid-size);
+        }
+
+        @media (max-width: 768px) {
+          .portfolio-grid {
+            gap: 0.5rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .portfolio-grid {
+            gap: 0.25rem;
+          }
+        }
+      `}</style>
+
+      <h1 className="text-center text-2xl md:text-3xl lg:text-4xl mb-6 md:mb-8 mt-8 md:mt-12">
         Quelques unes de nos créations
       </h1>
 
@@ -561,8 +584,8 @@ export default function Portfolio() {
         )}
       </div>
 
-      <div className="mx-6">
-        <div className="grid grid-cols-3 gap-4 auto-rows-[minmax(300px,auto)]">
+      <div className="mx-2 sm:mx-4 md:mx-6">
+        <div className="portfolio-grid">
           {gridItems.map((item) => (
             <Link
               href={`/portfolio/${item.id}`}
@@ -573,7 +596,6 @@ export default function Portfolio() {
                 hover:shadow-lg hover:shadow-blue-500/20
               `}
               style={{
-                minHeight: item.debugDimensions.height > 1 ? "600px" : "300px",
                 gridRow: `span ${item.debugDimensions.height}`,
                 gridColumn: `span ${item.debugDimensions.width}`,
               }}
@@ -583,26 +605,26 @@ export default function Portfolio() {
                   src={item.image}
                   alt={item.title}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
-                <h3 className="text-lg font-semibold text-blue-300">
+              <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3 sm:p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
+                <h3 className="text-base sm:text-lg font-semibold text-blue-300">
                   {item.title}
                 </h3>
-                <p className="text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity delay-100 duration-300">
+                <p className="text-xs sm:text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity delay-100 duration-300 line-clamp-2 sm:line-clamp-3">
                   {portfolioItems
                     .find((p) => p.id === item.id)
-                    ?.description?.slice(0, 100)}
+                    ?.description?.slice(0, 80)}
                   {portfolioItems.find((p) => p.id === item.id)?.description
-                    ?.length > 100
+                    ?.length > 80
                     ? "..."
                     : ""}
                 </p>
-                <div className="flex items-center mt-3">
-                  <span className="text-xs px-3 py-1 bg-blue-800/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity delay-200 duration-300">
+                <div className="flex items-center mt-2 sm:mt-3">
+                  <span className="text-xs px-2 py-1 bg-blue-800/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity delay-200 duration-300">
                     View Project
                   </span>
                 </div>
