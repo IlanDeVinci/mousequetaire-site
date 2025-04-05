@@ -153,10 +153,19 @@ export default function Contact() {
               <div key={index} className="w-[250px] h-[250px] relative">
                 <div
                   onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                  className={`w-full h-full rounded-full flex items-center justify-center 
-                  ${!activeModal ? "cursor-pointer hover:scale-105" : ""} 
-                  transition-all duration-700 ease-in-out`}
-                  style={{ backgroundColor: option.bgColor }}
+                  className={`w-full h-full rounded-full flex items-center justify-center
+                  ${
+                    !activeModal
+                      ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/20"
+                      : ""
+                  } 
+                  transition-all duration-300 ease-in-out`}
+                  style={{
+                    backgroundColor: option.bgColor,
+                    animation: !activeModal
+                      ? `float 3s ease-in-out infinite ${index * 0.5}s`
+                      : "none",
+                  }}
                 >
                   {/* Circle Content */}
                   <div className="flex w-[70%] flex-col items-center">
@@ -166,9 +175,13 @@ export default function Contact() {
                         alt={option.title}
                         fill
                         style={{ objectFit: "contain" }}
+                        className={!activeModal ? "hover:animate-pulse" : ""}
                       />
                     </div>
                   </div>
+                  {!activeModal && (
+                    <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:animate-ping opacity-0 hover:opacity-20" />
+                  )}
                 </div>
               </div>
             ))}
@@ -195,14 +208,21 @@ export default function Contact() {
                   <div
                     onClick={(e) => !activeModal && handleCircleClick(e, index)}
                     className={`w-72 h-72 rounded-full flex items-center justify-center 
-                      ${!activeModal ? "cursor-pointer hover:scale-105" : ""} 
-                      transition-all duration-700 ease-in-out`}
+                      ${
+                        !activeModal
+                          ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/30"
+                          : ""
+                      } 
+                      transition-all duration-500 ease-in-out`}
                     style={{
                       backgroundColor: option.bgColor,
                       transform:
                         activeModal === index && isExpanded
                           ? `translate(${circlePosition?.transform.translateX}px, ${circlePosition?.transform.translateY}px) scale(${circlePosition?.transform.scale})`
                           : "none",
+                      animation: !activeModal
+                        ? `float 3s ease-in-out infinite ${index * 0.5}s`
+                        : "none",
                     }}
                   >
                     {/* Circle Content */}
@@ -216,9 +236,13 @@ export default function Contact() {
                           alt={option.title}
                           fill
                           style={{ objectFit: "contain" }}
+                          className={!activeModal ? "hover:animate-pulse" : ""}
                         />
                       </div>
                     </div>
+                    {!activeModal && (
+                      <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:animate-ping opacity-0 hover:opacity-20" />
+                    )}
                   </div>
                 </div>
               ))}
@@ -237,16 +261,14 @@ export default function Contact() {
                   transition-all duration-300 ${
                     isExpanded ? "scale-100" : "scale-95"
                   }
-                  bg-[#070b18]/95 rounded-2xl p-4 sm:p-6 md:p-8 m-2 sm:m-4 md:m-6 max-h-[90vh] overflow-y-auto`}
+                  bg-[#070b18]/95 rounded-2xl p-4 sm:p-6 md:p-8 m-2 sm:m-4 md:m-6 max-h-[90vh] overflow-y-auto overflow-x-hidden`}
               >
                 <div className="text-white">
                   {contactOptions[activeModal].content}
                 </div>
                 <button
                   onClick={!isAnimating ? closeModal : undefined}
-                  className="absolute top-2 right-2 sm:-top-2 sm:-right-2 text-white text-xl 
-                    hover:text-[#7DD4FF] transition-colors p-2 sm:p-4
-                    hover:bg-black/10 rounded-full"
+                  className="absolute top-2 right-2 sm:-top-2 sm:-right-2 text-white text-xl hover:text-[#7DD4FF] transition-colors p-2 sm:p-4 hover:bg-black/10 rounded-full"
                   aria-label="Close modal"
                 >
                   ✕

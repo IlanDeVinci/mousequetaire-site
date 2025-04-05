@@ -259,6 +259,20 @@ export default function Equipe() {
   const [hoveredValue2, setHoveredValue2] = useState(false);
   const [hoveredValue3, setHoveredValue3] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if device is mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <>
       <main className="pt-20">
@@ -298,9 +312,9 @@ export default function Equipe() {
           {/* First value - Left side */}
           <div
             className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 mb-16"
-            onMouseEnter={() => setHoveredValue1(true)}
-            onMouseLeave={() => setHoveredValue1(false)}
-            onClick={() => setHoveredValue1(!hoveredValue1)}
+            onMouseEnter={() => !isMobile && setHoveredValue1(true)}
+            onMouseLeave={() => !isMobile && setHoveredValue1(false)}
+            onClick={() => isMobile && setHoveredValue1(!hoveredValue1)}
           >
             {/* Bottom rectangle */}
             <div
@@ -347,9 +361,9 @@ export default function Equipe() {
           {/* Second value - Right side */}
           <div
             className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 ml-auto mb-16"
-            onMouseEnter={() => setHoveredValue2(true)}
-            onMouseLeave={() => setHoveredValue2(false)}
-            onClick={() => setHoveredValue2(!hoveredValue2)}
+            onMouseEnter={() => !isMobile && setHoveredValue2(true)}
+            onMouseLeave={() => !isMobile && setHoveredValue2(false)}
+            onClick={() => isMobile && setHoveredValue2(!hoveredValue2)}
           >
             {/* Bottom rectangle */}
             <div
@@ -396,9 +410,9 @@ export default function Equipe() {
           {/* Third value - Left side */}
           <div
             className="relative px-4 py-12 flex justify-center overflow-visible w-1/2"
-            onMouseEnter={() => setHoveredValue3(true)}
-            onMouseLeave={() => setHoveredValue3(false)}
-            onClick={() => setHoveredValue3(!hoveredValue3)}
+            onMouseEnter={() => !isMobile && setHoveredValue3(true)}
+            onMouseLeave={() => !isMobile && setHoveredValue3(false)}
+            onClick={() => isMobile && setHoveredValue3(!hoveredValue3)}
           >
             {/* Bottom rectangle */}
             <div
