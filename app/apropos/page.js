@@ -120,8 +120,8 @@ function DiscoverElement() {
       <Image
         src="/images/contact0.png"
         alt="Start discovery"
-        width={300}
-        height={300}
+        width={3320}
+        height={1136}
         className={`transition-all duration-700 ease-in-out z-10 absolute inset-0 w-full h-full object-cover bg-white ${
           phase === 0
             ? `opacity-${isLoaded ? "100" : "0"}`
@@ -318,7 +318,7 @@ export default function Equipe() {
           >
             {/* Bottom rectangle */}
             <div
-              className={`absolute rounded-r-full bg-[#003C59] text-white p-4 md:p-8 
+              className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
                       w-[90%]  h-[80px] md:h-[120px] left-0 z-10
                       transition-all duration-300 ease-in-out max-w-none
                       ${hoveredValue1 ? "w-[90vw]" : ""}`}
@@ -326,7 +326,7 @@ export default function Equipe() {
 
             {/* Middle rectangle */}
             <div
-              className={`absolute rounded-r-full bg-[#007590] text-white p-4 md:p-8 
+              className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
                       w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
                       transition-all duration-300 ease-in-out max-w-none
                       ${hoveredValue1 ? "w-[90vw] left-[-40px]" : ""}`}
@@ -342,7 +342,7 @@ export default function Equipe() {
             >
               <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
                 <Image
-                  src="/images/photo-samuel.jpg"
+                  src="/images/valeur1.png"
                   alt="Icon Entraide"
                   width={100}
                   height={100}
@@ -367,7 +367,7 @@ export default function Equipe() {
           >
             {/* Bottom rectangle */}
             <div
-              className={`absolute rounded-l-full bg-[#003C59] text-white p-4 md:p-8 
+              className={`absolute rounded-l-full bg-[#00527A] text-white p-4 md:p-8 
                       w-[90%] h-[80px] md:h-[120px] right-0 z-10
                       transition-all duration-300 ease-in-out max-w-none
                       ${hoveredValue2 ? "w-[90vw]" : ""}`}
@@ -375,7 +375,7 @@ export default function Equipe() {
 
             {/* Middle rectangle */}
             <div
-              className={`absolute rounded-l-full bg-[#007590] text-white p-4 md:p-8 
+              className={`absolute rounded-l-full bg-[#006A9E] text-white p-4 md:p-8 
                       w-[90%] h-[80px] md:h-[120px] right-[-40px] z-20
                       transition-all duration-300 ease-in-out max-w-none
                       ${hoveredValue2 ? "w-[90vw] right-[-40px]" : ""}`}
@@ -397,7 +397,7 @@ export default function Equipe() {
               </p>
               <div className="flex-shrink-0 mr-[60px] md:mr-[80px]">
                 <Image
-                  src="/images/photo-ilan.jpeg"
+                  src="/images/valeur2.png"
                   alt="Icon Innovation"
                   width={100}
                   height={100}
@@ -416,7 +416,7 @@ export default function Equipe() {
           >
             {/* Bottom rectangle */}
             <div
-              className={`absolute rounded-r-full bg-[#003C59] text-white p-4 md:p-8 
+              className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
                       w-[90%]  h-[80px] md:h-[120px] left-0 z-10
                       transition-all duration-300 ease-in-out max-w-none
                       ${hoveredValue3 ? "w-[90vw]" : ""}`}
@@ -424,7 +424,7 @@ export default function Equipe() {
 
             {/* Middle rectangle */}
             <div
-              className={`absolute rounded-r-full bg-[#007590] text-white p-4 md:p-8 
+              className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
                       w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
                       transition-all duration-300 ease-in-out max-w-none
                       ${hoveredValue3 ? "w-[90vw] left-[-40px]" : ""}`}
@@ -440,7 +440,7 @@ export default function Equipe() {
             >
               <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
                 <Image
-                  src="/images/photo-célestin.jpg"
+                  src="/images/valeur3.png"
                   alt="Icon Excellence"
                   width={100}
                   height={100}
