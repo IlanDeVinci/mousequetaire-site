@@ -167,318 +167,371 @@ export default function Portfolio() {
       allItems.sort((a, b) => b.originalImportance - a.originalImportance);
       log(`Sorted items by importance (highest first)`);
 
-      // Create a predefined pattern layout
-      const createLayoutPattern = () => {
-        const displayItems = [];
-        const remainingItems = [...allItems];
+      // Two-phase layout approach
+      const createOptimizedLayout = () => {
+        // Phase 1: Generate layout blueprint first without assigning items
+        const generateLayoutBlueprint = (itemCount) => {
+          const layoutSpaces = [];
 
-        // Helper function to find items by importance
-        const findItemsByImportance = (importance, count = 1) => {
-          const result = [];
-          for (
-            let i = 0;
-            i < remainingItems.length && result.length < count;
-            i++
-          ) {
-            if (remainingItems[i].originalImportance === importance) {
-              result.push(remainingItems.splice(i, 1)[0]);
-              i--; // Adjust index since we removed an item
-            }
-          }
-          return result;
-        };
+          // Create a simulated set of dummy items just to run through the algorithm
+          const dummyItems = Array(itemCount)
+            .fill()
+            .map((_, i) => ({
+              id: `dummy-${i}`,
+              originalImportance: 1, // Doesn't matter for blueprint
+              title: `Dummy Item ${i}`,
+            }));
 
-        // Function to get next item with preferred importance
-        const getNextItem = (width, height, preferredImportance) => {
-          if (remainingItems.length === 0) return null;
-
-          let item;
-
-          // Try to find an item with matching importance
-          if (preferredImportance) {
-            const matches = findItemsByImportance(preferredImportance, 1);
-            if (matches.length > 0) {
-              item = matches[0];
-              log(
-                `Found item with correct importance (${preferredImportance}) for ${width}×${height}`
-              );
-            }
-          }
-
-          // If no match found, just take next item
-          if (!item) {
-            item = remainingItems.shift();
-            log(
-              `Using next available item for ${width}×${height} (preferred importance: ${preferredImportance})`
-            );
-          }
-
-          // Set dimensions based on parameters
-          item.debugDimensions = { width, height, label: `${width}×${height}` };
-          item.gridStyle = {
-            gridRow: `span ${height}`,
-            gridColumn: `span ${width}`,
+          // Helper function to track spaces without actually assigning items
+          const trackSpace = (width, height) => {
+            layoutSpaces.push({
+              type: `${width}x${height}`,
+              width,
+              height,
+            });
+            return { id: `dummy-space-${layoutSpaces.length}` };
           };
 
-          // Record adjustment if dimensions differ from original importance
-          const newImportance =
-            width === 2 && height === 2
-              ? 4
-              : width === 2 && height === 1
-              ? 3
-              : 1;
-          if (item.originalImportance !== newImportance) {
-            adjustments.push({
-              itemId: item.id,
-              title: item.title,
-              from: getOriginalSizeLabel(item.originalImportance),
-              to: `${width}×${height}`,
-              reason: `Assigned to ${width}×${height} based on layout pattern`,
+          // Clone the layout generation algorithm but just track spaces
+          const simulateLayoutCreation = () => {
+            const remainingDummyItems = [...dummyItems];
+
+            // Simulated getNextItem just records the space type
+            const simulatedGetNextItem = (width, height) => {
+              if (remainingDummyItems.length === 0) return null;
+              remainingDummyItems.shift(); // Remove a dummy item
+              return trackSpace(width, height);
+            };
+
+            // Now run through the same layout algorithm but just tracking spaces
+            while (remainingDummyItems.length > 0) {
+              const itemsLeft = remainingDummyItems.length;
+
+              // Pattern Row 1: Adaptive first row (identical to your original)
+              if (itemsLeft === 4) {
+                simulatedGetNextItem(2, 1); // First 2x1
+                simulatedGetNextItem(1, 1); // 1x1
+                simulatedGetNextItem(1, 1); // 1x1
+                simulatedGetNextItem(2, 1); // Second 2x1
+              } else if (itemsLeft >= 3) {
+                for (let i = 0; i < 3 && remainingDummyItems.length > 0; i++) {
+                  simulatedGetNextItem(1, 1);
+                }
+              } else if (itemsLeft === 2) {
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(2, 1);
+              } else if (itemsLeft === 1) {
+                simulatedGetNextItem(2, 1);
+              }
+
+              if (remainingDummyItems.length === 0) break;
+
+              // Pattern Row 2 (identical to your original)
+              if (remainingDummyItems.length <= 5) {
+                if (remainingDummyItems.length === 4) {
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(1, 1);
+                } else if (remainingDummyItems.length === 3) {
+                  for (let i = 0; i < 3; i++) {
+                    simulatedGetNextItem(1, 1);
+                  }
+                } else if (remainingDummyItems.length >= 2) {
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(1, 1);
+                } else if (remainingDummyItems.length === 1) {
+                  simulatedGetNextItem(2, 1);
+                }
+              } else {
+                if (remainingDummyItems.length >= 3) {
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 2); // 2x2
+                  simulatedGetNextItem(1, 1);
+                } else if (remainingDummyItems.length === 2) {
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 1);
+                } else if (remainingDummyItems.length === 1) {
+                  simulatedGetNextItem(2, 1);
+                }
+              }
+
+              if (remainingDummyItems.length === 0) break;
+
+              // Pattern Row 3 (identical to your original)
+              if (remainingDummyItems.length === 4) {
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(2, 1);
+                simulatedGetNextItem(2, 1);
+                simulatedGetNextItem(1, 1);
+              } else if (remainingDummyItems.length === 3) {
+                for (let i = 0; i < 3; i++) {
+                  simulatedGetNextItem(1, 1);
+                }
+              } else if (remainingDummyItems.length === 2) {
+                simulatedGetNextItem(2, 1);
+                simulatedGetNextItem(1, 1);
+              } else if (remainingDummyItems.length === 1) {
+                simulatedGetNextItem(2, 1);
+              } else {
+                simulatedGetNextItem(2, 1);
+                simulatedGetNextItem(1, 1);
+              }
+
+              if (remainingDummyItems.length === 0) break;
+
+              // Pattern Row 4 (identical to your original)
+              if (remainingDummyItems.length <= 3) {
+                if (remainingDummyItems.length === 3) {
+                  for (let i = 0; i < 3; i++) {
+                    simulatedGetNextItem(1, 1);
+                  }
+                } else if (remainingDummyItems.length === 2) {
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 1);
+                } else {
+                  simulatedGetNextItem(2, 1);
+                }
+              } else {
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(2, 1);
+              }
+
+              if (remainingDummyItems.length === 0) break;
+
+              // Pattern Row 5 (identical to your original)
+              if (remainingDummyItems.length <= 4) {
+                if (remainingDummyItems.length === 4) {
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 1);
+                } else if (remainingDummyItems.length === 3) {
+                  for (let i = 0; i < 3; i++) {
+                    simulatedGetNextItem(1, 1);
+                  }
+                } else if (remainingDummyItems.length === 2) {
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(1, 1);
+                } else {
+                  simulatedGetNextItem(2, 1);
+                }
+              } else {
+                simulatedGetNextItem(2, 2); // 2x2
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(1, 1);
+              }
+
+              if (remainingDummyItems.length === 0) break;
+
+              // Pattern Row 6 (identical to your original)
+              if (remainingDummyItems.length === 3) {
+                for (let i = 0; i < 3; i++) {
+                  simulatedGetNextItem(1, 1);
+                }
+              } else if (remainingDummyItems.length === 2) {
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(2, 1);
+              } else if (remainingDummyItems.length === 1) {
+                simulatedGetNextItem(2, 1);
+              } else {
+                if (remainingDummyItems.length === 4) {
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(2, 1);
+                  simulatedGetNextItem(1, 1);
+                } else {
+                  simulatedGetNextItem(1, 1);
+                  simulatedGetNextItem(2, 1);
+                }
+              }
+            }
+          };
+
+          // Run the simulation to get the layout blueprint
+          simulateLayoutCreation();
+          return layoutSpaces;
+        };
+
+        // Phase 2: Assign items to the blueprint based on importance
+        const assignItemsToBlueprint = (items, blueprint) => {
+          // Count spaces by type
+          const spacesByType = {
+            "2x2": [],
+            "2x1": [],
+            "1x1": [],
+          };
+
+          // Organize spaces by type
+          blueprint.forEach((space, index) => {
+            spacesByType[space.type].push({
+              ...space,
+              index,
             });
+          });
+
+          // Sort items by importance (highest first)
+          const sortedItems = [...items].sort(
+            (a, b) => b.originalImportance - a.originalImportance
+          );
+          const resultItems = new Array(sortedItems.length);
+
+          log(
+            `Blueprint has: ${spacesByType["2x2"].length} 2×2 spaces, ${spacesByType["2x1"].length} 2×1 spaces, ${spacesByType["1x1"].length} 1×1 spaces`
+          );
+
+          // Get original size label for importance
+          const getOriginalSizeLabel = (importance) => {
+            switch (importance) {
+              case 4:
+                return "2×2";
+              case 3:
+                return "2×1";
+              case 2:
+                return "1×2";
+              case 1:
+              default:
+                return "1×1";
+            }
+          };
+
+          let itemIndex = 0;
+
+          // First assign importance 4 items to 2x2 spaces
+          while (
+            itemIndex < sortedItems.length &&
+            sortedItems[itemIndex].originalImportance === 4 &&
+            spacesByType["2x2"].length > 0
+          ) {
+            const item = sortedItems[itemIndex];
+            const space = spacesByType["2x2"].shift();
+
+            item.debugDimensions = { width: 2, height: 2, label: "2×2" };
+            item.gridStyle = { gridRow: `span 2`, gridColumn: `span 2` };
+
+            resultItems[space.index] = item;
+            log(
+              `Assigned importance 4 item ${item.id} to 2×2 space at position ${space.index}`
+            );
+            itemIndex++;
           }
 
-          return item;
+          // Next assign importance 3 items to 2x1 spaces
+          while (
+            itemIndex < sortedItems.length &&
+            sortedItems[itemIndex].originalImportance === 3 &&
+            spacesByType["2x1"].length > 0
+          ) {
+            const item = sortedItems[itemIndex];
+            const space = spacesByType["2x1"].shift();
+
+            item.debugDimensions = { width: 2, height: 1, label: "2×1" };
+            item.gridStyle = { gridRow: `span 1`, gridColumn: `span 2` };
+
+            resultItems[space.index] = item;
+            log(
+              `Assigned importance 3 item ${item.id} to 2×1 space at position ${space.index}`
+            );
+            itemIndex++;
+          }
+
+          // If there are leftover 2x2 spaces, assign next highest importance items
+          while (
+            spacesByType["2x2"].length > 0 &&
+            itemIndex < sortedItems.length
+          ) {
+            const item = sortedItems[itemIndex];
+            const space = spacesByType["2x2"].shift();
+
+            item.debugDimensions = { width: 2, height: 2, label: "2×2" };
+            item.gridStyle = { gridRow: `span 2`, gridColumn: `span 2` };
+
+            if (item.originalImportance !== 4) {
+              adjustments.push({
+                itemId: item.id,
+                title: item.title,
+                from: getOriginalSizeLabel(item.originalImportance),
+                to: "2×2",
+                reason: "Assigned to 2×2 based on importance ranking",
+              });
+            }
+
+            resultItems[space.index] = item;
+            log(
+              `Assigned importance ${item.originalImportance} item ${item.id} to 2×2 space at position ${space.index}`
+            );
+            itemIndex++;
+          }
+
+          // If there are leftover 2x1 spaces, assign next highest importance items
+          while (
+            spacesByType["2x1"].length > 0 &&
+            itemIndex < sortedItems.length
+          ) {
+            const item = sortedItems[itemIndex];
+            const space = spacesByType["2x1"].shift();
+
+            item.debugDimensions = { width: 2, height: 1, label: "2×1" };
+            item.gridStyle = { gridRow: `span 1`, gridColumn: `span 2` };
+
+            if (item.originalImportance !== 3) {
+              adjustments.push({
+                itemId: item.id,
+                title: item.title,
+                from: getOriginalSizeLabel(item.originalImportance),
+                to: "2×1",
+                reason: "Assigned to 2×1 based on importance ranking",
+              });
+            }
+
+            resultItems[space.index] = item;
+            log(
+              `Assigned importance ${item.originalImportance} item ${item.id} to 2×1 space at position ${space.index}`
+            );
+            itemIndex++;
+          }
+
+          // Assign remaining items to 1x1 spaces
+          while (
+            spacesByType["1x1"].length > 0 &&
+            itemIndex < sortedItems.length
+          ) {
+            const item = sortedItems[itemIndex];
+            const space = spacesByType["1x1"].shift();
+
+            item.debugDimensions = { width: 1, height: 1, label: "1×1" };
+            item.gridStyle = { gridRow: `span 1`, gridColumn: `span 1` };
+
+            if (item.originalImportance !== 1) {
+              adjustments.push({
+                itemId: item.id,
+                title: item.title,
+                from: getOriginalSizeLabel(item.originalImportance),
+                to: "1×1",
+                reason: "Assigned to 1×1 based on importance ranking",
+              });
+            }
+
+            resultItems[space.index] = item;
+            log(
+              `Assigned importance ${item.originalImportance} item ${item.id} to 1×1 space at position ${space.index}`
+            );
+            itemIndex++;
+          }
+
+          // Filter out any undefined elements (shouldn't happen if algorithm is correct)
+          return resultItems.filter((item) => item !== undefined);
         };
 
-        const getOriginalSizeLabel = (importance) => {
-          switch (importance) {
-            case 4:
-              return "2×2";
-            case 3:
-              return "2×1";
-            case 2:
-              return "1×2";
-            case 1:
-            default:
-              return "1×1";
-          }
-        };
-
-        // Keep creating pattern rows until we run out of items
-        while (remainingItems.length > 0) {
-          // Check remaining items and plan accordingly
-          const itemsLeft = remainingItems.length;
-          // Pattern Row 1: Adaptive first row based on remaining items
-          if (itemsLeft === 4) {
-            // For exactly 4 items, use pattern: 2x1, 1x1, 1x1, 2x1
-            displayItems.push(getNextItem(2, 1, 3)); // First 2x1
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            displayItems.push(getNextItem(2, 1, 3)); // Second 2x1
-            log(
-              "Created row pattern: 2×1, 1×1, 1×1, 2×1 (for exactly 4 items)"
-            );
-          } else if (itemsLeft >= 3) {
-            for (let i = 0; i < 3 && remainingItems.length > 0; i++) {
-              displayItems.push(getNextItem(1, 1, 1)); // Prefer importance 1
-            }
-            log("Created row pattern: Three 1×1 items");
-          } else if (itemsLeft === 2) {
-            displayItems.push(getNextItem(1, 1, 1));
-            displayItems.push(getNextItem(2, 1, 3)); // Make the second one wider
-            log("Created row pattern: 1×1, 2×1 (for 2 remaining items)");
-          } else if (itemsLeft === 1) {
-            // For last item, make it a 2x1 instead of 3x1
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
-            log("Created row pattern: 2×1 (for final item)");
-          }
-
-          if (remainingItems.length === 0) break;
-
-          // Pattern Row 2: Check if we need to adjust layout based on remaining items
-          if (remainingItems.length <= 5) {
-            // If we're getting low on items
-            // Create a layout that will work well for few remaining items
-            if (remainingItems.length === 4) {
-              // Special pattern for exactly 4 items
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              log(
-                "Created adjusted row pattern: 1×1, 2×1, 2×1, 1×1 (for exactly 4 items)"
-              );
-            } else if (remainingItems.length === 3) {
-              // For exactly 3 items, use three 1x1 items
-              for (let i = 0; i < 3; i++) {
-                displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              }
-              log(
-                "Created adjusted row pattern: Three 1×1 items (for exactly 3 items)"
-              );
-            } else if (remainingItems.length >= 2) {
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              log(
-                "Created adjusted row pattern: 2×1, 1×1 (for few remaining items)"
-              );
-            } else if (remainingItems.length === 1) {
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1 for last item
-              log("Created adjusted row pattern: 2×1 (for final item)");
-            }
-          } else {
-            // Standard pattern: One 1x1, one 2x2 spanning columns 2-3, one 1x1
-            if (remainingItems.length >= 3) {
-              displayItems.push(getNextItem(1, 1, 1)); // First 1x1
-              displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
-              displayItems.push(getNextItem(1, 1, 1)); // Another 1x1
-              log("Created row pattern: 1×1, 2×2, 1×1 items");
-            } else if (remainingItems.length === 2) {
-              displayItems.push(getNextItem(1, 1, 1));
-              displayItems.push(getNextItem(2, 1, 3));
-              log("Created row pattern: 1×1, 2×1 (for 2 remaining items)");
-            } else if (remainingItems.length === 1) {
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
-              log("Created row pattern: 2×1 (for final item)");
-            }
-          }
-
-          if (remainingItems.length === 0) break;
-
-          // Pattern Row 3: Look ahead to optimize
-          if (remainingItems.length === 4) {
-            // If exactly 4 items remain, create balanced pattern
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            log(
-              "Created row pattern: 1×1, 2×1, 2×1, 1×1 (for exactly 4 items)"
-            );
-          } else if (remainingItems.length === 3) {
-            // If exactly 3 items remain, use 3 1x1 items to complete the grid
-            for (let i = 0; i < 3; i++) {
-              displayItems.push(getNextItem(1, 1, 1));
-            }
-            log("Created row pattern: Three 1×1 items (for final 3 items)");
-          } else if (remainingItems.length === 2) {
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            log("Created row pattern: 2×1, 1×1 (for final 2 items)");
-          } else if (remainingItems.length === 1) {
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
-            log("Created row pattern: 2×1 (for final item)");
-          } else {
-            // Standard pattern for more items
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1 (prefer importance 3)
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            log("Created row pattern: 2×1, 1×1 items");
-          }
-
-          if (remainingItems.length === 0) break;
-
-          // Pattern Row 4: Look ahead to optimize
-          if (remainingItems.length <= 3) {
-            // If 3 or fewer items remain
-            // Use them all in a balanced way
-            if (remainingItems.length === 3) {
-              for (let i = 0; i < 3; i++) {
-                displayItems.push(getNextItem(1, 1, 1));
-              }
-              log("Created balanced row: Three 1×1 items (for final 3 items)");
-            } else if (remainingItems.length === 2) {
-              displayItems.push(getNextItem(1, 1, 1));
-              displayItems.push(getNextItem(2, 1, 3));
-              log("Created balanced row: 1×1, 2×1 (for final 2 items)");
-            } else {
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1 for last item
-              log("Created final item row: 2×1 (for final item)");
-            }
-          } else {
-            // Standard pattern: 1x1 followed by 2x1
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1 (prefer importance 3)
-            log("Created row pattern: 1×1, 2×1 items");
-          }
-
-          if (remainingItems.length === 0) break;
-
-          // Pattern Row 5: 2x2 followed by two 1x1 - or adaptive pattern
-          if (remainingItems.length <= 4) {
-            // If we're in the final items
-            // Create a pattern that uses remaining items effectively
-            if (remainingItems.length === 4) {
-              // Two 2x1 items
-              displayItems.push(getNextItem(2, 1, 3));
-              displayItems.push(getNextItem(1, 1, 1));
-              displayItems.push(getNextItem(1, 1, 1));
-              displayItems.push(getNextItem(2, 1, 3));
-
-              log(
-                "Created adaptive row: 2×1, 1×1 and 2×1, 1×1 (for final 4 items)"
-              );
-            } else if (remainingItems.length === 3) {
-              for (let i = 0; i < 3; i++) {
-                displayItems.push(getNextItem(1, 1, 1));
-              }
-              log("Created adaptive row: Three 1×1 items (for final 3 items)");
-            } else if (remainingItems.length === 2) {
-              displayItems.push(getNextItem(2, 1, 3));
-              displayItems.push(getNextItem(1, 1, 1));
-              log("Created adaptive row: 2×1, 1×1 (for final 2 items)");
-            } else {
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1 for last item
-              log("Created adaptive row: 2×1 (for final item)");
-            }
-          } else {
-            // Standard pattern if we have enough items
-            displayItems.push(getNextItem(2, 2, 4)); // 2x2 (prefer importance 4)
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            displayItems.push(getNextItem(1, 1, 1)); // 1x1
-            log("Created row pattern: 2×2, 1×1, 1×1 items");
-          }
-
-          if (remainingItems.length === 0) break;
-
-          // Pattern Row 6: Final row with adaptive sizing
-          // Use different patterns based on exact number of items remaining
-          if (remainingItems.length === 3) {
-            for (let i = 0; i < 3; i++) {
-              displayItems.push(getNextItem(1, 1, 1));
-            }
-            log("Created final row: Three 1×1 items");
-          } else if (remainingItems.length === 2) {
-            const preferLargeItem =
-              remainingItems.findIndex(
-                (item) => item.originalImportance >= 3
-              ) !== -1;
-            if (preferLargeItem) {
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1 item
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1 item
-            } else {
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1 item
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1 item
-            }
-            log("Created final row: 2×1, 1×1 or 1×1, 2×1 items");
-          } else if (remainingItems.length === 1) {
-            displayItems.push(getNextItem(2, 1, 3)); // 2x1 instead of 3x1
-            log("Created final row: 2×1 (for final item)");
-          } else {
-            // Create a pattern for remaining items
-            if (remainingItems.length === 4) {
-              // For exactly 4 items, create a balanced row: 1x1, 2x1, 2x1, 1x1
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              log(
-                "Created balanced row: 1×1, 2×1, 2×1, 1×1 (for exactly 4 items)"
-              );
-            } else {
-              // Standard pattern for other cases
-              displayItems.push(getNextItem(1, 1, 1)); // 1x1
-              displayItems.push(getNextItem(2, 1, 3)); // 2x1
-              log("Created standard row: 1×1, 2×1 items");
-            }
-          }
-        }
-
-        return displayItems;
+        // Execute the two-phase layout process
+        const layoutBlueprint = generateLayoutBlueprint(allItems.length);
+        return assignItemsToBlueprint(allItems, layoutBlueprint);
       };
 
-      const finalItems = createLayoutPattern();
+      // Use the optimized two-phase layout approach instead of createLayoutPattern
+      const finalItems = createOptimizedLayout();
 
-      log(`Created layout with ${finalItems.length} items`);
+      log(`Created optimized layout with ${finalItems.length} items`);
       log(`Made ${adjustments.length} size adjustments to fit pattern`);
 
       setGridItems(finalItems);
@@ -565,7 +618,7 @@ export default function Portfolio() {
       <div className="mx-auto mb-6 flex justify-between items-center">
         <button
           onClick={() => setShowDebug(!showDebug)}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors hidden"
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors"
         >
           {showDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
@@ -643,6 +696,9 @@ export default function Portfolio() {
                   <p className="text-xs">
                     Cells:{" "}
                     {item.debugDimensions.width * item.debugDimensions.height}
+                  </p>
+                  <p className="text-xs">
+                    Importance: {item.originalImportance}
                   </p>
                   {item.originalImportance !==
                     (item.debugDimensions.width === 2 &&
