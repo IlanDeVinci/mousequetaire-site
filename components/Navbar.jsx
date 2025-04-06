@@ -30,9 +30,9 @@ const Navbar = () => {
     }
   };
 
-  // Logo component positioned absolutely at top left
+  // Logo component positioned relatively within the navbar
   const Logo = () => (
-    <div className="absolute top-4 left-4 z-50">
+    <div className="absolute left-4 top-4 md:top-2 z-50">
       <Link
         href="/"
         onClick={(e) => {
@@ -56,12 +56,12 @@ const Navbar = () => {
   );
 
   return (
-    <>
+    <header className="fixed top-0 left-0 w-full z-40">
       <Logo />
 
       {/* Mobile hamburger menu button */}
       <button
-        className="fixed top-8 right-4 z-50 md:hidden bg-white rounded-full p-2 w-10 h-10"
+        className="absolute top-8 right-4 z-50 md:hidden bg-white rounded-full p-2 w-10 h-10"
         onClick={toggleMobileMenu}
         aria-label="Toggle menu"
       >
@@ -121,8 +121,8 @@ const Navbar = () => {
 
       {/* Desktop navbar */}
       <nav
-        className={`fixed w-full z-40 pt-12 px-4 hidden md:flex justify-center transition-all duration-300 ${
-          scrolled ? "-top-10" : "top-6"
+        className={`w-full px-4 hidden md:flex justify-center transition-all duration-300 ${
+          scrolled ? "pt-0 mt-0" : "pt-12 mt-2"
         }`}
       >
         <div className="w-[800px] bg-white rounded-full px-4 py-4 shadow-md">
@@ -171,7 +171,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-    </>
+    </header>
   );
 };
 

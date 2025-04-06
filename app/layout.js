@@ -39,10 +39,10 @@ export default function RootLayout({ children }) {
         <title>Mousequetaire</title>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased relative`}
       >
         <Navbar />
-        <main className="w-full py-16 mt-16 bg-[#050610] min-h-screen overflow-x-hidden">
+        <main className="w-full py-16 pt-32 bg-[#050610] min-h-screen overflow-x-hidden">
           {children}
         </main>
         <Footer />

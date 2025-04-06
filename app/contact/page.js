@@ -150,7 +150,18 @@ export default function Contact() {
           {/* Mobile view - stack circles vertically */}
           <div className="md:hidden flex flex-col items-center gap-8 mb-16">
             {contactOptions.map((option, index) => (
-              <div key={index} className="w-[250px] h-[250px] relative">
+              <div
+                key={index}
+                className="w-[250px] h-[250px] relative transition-all duration-700"
+                style={{
+                  opacity:
+                    activeModal !== null && activeModal !== index ? 0 : 1,
+                  transitionDuration:
+                    activeModal !== null && activeModal !== index
+                      ? "300ms"
+                      : "700ms",
+                }}
+              >
                 <div
                   onClick={(e) => !activeModal && handleCircleClick(e, index)}
                   className={`w-full h-full rounded-full flex items-center justify-center
@@ -159,16 +170,23 @@ export default function Contact() {
                       ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/20"
                       : ""
                   } 
-                  transition-all duration-300 ease-in-out`}
+                  transition-all duration-500 ease-in-out`}
                   style={{
                     backgroundColor: option.bgColor,
+                    transform:
+                      activeModal === index && isExpanded
+                        ? `translate(${circlePosition?.transform.translateX}px, ${circlePosition?.transform.translateY}px) scale(${circlePosition?.transform.scale})`
+                        : "none",
                     animation: !activeModal
                       ? `float 3s ease-in-out infinite ${index * 0.5}s`
                       : "none",
                   }}
                 >
                   {/* Circle Content */}
-                  <div className="flex w-[70%] flex-col items-center">
+                  <div
+                    className={`flex w-[70%] flex-col items-center transition-opacity duration-700
+                    ${!isExpanded ? "opacity-100" : "opacity-0"}`}
+                  >
                     <div className="text-5xl text-white relative w-full aspect-[1]">
                       <Image
                         src={option.icon}
@@ -251,28 +269,32 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens */}
           {activeModal !== null && (
-            <div
-              className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none
-                transition-opacity duration-300 px-4
-                ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
-            >
+            <div className="h-[100vh] w-full overflow-hidden fixed inset-0 z-[1000]">
               <div
-                className={`relative w-full max-w-4xl pointer-events-auto
-                  transition-all duration-300 ${
-                    isExpanded ? "scale-100" : "scale-95"
-                  }
-                  bg-[#070b18]/95 rounded-2xl p-4 sm:p-6 md:p-8 m-2 sm:m-4 md:m-6 max-h-[90vh] overflow-y-auto overflow-x-hidden`}
+                className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none overflow-hidden
+                  transition-opacity duration-300 px-4
+                  ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
               >
-                <div className="text-white">
-                  {contactOptions[activeModal].content}
-                </div>
-                <button
-                  onClick={!isAnimating ? closeModal : undefined}
-                  className="absolute top-2 right-2 sm:-top-2 sm:-right-2 text-white text-xl hover:text-[#7DD4FF] transition-colors p-2 sm:p-4 hover:bg-black/10 rounded-full"
-                  aria-label="Close modal"
+                <div
+                  className={`relative w-full max-w-4xl pointer-events-auto
+                    transition-all duration-300 ${
+                      isExpanded ? "scale-100" : "scale-95"
+                    }
+                    bg-[#070b18]/95 rounded-2xl p-4 sm:p-6 md:p-8 m-0 sm:m-4 md:m-6
+                    fixed sm:relative inset-0 sm:inset-auto h-full sm:h-auto
+                    flex items-center justify-center`}
                 >
-                  ✕
-                </button>
+                  <div className="text-white w-full flex items-center justify-center">
+                    {contactOptions[activeModal].content}
+                  </div>
+                  <button
+                    onClick={!isAnimating ? closeModal : undefined}
+                    className="absolute top-4 right-4 sm:-top-2 sm:-right-2 text-white text-xl hover:text-[#7DD4FF] transition-colors p-2 sm:p-4 hover:bg-black/10 rounded-full z-[1002]"
+                    aria-label="Close modal"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
           )}
