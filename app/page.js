@@ -197,9 +197,9 @@ export default function Home() {
             ].map((service, index) => (
               <div
                 key={index}
-                className="bg-[#48B1E5] rounded-2xl p-6 m-[1vw] transition-all duration-300 aspect-square hover:shadow-lg hover:shadow-blue-500/20 flex text-center items-center justify-center flex-col relative group overflow-hidden"
+                className="bg-[#003C59] rounded-2xl p-6 m-[1vw] transition-all duration-300 aspect-square hover:shadow-lg hover:shadow-blue-500/20 flex text-center items-center justify-center flex-col relative group overflow-hidden"
               >
-                <h3 className="text-2xl md:text-3xl font-medium text-white mb-3 z-10 transition-all duration-300 group-hover:transform group-hover:translate-y-[-10px] ">
+                <h3 className="text-2xl md:text-3xl font-medium text-[#87D7FF] mb-3 z-10 transition-all duration-300 group-hover:transform group-hover:translate-y-[-10px] ">
                   {service.title}
                 </h3>
                 <p className="text-[#050610] absolute opacity-0 mt-20 transition-all duration-300 transform translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 max-w-[80%]">

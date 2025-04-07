@@ -8,13 +8,29 @@ import { usePathname } from "next/navigation";
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1450); // 768px is md breakpoint in Tailwind
+    };
+
+    // Initialize on mount
+    handleResize();
+
+    // Add event listeners
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const pathname = usePathname();
@@ -48,12 +64,22 @@ const Navbar = () => {
             src="/images/logoblanc.png"
             alt="Mousequetaire Logo Dark"
             fill
-            className="object-contain"
+            className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.35)] filter"
+            style={{ filter: "drop-shadow(0 0 8px rgba(0, 0, 0, 0.35))" }}
           />
         </div>
       </Link>
     </div>
   );
+
+  // Calculate navbar classes based on scroll state and screen size
+  const getNavbarClasses = () => {
+    // Always use pt-12 mt-4 for non-scrolled state
+    if (!scrolled) return "pt-12 mt-4";
+
+    // When scrolled, only remove padding/margin on large screens
+    return isLargeScreen ? "pt-0 mt-0" : "pt-12 mt-4";
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full z-40">
@@ -121,11 +147,9 @@ const Navbar = () => {
 
       {/* Desktop navbar */}
       <nav
-        className={`w-full px-4 hidden md:flex justify-center transition-all duration-300 ${
-          scrolled ? "pt-0 mt-0" : "pt-12 mt-2"
-        }`}
+        className={`w-full px-4 hidden md:flex justify-center transition-all duration-300 ${getNavbarClasses()}`}
       >
-        <div className="w-[800px] bg-white rounded-full px-4 py-4 shadow-md">
+        <div className="w-[800px] bg-white rounded-full px-4 py-2 md:py-4 shadow-md">
           <div className="flex justify-center space-x-4">
             {[
               "Accueil",

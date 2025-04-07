@@ -306,7 +306,7 @@ export default function Equipe() {
         </section>
 
         {/* Section valeurs */}
-        <section className="text-center my-12">
+        <section className="text-center my-12 pb-20">
           <h1 className="text-3xl md:text-4xl my-8 md:m-24">Nos valeurs</h1>
 
           {/* First value - Left side */}
