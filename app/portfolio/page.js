@@ -618,7 +618,7 @@ export default function Portfolio() {
       <div className="mx-auto mb-6 flex justify-between items-center">
         <button
           onClick={() => setShowDebug(!showDebug)}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors"
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors hidden"
         >
           {showDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
