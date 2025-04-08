@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import ScrollReveal from "../../components/ScrollReveal";
 
 // Enhanced portfolio items with importance representing layout size:
 // 4: 2x2 grid (takes 4 spaces)
@@ -127,8 +127,9 @@ export default function Portfolio() {
     adjustments: [],
     debugLog: [],
   });
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fix the debug message function
   const createDebugLogger = () => {
     const debugLog = [];
     return {
@@ -140,13 +141,23 @@ export default function Portfolio() {
     };
   };
 
+  const openProjectModal = (project) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeProjectModal = () => {
+    setIsModalOpen(false);
+    document.body.style.overflow = "auto";
+  };
+
   useEffect(() => {
     const { log, getLog } = createDebugLogger();
-    const gridWidth = 3; // Our grid has 3 columns
+    const gridWidth = 3;
     const adjustments = [];
 
     try {
-      // First prepare all items with 1x1 dimensions by default
       let allItems = portfolioItems.map((item, index) => {
         return {
           ...item,
@@ -157,32 +168,26 @@ export default function Portfolio() {
           },
           debugDimensions: { width: 1, height: 1, label: "1×1" },
           uniqueKey: `item-${item.id}`,
-          index: index, // Store original index for sorting later
+          index: index,
         };
       });
 
       log(`Prepared ${allItems.length} items with default 1×1 size`);
 
-      // Sort items by importance for better assignment
       allItems.sort((a, b) => b.originalImportance - a.originalImportance);
       log(`Sorted items by importance (highest first)`);
 
-      // Two-phase layout approach
       const createOptimizedLayout = () => {
-        // Phase 1: Generate layout blueprint first without assigning items
         const generateLayoutBlueprint = (itemCount) => {
           const layoutSpaces = [];
-
-          // Create a simulated set of dummy items just to run through the algorithm
           const dummyItems = Array(itemCount)
             .fill()
             .map((_, i) => ({
               id: `dummy-${i}`,
-              originalImportance: 1, // Doesn't matter for blueprint
+              originalImportance: 1,
               title: `Dummy Item ${i}`,
             }));
 
-          // Helper function to track spaces without actually assigning items
           const trackSpace = (width, height) => {
             layoutSpaces.push({
               type: `${width}x${height}`,
@@ -192,27 +197,23 @@ export default function Portfolio() {
             return { id: `dummy-space-${layoutSpaces.length}` };
           };
 
-          // Clone the layout generation algorithm but just track spaces
           const simulateLayoutCreation = () => {
             const remainingDummyItems = [...dummyItems];
 
-            // Simulated getNextItem just records the space type
             const simulatedGetNextItem = (width, height) => {
               if (remainingDummyItems.length === 0) return null;
-              remainingDummyItems.shift(); // Remove a dummy item
+              remainingDummyItems.shift();
               return trackSpace(width, height);
             };
 
-            // Now run through the same layout algorithm but just tracking spaces
             while (remainingDummyItems.length > 0) {
               const itemsLeft = remainingDummyItems.length;
 
-              // Pattern Row 1: Adaptive first row (identical to your original)
               if (itemsLeft === 4) {
-                simulatedGetNextItem(2, 1); // First 2x1
-                simulatedGetNextItem(1, 1); // 1x1
-                simulatedGetNextItem(1, 1); // 1x1
-                simulatedGetNextItem(2, 1); // Second 2x1
+                simulatedGetNextItem(2, 1);
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(1, 1);
+                simulatedGetNextItem(2, 1);
               } else if (itemsLeft >= 3) {
                 for (let i = 0; i < 3 && remainingDummyItems.length > 0; i++) {
                   simulatedGetNextItem(1, 1);
@@ -226,7 +227,6 @@ export default function Portfolio() {
 
               if (remainingDummyItems.length === 0) break;
 
-              // Pattern Row 2 (identical to your original)
               if (remainingDummyItems.length <= 5) {
                 if (remainingDummyItems.length === 4) {
                   simulatedGetNextItem(1, 1);
@@ -246,7 +246,7 @@ export default function Portfolio() {
               } else {
                 if (remainingDummyItems.length >= 3) {
                   simulatedGetNextItem(1, 1);
-                  simulatedGetNextItem(2, 2); // 2x2
+                  simulatedGetNextItem(2, 2);
                   simulatedGetNextItem(1, 1);
                 } else if (remainingDummyItems.length === 2) {
                   simulatedGetNextItem(1, 1);
@@ -258,7 +258,6 @@ export default function Portfolio() {
 
               if (remainingDummyItems.length === 0) break;
 
-              // Pattern Row 3 (identical to your original)
               if (remainingDummyItems.length === 4) {
                 simulatedGetNextItem(1, 1);
                 simulatedGetNextItem(2, 1);
@@ -280,7 +279,6 @@ export default function Portfolio() {
 
               if (remainingDummyItems.length === 0) break;
 
-              // Pattern Row 4 (identical to your original)
               if (remainingDummyItems.length <= 3) {
                 if (remainingDummyItems.length === 3) {
                   for (let i = 0; i < 3; i++) {
@@ -299,7 +297,6 @@ export default function Portfolio() {
 
               if (remainingDummyItems.length === 0) break;
 
-              // Pattern Row 5 (identical to your original)
               if (remainingDummyItems.length <= 4) {
                 if (remainingDummyItems.length === 4) {
                   simulatedGetNextItem(2, 1);
@@ -317,14 +314,13 @@ export default function Portfolio() {
                   simulatedGetNextItem(2, 1);
                 }
               } else {
-                simulatedGetNextItem(2, 2); // 2x2
+                simulatedGetNextItem(2, 2);
                 simulatedGetNextItem(1, 1);
                 simulatedGetNextItem(1, 1);
               }
 
               if (remainingDummyItems.length === 0) break;
 
-              // Pattern Row 6 (identical to your original)
               if (remainingDummyItems.length === 3) {
                 for (let i = 0; i < 3; i++) {
                   simulatedGetNextItem(1, 1);
@@ -348,21 +344,17 @@ export default function Portfolio() {
             }
           };
 
-          // Run the simulation to get the layout blueprint
           simulateLayoutCreation();
           return layoutSpaces;
         };
 
-        // Phase 2: Assign items to the blueprint based on importance
         const assignItemsToBlueprint = (items, blueprint) => {
-          // Count spaces by type
           const spacesByType = {
             "2x2": [],
             "2x1": [],
             "1x1": [],
           };
 
-          // Organize spaces by type
           blueprint.forEach((space, index) => {
             spacesByType[space.type].push({
               ...space,
@@ -370,7 +362,6 @@ export default function Portfolio() {
             });
           });
 
-          // Sort items by importance (highest first)
           const sortedItems = [...items].sort(
             (a, b) => b.originalImportance - a.originalImportance
           );
@@ -380,7 +371,6 @@ export default function Portfolio() {
             `Blueprint has: ${spacesByType["2x2"].length} 2×2 spaces, ${spacesByType["2x1"].length} 2×1 spaces, ${spacesByType["1x1"].length} 1×1 spaces`
           );
 
-          // Get original size label for importance
           const getOriginalSizeLabel = (importance) => {
             switch (importance) {
               case 4:
@@ -397,7 +387,6 @@ export default function Portfolio() {
 
           let itemIndex = 0;
 
-          // First assign importance 4 items to 2x2 spaces
           while (
             itemIndex < sortedItems.length &&
             sortedItems[itemIndex].originalImportance === 4 &&
@@ -416,7 +405,6 @@ export default function Portfolio() {
             itemIndex++;
           }
 
-          // Next assign importance 3 items to 2x1 spaces
           while (
             itemIndex < sortedItems.length &&
             sortedItems[itemIndex].originalImportance === 3 &&
@@ -435,7 +423,6 @@ export default function Portfolio() {
             itemIndex++;
           }
 
-          // If there are leftover 2x2 spaces, assign next highest importance items
           while (
             spacesByType["2x2"].length > 0 &&
             itemIndex < sortedItems.length
@@ -463,7 +450,6 @@ export default function Portfolio() {
             itemIndex++;
           }
 
-          // If there are leftover 2x1 spaces, assign next highest importance items
           while (
             spacesByType["2x1"].length > 0 &&
             itemIndex < sortedItems.length
@@ -491,7 +477,6 @@ export default function Portfolio() {
             itemIndex++;
           }
 
-          // Assign remaining items to 1x1 spaces
           while (
             spacesByType["1x1"].length > 0 &&
             itemIndex < sortedItems.length
@@ -519,16 +504,13 @@ export default function Portfolio() {
             itemIndex++;
           }
 
-          // Filter out any undefined elements (shouldn't happen if algorithm is correct)
           return resultItems.filter((item) => item !== undefined);
         };
 
-        // Execute the two-phase layout process
         const layoutBlueprint = generateLayoutBlueprint(allItems.length);
         return assignItemsToBlueprint(allItems, layoutBlueprint);
       };
 
-      // Use the optimized two-phase layout approach instead of createLayoutPattern
       const finalItems = createOptimizedLayout();
 
       log(`Created optimized layout with ${finalItems.length} items`);
@@ -536,7 +518,6 @@ export default function Portfolio() {
 
       setGridItems(finalItems);
 
-      // Calculate final metrics for debug info
       let totalCells = 0;
       let totalWidth = 0;
 
@@ -563,7 +544,6 @@ export default function Portfolio() {
       setError(err.message);
       console.error("Grid error:", err);
 
-      // Fallback to simple grid
       const simpleGrid = portfolioItems.map((item) => {
         return {
           ...item,
@@ -578,6 +558,17 @@ export default function Portfolio() {
 
       setGridItems(simpleGrid);
     }
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") closeProjectModal();
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => {
+      window.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "auto";
+    };
   }, []);
 
   return (
@@ -602,6 +593,30 @@ export default function Portfolio() {
           .portfolio-grid {
             gap: 0.25rem;
           }
+        }
+
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.75);
+          z-index: 50;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 1rem;
+        }
+
+        .modal-content {
+          background-color: #111827;
+          border-radius: 0.5rem;
+          max-width: 90%;
+          width: 800px;
+          max-height: 90vh;
+          overflow-y: auto;
+          position: relative;
         }
       `}</style>
 
@@ -639,85 +654,189 @@ export default function Portfolio() {
 
       <div className="mx-2 sm:mx-4 md:mx-6">
         <div className="portfolio-grid">
-          {gridItems.map((item) => (
-            <Link
-              href={`/portfolio/${item.id}`}
-              key={item.uniqueKey || item.id}
-              className={`
-                relative overflow-hidden rounded-lg transition-all duration-300
-                group cursor-pointer
-                hover:shadow-lg hover:shadow-blue-500/20
-              `}
+          {gridItems.map((item, index) => (
+            <div
+              key={`grid-cell-${item.uniqueKey || item.id}`}
               style={{
                 gridRow: `span ${item.debugDimensions.height}`,
                 gridColumn: `span ${item.debugDimensions.width}`,
               }}
             >
-              <div className="absolute inset-0">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3 sm:p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
-                <h3 className="text-base sm:text-lg font-semibold text-blue-300">
-                  {item.title}
-                </h3>
-                <p className="text-xs sm:text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity delay-100 duration-300 line-clamp-2 sm:line-clamp-3">
-                  {portfolioItems
-                    .find((p) => p.id === item.id)
-                    ?.description?.slice(0, 80)}
-                  {portfolioItems.find((p) => p.id === item.id)?.description
-                    ?.length > 80
-                    ? "..."
-                    : ""}
-                </p>
-                <div className="flex items-center mt-2 sm:mt-3">
-                  <span className="text-xs px-2 py-1 bg-blue-800/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity delay-200 duration-300">
-                    View Project
-                  </span>
-                </div>
-              </div>
-
-              {showDebug && (
-                <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white p-2 text-center">
-                  <p className="font-bold text-lg">
-                    {item.debugDimensions.label}
-                  </p>
-                  <p className="text-xs">ID: {item.id}</p>
-                  <p className="text-xs">
-                    Grid: {item.debugDimensions.width}×
-                    {item.debugDimensions.height}
-                  </p>
-                  <p className="text-xs">
-                    Cells:{" "}
-                    {item.debugDimensions.width * item.debugDimensions.height}
-                  </p>
-                  <p className="text-xs">
-                    Importance: {item.originalImportance}
-                  </p>
-                  {item.originalImportance !==
-                    (item.debugDimensions.width === 2 &&
-                    item.debugDimensions.height === 2
-                      ? 4
-                      : item.debugDimensions.width === 2 &&
-                        item.debugDimensions.height === 1
-                      ? 3
-                      : 1) && (
-                    <p className="text-xs text-yellow-400 mt-2">
-                      Adjusted from original size
+              <ScrollReveal
+                key={item.uniqueKey || item.id}
+                threshold={0.1}
+                delay={(index % 3) * 100}
+                animation="fade-up"
+                className={`
+                  h-full w-full
+                  relative overflow-hidden rounded-lg transition-all duration-300
+                  group cursor-pointer
+                  hover:shadow-lg hover:shadow-blue-500/20
+                `}
+              >
+                <div
+                  className="h-full w-full"
+                  onClick={() => openProjectModal(item)}
+                >
+                  <div className="absolute inset-0">
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3 sm:p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
+                    <h3 className="text-base sm:text-lg font-semibold text-blue-300">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity delay-100 duration-300 line-clamp-2 sm:line-clamp-3">
+                      {portfolioItems
+                        .find((p) => p.id === item.id)
+                        ?.description?.slice(0, 80)}
+                      {portfolioItems.find((p) => p.id === item.id)?.description
+                        ?.length > 80
+                        ? "..."
+                        : ""}
                     </p>
+                    <div className="flex items-center mt-2 sm:mt-3">
+                      <span className="text-xs px-2 py-1 bg-blue-800/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity delay-200 duration-300">
+                        View Project
+                      </span>
+                    </div>
+                  </div>
+
+                  {showDebug && (
+                    <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-white p-2 text-center">
+                      <p className="font-bold text-lg">
+                        {item.debugDimensions.label}
+                      </p>
+                      <p className="text-xs">ID: {item.id}</p>
+                      <p className="text-xs">
+                        Grid: {item.debugDimensions.width}×
+                        {item.debugDimensions.height}
+                      </p>
+                      <p className="text-xs">
+                        Cells:{" "}
+                        {item.debugDimensions.width *
+                          item.debugDimensions.height}
+                      </p>
+                      <p className="text-xs">
+                        Importance: {item.originalImportance}
+                      </p>
+                      {item.originalImportance !==
+                        (item.debugDimensions.width === 2 &&
+                        item.debugDimensions.height === 2
+                          ? 4
+                          : item.debugDimensions.width === 2 &&
+                            item.debugDimensions.height === 1
+                          ? 3
+                          : 1) && (
+                        <p className="text-xs text-yellow-400 mt-2">
+                          Adjusted from original size
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </Link>
+              </ScrollReveal>
+            </div>
           ))}
         </div>
       </div>
+
+      {isModalOpen && selectedProject && (
+        <div className="modal-overlay" onClick={closeProjectModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="relative h-64 md:h-80 lg:h-96">
+              <Image
+                src={selectedProject.image}
+                alt={selectedProject.title}
+                fill
+                priority
+                className="object-cover"
+              />
+              <button
+                onClick={closeProjectModal}
+                className="absolute top-4 right-4 bg-black/50 hover:bg-black/80 text-white p-2 rounded-full transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-blue-300">
+                {selectedProject.title}
+              </h2>
+
+              <div className="mt-4">
+                <p className="text-gray-200 mb-4">
+                  {portfolioItems.find((p) => p.id === selectedProject.id)
+                    ?.description || "No description available."}
+                </p>
+
+                {selectedProject.technologies && (
+                  <div className="mt-5">
+                    <h3 className="text-lg font-semibold mb-2">Technologies</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProject.technologies.map((tech, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-900/50 text-blue-200 px-3 py-1 rounded-full text-xs"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-5 grid grid-cols-2 gap-4 text-sm">
+                  {selectedProject.client && (
+                    <div>
+                      <span className="font-semibold text-gray-400">
+                        Client:
+                      </span>
+                      <p className="text-white">{selectedProject.client}</p>
+                    </div>
+                  )}
+
+                  {selectedProject.year && (
+                    <div>
+                      <span className="font-semibold text-gray-400">Year:</span>
+                      <p className="text-white">{selectedProject.year}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-8">
+                  <button
+                    onClick={closeProjectModal}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showDebug && (
         <>
