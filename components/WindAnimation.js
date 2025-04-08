@@ -14,7 +14,9 @@ class PathTree {
     this.direction = direction; // 'right' or 'left'
 
     // Fixed grid settings
-    this.gridSize = 25; // Changed from 50 to 25 to make the tree about half the size
+    // Responsive grid size based on screen width
+    this.gridSize =
+      typeof window !== "undefined" && window.innerWidth < 768 ? 15 : 25; // Smaller grid (15px) for mobile, 25px for larger screens
 
     // Path offset settings to avoid all paths turning at same points
     this.pathOffsets = [];
@@ -882,7 +884,13 @@ class WindAnimation {
     };
 
     if (typeof window !== "undefined") {
-      window.addEventListener("resize", this.handleResize.bind(this));
+      let previousWidth = window.innerWidth;
+      window.addEventListener("resize", () => {
+        if (window.innerWidth !== previousWidth) {
+          previousWidth = window.innerWidth;
+          this.handleResize();
+        }
+      });
     }
 
     this.rightPathTree = new PathTree(

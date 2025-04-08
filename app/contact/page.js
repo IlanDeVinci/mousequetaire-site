@@ -57,23 +57,6 @@ const contactOptions = [
     ),
     bgColor: "#70C7F2",
   },
-  {
-    icon: "/images/chat-icon.png",
-    title: "Chat",
-    description: "Discutez en direct",
-    content: (
-      <div className="flex flex-col items-center gap-6">
-        <h3 className="text-2xl md:text-3xl font-bold mb-4">Chat en Direct</h3>
-        <p className="text-base md:text-lg mb-6">
-          Notre équipe est disponible pour répondre à vos questions
-        </p>
-        <button className="bg-[#7DD4FF] text-[#002132] font-bold py-3 px-6 rounded">
-          Démarrer le chat
-        </button>
-      </div>
-    ),
-    bgColor: "#006A9E",
-  },
 ];
 
 export default function Contact() {
@@ -207,14 +190,14 @@ export default function Contact() {
 
           {/* Desktop view - horizontal layout */}
           <div className="hidden md:flex justify-center mb-24 relative h-72">
-            <div className="w-full max-w-[1000px] relative">
+            <div className="w-full max-w-[800px] relative flex justify-center">
               {contactOptions.map((option, index) => (
                 <div
                   key={index}
-                  className="absolute top-0 transition-all duration-700"
+                  className="transition-all duration-700 absolute top-0"
                   style={{
-                    left: `${index * 350}px`,
                     width: "288px",
+                    left: `${index * 500}px`,
                     opacity:
                       activeModal !== null && activeModal !== index ? 0 : 1,
                     transitionDuration:

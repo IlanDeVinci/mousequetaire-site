@@ -94,11 +94,49 @@ function DiscoverElement() {
     }
   };
 
+  // Add these animations to your component
+  useEffect(() => {
+    // Add keyframes for animations to the document if they don't exist
+    if (!document.querySelector("#pulse-animations")) {
+      const styleEl = document.createElement("style");
+      styleEl.id = "pulse-animations";
+      styleEl.innerHTML = `
+        @keyframes pulseRing {
+          0% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0.8); }
+          70% { box-shadow: 0 0 0 25px rgba(135, 215, 255, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0); }
+        }
+        
+        @keyframes pulseLight {
+          0% { background-color: rgba(255, 255, 255, 0.1); }
+          50% { background-color: rgba(135, 215, 255, 0.3); }
+          100% { background-color: rgba(255, 255, 255, 0.1); }
+        }
+        
+        .animate-pulse-ring {
+          animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+        
+        .animate-pulse-light {
+          animation: pulseLight 2s ease-in-out infinite;
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+  }, []);
+
   return (
     <div
       onClick={handleClick}
-      className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
+      className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()} ${
+        phase === 0 ? "animate-pulse-ring" : ""
+      }`}
     >
+      {/* Pulsing light effect overlay (only visible in phase 0) */}
+      {phase === 0 && (
+        <div className="absolute inset-0 rounded-full animate-pulse-light z-10 pointer-events-none"></div>
+      )}
+
       <div
         className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[40%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
       >

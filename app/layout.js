@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,12 +40,13 @@ export default function RootLayout({ children }) {
         <title>Mousequetaire</title>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased relative`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased relative bg-[#050610]`}
       >
         <Navbar />
         <main className="w-full py-16 pt-32 bg-[#050610] min-h-screen overflow-x-hidden">
           {children}
         </main>
+        <BackToTop />
         <Footer />
       </body>
     </html>
