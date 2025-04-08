@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { useState, useCallback, useRef } from "react";
 import ScrollReveal from "../../components/ScrollReveal";
@@ -56,7 +55,6 @@ export default function Services() {
 
   const handleMouseEnter = useCallback(
     (index) => {
-      // Allow animation if hovering a different circle or no animation is in progress
       if (!isAnimating || lastIndex.current !== index) {
         setIsAnimating(true);
         setActiveIndex(index);
@@ -69,7 +67,6 @@ export default function Services() {
     [isAnimating]
   );
 
-  // For touch devices - toggle active state
   const handleClick = useCallback(
     (index) => {
       if (activeIndex === index) {
@@ -96,6 +93,7 @@ export default function Services() {
               Nos Services
             </h1>
           </ScrollReveal>
+
           <ScrollReveal animation="fade-up" delay={200}>
             <p className="text-white text-center max-w-2xl mx-auto mb-8 sm:mb-12 md:mb-16 text-sm sm:text-base md:text-lg px-3 sm:px-4">
               Découvrez notre gamme complète de services numériques conçus pour
@@ -104,9 +102,9 @@ export default function Services() {
           </ScrollReveal>
 
           {/* Tablet Interactive Circles (Vertical Layout) */}
-          <div className="flex md:hidden flex-col items-center mb-16 px-4 relative min-h-[900px]">
-            {services.map((service, index) => (
-              <ScrollReveal key={index} animation="zoom-in" delay={index * 200}>
+          <ScrollReveal animation="fade-up" delay={400}>
+            <div className="flex md:hidden flex-col items-center mb-16 px-4 relative min-h-[900px]">
+              {services.map((service, index) => (
                 <div
                   className="absolute transition-all duration-500 ease-in-out w-full flex justify-center"
                   style={{
@@ -116,6 +114,7 @@ export default function Services() {
                         : `${index * 300}px`,
                     zIndex: activeIndex === index ? 10 : 1,
                   }}
+                  key={index}
                 >
                   <div
                     className="w-full max-w-[280px]"
@@ -123,11 +122,11 @@ export default function Services() {
                   >
                     <div
                       className={`rounded-full transition-all duration-500 ease-in-out overflow-hidden relative mx-auto
-                    ${
-                      activeIndex === index
-                        ? "h-[600px] w-full max-w-[600px]"
-                        : "h-[280px] w-[280px]"
-                    }`}
+                      ${
+                        activeIndex === index
+                          ? "h-[600px] w-full max-w-[600px]"
+                          : "h-[280px] w-[280px]"
+                      }`}
                       style={{
                         backgroundColor: service.bgColor,
                       }}
@@ -154,11 +153,11 @@ export default function Services() {
                         </h3>
                         <div
                           className={`transition-all duration-300 text-white text-center px-4 mt-2
-                        ${
-                          activeIndex === index
-                            ? "opacity-100 delay-200"
-                            : "opacity-0"
-                        }`}
+                          ${
+                            activeIndex === index
+                              ? "opacity-100 delay-200"
+                              : "opacity-0"
+                          }`}
                         >
                           <p className="whitespace-normal text-base">
                             {service.description}
@@ -173,26 +172,23 @@ export default function Services() {
                     </div>
                   </div>
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ScrollReveal>
 
           {/* Desktop Interactive Circles */}
-          <div className="hidden md:flex justify-center mb-16 lg:mb-24 relative h-72">
-            <div className="w-full max-w-[1000px] relative">
-              {services.map((service, index) => (
-                <ScrollReveal
-                  key={index}
-                  animation="zoom-in"
-                  delay={index * 200}
-                >
+          <ScrollReveal animation="zoom-in">
+            <div className="hidden md:flex justify-center mb-16 lg:mb-24 relative h-72">
+              <div className="w-full max-w-[1000px] relative">
+                {services.map((service, index) => (
                   <div
+                    key={index}
                     className="absolute top-0 transition-all duration-700 ease-in-out"
                     style={{
                       left:
                         activeIndex === index
                           ? index === 2
-                            ? "calc(100% - 1012px)" // Adjusted: 1000px + 16px padding
+                            ? "calc(100% - 1012px)"
                             : "0px"
                           : `${index * 33}%`,
                       zIndex: activeIndex === index ? 10 : 1,
@@ -213,9 +209,7 @@ export default function Services() {
                     >
                       <div
                         className={`absolute transition-all duration-700 ease-in-out flex items-center gap-6 md:gap-8 lg:gap-12 ${
-                          index === 2
-                            ? "right-3 flex-row-reverse" // Added flex-row-reverse for the right circle
-                            : "left-3"
+                          index === 2 ? "right-3 flex-row-reverse" : "left-3"
                         }`}
                       >
                         <span className="text-5xl md:text-6xl text-white shrink-0 w-56 md:w-64 h-56 md:h-64 relative">
@@ -243,14 +237,18 @@ export default function Services() {
                       </div>
                     </div>
                   </div>
-                </ScrollReveal>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Alternating Sections - Responsive */}
           {sections.map((section, index) => (
-            <ScrollReveal key={index} animation="fade-up" delay={index * 200}>
+            <ScrollReveal
+              key={index}
+              animation={section.isReversed ? "fade-left" : "fade-right"}
+              delay={index * 200}
+            >
               <div
                 className={`flex flex-col ${
                   section.isReversed ? "md:flex-row-reverse" : "md:flex-row"
