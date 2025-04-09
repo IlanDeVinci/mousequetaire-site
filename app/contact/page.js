@@ -1,55 +1,284 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 
-// New component for Instagram image slider
+// Move images array outside component to prevent recreation on each render
+const instagramSliderImages = [
+  "/images/instagram-icon.svg",
+  "/images/linkedin.svg",
+  "/images/facebook-icon.svg",
+];
+
+// Simplified Instagram Slider Component
 const InstagramSlider = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const images = [
-    "/images/instagram-icon.png",
-    "/images/instagram-slide2.png",
-    "/images/instagram-slide3.png",
-  ];
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [slidesArray, setSlidesArray] = useState([]);
+  const originalImages = instagramSliderImages;
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  // Ref to track if we're currently updating slides to avoid infinite loop
+  const isUpdating = useRef(false);
+
+  // Function to ensure we have enough slides ahead
+  const ensureSufficientSlides = useCallback(
+    (targetIndex) => {
+      // Don't run if already updating
+      if (isUpdating.current) return;
+
+      isUpdating.current = true;
+
+      setSlidesArray((prevSlides) => {
+        try {
+          // Always maintain 2 full sets of slides ahead of current position
+          const remainingSlides = prevSlides.length - targetIndex - 1;
+
+          console.log(
+            `Checking slides: ${prevSlides.length} total, ${remainingSlides} ahead of position ${targetIndex}`
+          );
+
+          // If we don't have enough slides ahead, add more
+          if (remainingSlides < originalImages.length * 2) {
+            // FIXED: Create unique timestamps for each set to prevent duplicate keys
+            const timestamp1 = Date.now();
+            const timestamp2 = timestamp1 + 1;
+
+            // Add two complete sets to ensure we have plenty of slides ahead
+            const newSlides = [
+              ...originalImages.map((src, idx) => ({
+                id: `slide-${timestamp1}-${idx}`,
+                src,
+                originalIndex: idx,
+              })),
+              ...originalImages.map((src, idx) => ({
+                id: `slide-${timestamp2}-${idx}`,
+                src,
+                originalIndex: idx,
+              })),
+            ];
+
+            // FIXED: Don't slice existing slides if it would result in too few slides
+            // Keep everything from beginning to current position plus a small buffer
+            const keepCount = targetIndex + 1; // Keep at least up to current position
+
+            // Combine without removing any slides that are still needed
+            const result = [...prevSlides, ...newSlides];
+
+            console.log(
+              `Added ${newSlides.length} new slides. New total: ${
+                result.length
+              }, ${
+                result.length - targetIndex - 1
+              } ahead of position ${targetIndex}`
+            );
+
+            return result;
+          }
+          return prevSlides;
+        } finally {
+          // Always reset the updating flag
+          setTimeout(() => {
+            isUpdating.current = false;
+          }, 0);
+        }
+      });
+    },
+    [originalImages]
+  );
+
+  // Add a debounced version of the slide management to avoid too many updates
+  const debouncedEnsureSlides = useCallback(
+    (targetIndex) => {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      // Set a new timeout
+      timeoutRef.current = setTimeout(() => {
+        ensureSufficientSlides(targetIndex);
+      }, 100);
+    },
+    [ensureSufficientSlides]
+  );
+
+  // Modified advanceSlide to use the debounced version
+  const advanceSlide = useCallback(
+    (forward = true) => {
+      // Calculate the next index first
+      const nextIndex = currentIndex + 1;
+
+      // Ensure we have enough slides BEFORE setting transition state or changing index
+      // Use the debounced version to avoid too many updates
+      debouncedEnsureSlides(nextIndex);
+
+      // Now start the transition
+      setIsTransitioning(true);
+
+      setCurrentIndex(nextIndex);
+
+      // After transition completes
+      timeoutRef.current = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 500);
+    },
+    [currentIndex, debouncedEnsureSlides]
+  );
+
+  // Initialize with more slides at the start
+  useEffect(() => {
+    // Create initial slide set with FOUR copies of each image for a good buffer
+    const initialSlides = [
+      ...originalImages,
+      ...originalImages,
+      ...originalImages,
+      ...originalImages,
+    ].map((src, index) => ({
+      id: `slide-init-${index}`,
+      src: src,
+      originalIndex: index % originalImages.length,
+    }));
+
+    setSlidesArray(initialSlides);
+    console.log(`Initialized with ${initialSlides.length} slides`);
+  }, []);
+
+  // Replace the safety check effect with a more conservative approach
+  useEffect(() => {
+    // Only check if we're not transitioning to avoid conflicts
+    if (!isTransitioning) {
+      const remainingSlides = slidesArray.length - currentIndex - 1;
+      if (remainingSlides < originalImages.length * 2) {
+        // Use timeout to avoid render loop
+        const timer = setTimeout(() => {
+          setSlidesArray((prev) => {
+            // Add one full set of slides
+            const timestamp = Date.now();
+            const newSlides = originalImages.map((src, idx) => ({
+              id: `slide-${timestamp}-${idx}`,
+              src,
+              originalIndex: idx,
+            }));
+
+            return [...prev, ...newSlides];
+          });
+        }, 100);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [
+    currentIndex,
+    slidesArray.length,
+    originalImages.length,
+    isTransitioning,
+  ]);
+  // Modified returnToInstagram to ensure we have enough slides before jumping
+  const returnToInstagram = useCallback(() => {
+    // Find how many slides until the next Instagram logo
+    const currentPosition = currentIndex % originalImages.length;
+
+    console.log(
+      `Return to Instagram: Current position in cycle: ${currentPosition}, Total slides: ${slidesArray.length}`
+    );
+
+    // If not already on Instagram logo, advance to the next one
+    if (currentPosition !== 0) {
+      // Calculate steps needed to reach next Instagram logo by moving forward
+      const stepsToNextLogo = originalImages.length - currentPosition;
+      console.log(`Steps to next Instagram logo: ${stepsToNextLogo}`);
+
+      // Calculate the target position
+      const nextInstagramPosition = currentIndex + stepsToNextLogo;
+      console.log(`Planning jump to position: ${nextInstagramPosition}`);
+
+      // FIRST ensure we have enough slides for this jump
+      ensureSufficientSlides(nextInstagramPosition);
+
+      // Now start the transition
+      setIsTransitioning(true);
+      console.log(`Jumping to position: ${nextInstagramPosition}`);
+      setCurrentIndex(nextInstagramPosition);
+
+      // After transition completes
+      timeoutRef.current = setTimeout(() => {
+        setIsTransitioning(false);
+      }, 500);
+    }
+  }, [
+    currentIndex,
+    originalImages.length,
+    slidesArray.length,
+    ensureSufficientSlides,
+  ]);
 
   useEffect(() => {
-    let interval;
+    // Handle hover state changes
     if (isHovered) {
-      interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % images.length);
+      // Start rotating through slides when hovered
+      intervalRef.current = setInterval(() => {
+        advanceSlide();
       }, 1500);
+    } else {
+      // When hover ends, return to Instagram logo by advancing forward
+      clearTimeouts();
+      returnToInstagram();
     }
-    return () => clearInterval(interval);
-  }, [isHovered]);
+
+    return () => {
+      clearTimeouts();
+    };
+  }, [isHovered, advanceSlide, returnToInstagram]);
+
+  // Clear any timeouts to prevent memory leaks
+  const clearTimeouts = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+  };
 
   return (
     <div
-      className="relative w-full h-full"
+      className="w-full h-full flex items-center justify-center cursor-pointer overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {images.map((src, index) => (
-        <div
-          key={index}
-          className="absolute inset-0 transition-opacity duration-500"
-          style={{ opacity: isHovered && currentSlide === index ? 1 : 0 }}
-        >
-          <Image
-            src={src}
-            alt={`Instagram slide ${index + 1}`}
-            fill
-            style={{ objectFit: "contain" }}
-          />
-        </div>
-      ))}
-      {!isHovered && (
-        <Image
-          src={images[0]}
-          alt="Instagram"
-          fill
-          style={{ objectFit: "contain" }}
-        />
-      )}
+      <div className="w-full h-full relative">
+        {slidesArray.map((slide, index) => {
+          // Calculate visual position relative to current index
+          const position = index - currentIndex;
+
+          // Render more slides to ensure smooth transitions
+          // Keep more slides in the DOM to prevent empty spaces
+          const isVisible = position >= -2 && position <= 2;
+
+          return (
+            <div
+              key={slide.id}
+              className="absolute inset-0 flex items-center justify-center w-full h-full"
+              style={{
+                opacity: 1,
+                transform: `translateX(${position * 100}%)`,
+                transition: isTransitioning
+                  ? "transform 500ms cubic-bezier(0.4, 0.0, 0.2, 1)"
+                  : "none",
+                visibility: isVisible ? "visible" : "hidden",
+                zIndex: position === 0 ? 2 : 1,
+              }}
+            >
+              <Image
+                src={slide.src}
+                alt={`Social media icon ${slide.originalIndex + 1}`}
+                width={120}
+                height={120}
+                style={{ width: "70%", height: "auto" }}
+                priority={slide.originalIndex === 0}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -57,75 +286,241 @@ const InstagramSlider = () => {
 // New component for animated form icon SVG
 const FormIconSVG = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [pathProgress, setPathProgress] = useState(0);
+  const lastProgressRef = useRef(0);
+  const animationDirectionRef = useRef(null);
+  const startProgressRef = useRef(0);
+
+  useEffect(() => {
+    let animationFrame;
+    let startTime;
+
+    // Update the animation direction based on hover state
+    if (isHovered && animationDirectionRef.current !== "forward") {
+      animationDirectionRef.current = "forward";
+      startTime = null; // Reset start time for new animation direction
+      startProgressRef.current = pathProgress; // Save starting point
+    } else if (!isHovered && animationDirectionRef.current !== "backward") {
+      animationDirectionRef.current = "backward";
+      startTime = null; // Reset start time for new animation direction
+      startProgressRef.current = pathProgress; // Save starting point
+    }
+
+    const animatePath = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const duration = 600; // Animation duration in ms
+
+      let progress;
+
+      if (isHovered) {
+        // Forward animation - linear progression from start to 1
+        // Calculate how much progress we need to make (from current to 1)
+        const remainingDistance = 1 - startProgressRef.current;
+        // Apply that progress proportionally
+        const progressFraction = Math.min(elapsed / duration, 1);
+        progress =
+          startProgressRef.current + remainingDistance * progressFraction;
+      } else {
+        // Backward animation - linear regression from start to 0
+        // The total distance to travel is the current progress value
+        const progressFraction = Math.min(elapsed / duration, 1);
+        // Apply regression proportionally
+        progress = startProgressRef.current * (1 - progressFraction);
+      }
+
+      setPathProgress(progress);
+
+      // Continue animation if we're not at the target state
+      if ((isHovered && progress < 1) || (!isHovered && progress > 0)) {
+        animationFrame = requestAnimationFrame(animatePath);
+      }
+    };
+
+    // Start the animation immediately
+    animationFrame = requestAnimationFrame(animatePath);
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [isHovered]); // Remove the pathProgress dependency to prevent re-triggering
+
+  // SVG constants
+  const circleRadius = 8;
+  const strokeWidth = 4;
+  const grayColor = "#1D1D1B";
+  const whiteColor = "#FFFFFF";
+
+  // Circle properties for animation with staggered delays
+  const circleCircumference = 2 * Math.PI * circleRadius;
+
+  // Calculate animation timing with consistent speed
+  const getElementAnimation = (delay) => {
+    // Base animation duration as a fraction of total progress (0-1)
+    const animationDuration = 0.4; // 40% of the total animation time
+
+    // Start time based on delay (when this element should start animating)
+    const startTime = delay;
+
+    // End time (when animation completes)
+    const endTime = startTime + animationDuration;
+
+    // Current position within the animation timeline
+    let progress = 0;
+
+    if (pathProgress < startTime) {
+      // Before animation starts
+      progress = 0;
+    } else if (pathProgress > endTime) {
+      // After animation completes
+      progress = 1;
+    } else {
+      // During animation - normalize to 0-1 range for this segment
+      progress = (pathProgress - startTime) / animationDuration;
+    }
+
+    return progress;
+  };
+
+  const getCircleDash = (index) => {
+    // Start times for circles (staggered)
+    const delay = index * 0.15;
+    const progress = getElementAnimation(delay);
+    return progress * circleCircumference;
+  };
+
+  const getLineDash = (index) => {
+    // Start lines after circles with staggered timing
+    const delay = (index + 1.5) * 0.15;
+    const progress = getElementAnimation(delay);
+    // Return dashoffset (55 when not animated, 0 when fully animated)
+    return 55 * (1 - progress);
+  };
 
   return (
     <div
-      className="w-full h-full flex items-center justify-center"
+      className="w-full h-full flex items-center justify-center cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <svg
-        viewBox="0 0 100 100"
-        width="100%"
-        height="100%"
-        className="transition-all duration-500"
-      >
-        {/* Circles on the left */}
+      <svg viewBox="0 0 100 100" className="w-[70%] h-[70%]">
+        {/* Base gray elements */}
         <circle
-          cx="30"
-          cy="30"
-          r="8"
+          cx="15"
+          cy="20"
+          r={circleRadius}
           fill="none"
-          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
-          strokeWidth="2"
-          className="transition-all duration-500"
+          stroke={grayColor}
+          strokeWidth={strokeWidth}
         />
         <circle
-          cx="30"
+          cx="15"
           cy="50"
-          r="8"
+          r={circleRadius}
           fill="none"
-          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
-          strokeWidth="2"
-          className="transition-all duration-500"
+          stroke={grayColor}
+          strokeWidth={strokeWidth}
         />
         <circle
-          cx="30"
-          cy="70"
-          r="8"
+          cx="15"
+          cy="80"
+          r={circleRadius}
           fill="none"
-          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
-          strokeWidth="2"
-          className="transition-all duration-500"
-        />
-
-        {/* Lines on the right */}
-        <line
-          x1="50"
-          y1="30"
-          x2="80"
-          y2="30"
-          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
-          strokeWidth="2"
-          className="transition-all duration-500"
+          stroke={grayColor}
+          strokeWidth={strokeWidth}
         />
         <line
-          x1="50"
+          x1="35"
+          y1="20"
+          x2="90"
+          y2="20"
+          stroke={grayColor}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+        />
+        <line
+          x1="35"
           y1="50"
-          x2="80"
+          x2="90"
           y2="50"
-          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
-          strokeWidth="2"
-          className="transition-all duration-500"
+          stroke={grayColor}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
         />
         <line
-          x1="50"
-          y1="70"
-          x2="80"
-          y2="70"
-          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
-          strokeWidth="2"
-          className="transition-all duration-500"
+          x1="35"
+          y1="80"
+          x2="90"
+          y2="80"
+          stroke={grayColor}
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+        />
+        {/* White animated elements */}
+        <circle
+          cx="15"
+          cy="20"
+          r={circleRadius}
+          fill="none"
+          stroke={whiteColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circleCircumference}
+          strokeDashoffset={circleCircumference - getCircleDash(0)}
+        />
+        <circle
+          cx="15"
+          cy="50"
+          r={circleRadius}
+          fill="none"
+          stroke={whiteColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circleCircumference}
+          strokeDashoffset={circleCircumference - getCircleDash(1)}
+        />
+        <circle
+          cx="15"
+          cy="80"
+          r={circleRadius}
+          fill="none"
+          stroke={whiteColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circleCircumference}
+          strokeDashoffset={circleCircumference - getCircleDash(2)}
+        />
+        <line
+          x1="35"
+          y1="20"
+          x2="90"
+          y2="20"
+          stroke={whiteColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray="55"
+          strokeDashoffset={getLineDash(0)}
+          strokeLinecap="round"
+        />
+        <line
+          x1="35"
+          y1="50"
+          x2="90"
+          y2="50"
+          stroke={whiteColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray="55"
+          strokeDashoffset={getLineDash(1)}
+          strokeLinecap="round"
+        />
+        <line
+          x1="35"
+          y1="80"
+          x2="90"
+          y2="80"
+          stroke={whiteColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray="55"
+          strokeDashoffset={getLineDash(2)}
+          strokeLinecap="round"
         />
       </svg>
     </div>
@@ -279,7 +674,7 @@ export default function Contact() {
               >
                 <div
                   onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                  className={`w-full h-full rounded-full flex items-center justify-center
+                  className={`w-full h-full rounded-full flex items-center justify-center overflow-hidden
                   ${
                     !activeModal
                       ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/20"
@@ -301,15 +696,13 @@ export default function Contact() {
                 >
                   {/* Circle Content */}
                   <div
-                    className={`flex w-[70%] flex-col items-center transition-opacity duration-700
+                    className={`flex items-center justify-center w-full h-full transition-opacity duration-700
                     ${!isExpanded ? "opacity-100" : "opacity-0"}`}
                   >
-                    <div className="text-5xl text-white relative w-full aspect-[1]">
-                      {option.customIcon}
-                    </div>
+                    {option.customIcon}
                   </div>
                   {!activeModal && (
-                    <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20" />
+                    <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20 pointer-events-none" />
                   )}
                 </div>
               </div>
@@ -336,7 +729,7 @@ export default function Contact() {
                 >
                   <div
                     onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                    className={`w-72 h-72 rounded-full flex items-center justify-center 
+                    className={`w-72 h-72 rounded-full flex items-center justify-center overflow-hidden
                       ${
                         !activeModal
                           ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/30"
@@ -358,15 +751,13 @@ export default function Contact() {
                   >
                     {/* Circle Content */}
                     <div
-                      className={`flex w-[70%] flex-col items-center transition-opacity duration-700
+                      className={`flex items-center justify-center w-full h-full transition-opacity duration-700
                       ${!isExpanded ? "opacity-100" : "opacity-0"}`}
                     >
-                      <div className="text-6xl text-white relative w-full aspect-[1]">
-                        {option.customIcon}
-                      </div>
+                      {option.customIcon}
                     </div>
                     {!activeModal && (
-                      <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20" />
+                      <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20 pointer-events-none" />
                     )}
                   </div>
                 </div>
