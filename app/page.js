@@ -667,7 +667,7 @@ function FlipCard({ frontContent, backContent, index }) {
               </svg>
             ) : (
               <svg
-                className="w-[90%] h-[90%] items-start"
+                className="w-[90%] h-[93%] items-start"
                 viewBox="0 0 407 407"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -736,7 +736,7 @@ function FlipCard({ frontContent, backContent, index }) {
               {frontContent}
             </h3>
             <div className="flex-grow flex items-center justify-center">
-              <p className="text-base md:text-lg font-medium leading-relaxed">
+              <p className="text-base md:text-lg font-medium leading-relaxed pb-[10%]">
                 {backContent}
               </p>
             </div>

@@ -5,19 +5,19 @@ import ScrollReveal from "../../components/ScrollReveal";
 
 const services = [
   {
-    icon: "/bulbe.png",
+    icon: "/bulbe.svg",
     title: "Développement Web",
     description: "Création de sites web modernes et responsive",
     bgColor: "#004165",
   },
   {
-    icon: "/supporttechnique.png",
+    icon: "/supporttechnique.svg",
     title: "Support Technique",
     description: "Assistance et maintenance professionnelle",
     bgColor: "#005180",
   },
   {
-    icon: "/internetpicto.png",
+    icon: "/internetpicto.svg",
     title: "Conseil",
     description: "Solutions digitales sur mesure",
     bgColor: "#006A9E",

@@ -2,9 +2,138 @@
 import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 
+// New component for Instagram image slider
+const InstagramSlider = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const images = [
+    "/images/instagram-icon.png",
+    "/images/instagram-slide2.png",
+    "/images/instagram-slide3.png",
+  ];
+
+  useEffect(() => {
+    let interval;
+    if (isHovered) {
+      interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % images.length);
+      }, 1500);
+    }
+    return () => clearInterval(interval);
+  }, [isHovered]);
+
+  return (
+    <div
+      className="relative w-full h-full"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {images.map((src, index) => (
+        <div
+          key={index}
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{ opacity: isHovered && currentSlide === index ? 1 : 0 }}
+        >
+          <Image
+            src={src}
+            alt={`Instagram slide ${index + 1}`}
+            fill
+            style={{ objectFit: "contain" }}
+          />
+        </div>
+      ))}
+      {!isHovered && (
+        <Image
+          src={images[0]}
+          alt="Instagram"
+          fill
+          style={{ objectFit: "contain" }}
+        />
+      )}
+    </div>
+  );
+};
+
+// New component for animated form icon SVG
+const FormIconSVG = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      className="w-full h-full flex items-center justify-center"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <svg
+        viewBox="0 0 100 100"
+        width="100%"
+        height="100%"
+        className="transition-all duration-500"
+      >
+        {/* Circles on the left */}
+        <circle
+          cx="30"
+          cy="30"
+          r="8"
+          fill="none"
+          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
+          strokeWidth="2"
+          className="transition-all duration-500"
+        />
+        <circle
+          cx="30"
+          cy="50"
+          r="8"
+          fill="none"
+          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
+          strokeWidth="2"
+          className="transition-all duration-500"
+        />
+        <circle
+          cx="30"
+          cy="70"
+          r="8"
+          fill="none"
+          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
+          strokeWidth="2"
+          className="transition-all duration-500"
+        />
+
+        {/* Lines on the right */}
+        <line
+          x1="50"
+          y1="30"
+          x2="80"
+          y2="30"
+          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
+          strokeWidth="2"
+          className="transition-all duration-500"
+        />
+        <line
+          x1="50"
+          y1="50"
+          x2="80"
+          y2="50"
+          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
+          strokeWidth="2"
+          className="transition-all duration-500"
+        />
+        <line
+          x1="50"
+          y1="70"
+          x2="80"
+          y2="70"
+          stroke={isHovered ? "#FFFFFF" : "#1D1D1B"}
+          strokeWidth="2"
+          className="transition-all duration-500"
+        />
+      </svg>
+    </div>
+  );
+};
+
 const contactOptions = [
   {
-    icon: "/images/instagram-icon.png",
     title: "Instagram",
     description: "Appelez-nous directement",
     content: (
@@ -24,9 +153,10 @@ const contactOptions = [
       </div>
     ),
     bgColor: "#002132",
+    customIcon: <InstagramSlider />,
+    hoverEffect: "hover:animate-pulse",
   },
   {
-    icon: "/images/form-icon.png",
     title: "Email",
     description: "Contactez-nous par email",
     content: (
@@ -56,11 +186,11 @@ const contactOptions = [
       </div>
     ),
     bgColor: "#70C7F2",
+    customIcon: <FormIconSVG />,
   },
 ];
 
 export default function Contact() {
-  // Simplify state management
   const [activeModal, setActiveModal] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -113,6 +243,7 @@ export default function Contact() {
       document.body.style.overflow = "auto";
     }, 300);
   }, [isAnimating]);
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape" && !isAnimating && activeModal !== null) {
@@ -122,6 +253,7 @@ export default function Contact() {
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isAnimating, activeModal, closeModal]);
+
   return (
     <>
       <main className="pt-24 pb-16 bg-[#050610] min-h-screen">
@@ -153,7 +285,9 @@ export default function Contact() {
                       ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/20"
                       : ""
                   } 
-                  transition-all duration-500 ease-in-out`}
+                  transition-all duration-500 ease-in-out ${
+                    option.hoverEffect || ""
+                  }`}
                   style={{
                     backgroundColor: option.bgColor,
                     transform:
@@ -171,17 +305,11 @@ export default function Contact() {
                     ${!isExpanded ? "opacity-100" : "opacity-0"}`}
                   >
                     <div className="text-5xl text-white relative w-full aspect-[1]">
-                      <Image
-                        src={option.icon}
-                        alt={option.title}
-                        fill
-                        style={{ objectFit: "contain" }}
-                        className={!activeModal ? "hover:animate-pulse" : ""}
-                      />
+                      {option.customIcon}
                     </div>
                   </div>
                   {!activeModal && (
-                    <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:animate-ping opacity-0 hover:opacity-20" />
+                    <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20" />
                   )}
                 </div>
               </div>
@@ -214,7 +342,9 @@ export default function Contact() {
                           ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/30"
                           : ""
                       } 
-                      transition-all duration-500 ease-in-out`}
+                      transition-all duration-500 ease-in-out ${
+                        option.hoverEffect || ""
+                      }`}
                     style={{
                       backgroundColor: option.bgColor,
                       transform:
@@ -232,17 +362,11 @@ export default function Contact() {
                       ${!isExpanded ? "opacity-100" : "opacity-0"}`}
                     >
                       <div className="text-6xl text-white relative w-full aspect-[1]">
-                        <Image
-                          src={option.icon}
-                          alt={option.title}
-                          fill
-                          style={{ objectFit: "contain" }}
-                          className={!activeModal ? "hover:animate-pulse" : ""}
-                        />
+                        {option.customIcon}
                       </div>
                     </div>
                     {!activeModal && (
-                      <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:animate-ping opacity-0 hover:opacity-20" />
+                      <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20" />
                     )}
                   </div>
                 </div>

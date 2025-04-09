@@ -61,7 +61,7 @@ const Navbar = () => {
       >
         <div className="relative w-[200px] md:w-[300px] h-[60px] md:h-[80px]">
           <Image
-            src="/images/logoblanc.png"
+            src="/images/logo.svg"
             alt="Mousequetaire Logo Dark"
             fill
             className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.35)] filter"

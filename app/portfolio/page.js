@@ -206,7 +206,7 @@ const portfolioItems = [
   },
   {
     id: 15,
-    title: "Marketing Zeubi",
+    title: "Marketing",
     description:
       "Strategic marketing campaign combining traditional and digital approaches. Creating buzz and driving customer engagement through multiple channels.",
     image: "/images/project15.jpg",

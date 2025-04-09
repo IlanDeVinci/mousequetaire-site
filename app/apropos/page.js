@@ -152,7 +152,7 @@ function DiscoverElement() {
       </div>
 
       <Image
-        src="/images/contact0.png"
+        src="/images/contact0.svg"
         alt="Start discovery"
         width={3320}
         height={1136}
@@ -163,7 +163,7 @@ function DiscoverElement() {
         }`}
       />
       <Image
-        src="/images/contact1.png"
+        src="/images/contact1.svg"
         alt="Our beginning"
         width={300}
         height={300}
@@ -174,7 +174,7 @@ function DiscoverElement() {
         }`}
       />
       <Image
-        src="/images/contact2.png"
+        src="/images/contact2.svg"
         alt="Our growth"
         width={300}
         height={300}
@@ -185,7 +185,7 @@ function DiscoverElement() {
         }`}
       />
       <Image
-        src="/images/contact3.png"
+        src="/images/contact3.svg"
         alt="Our vision"
         width={300}
         height={300}
@@ -303,6 +303,24 @@ export default function Equipe() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  useEffect(() => {
+    if (!document.querySelector("#fade-animations")) {
+      const styleEl = document.createElement("style");
+      styleEl.id = "fade-animations";
+      styleEl.innerHTML = `
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-in-out forwards;
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+  }, []);
+
   return (
     <>
       <main className="pt-20">
@@ -357,37 +375,53 @@ export default function Equipe() {
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
                         w-[90%]  h-[80px] md:h-[120px] left-0 z-10
                         transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue1 ? "w-[90vw]" : ""}`}
+                        ${hoveredValue1 ? "w-[80vw]" : ""}`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
                         w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
                         transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue1 ? "w-[90vw] left-[-40px]" : ""}`}
+                        ${hoveredValue1 ? "w-[80vw] left-[-40px]" : ""}`}
               ></div>
 
               <div
-                className={`absolute rounded-r-full bg-[#0091D9] text-white p-4 md:p-8 
+                className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
                         flex items-center gap-4 cursor-pointer 
                         transition-all duration-300 ease-in-out max-w-none
                         w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue1 ? "w-[90vw] left-[-80px]" : ""}`}
+                        ${hoveredValue1 ? "w-[80vw] left-[-80px]" : ""}`}
               >
                 <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
                   <Image
-                    src="/images/valeur1.png"
+                    src="/images/valeur1.svg"
                     alt="Icon Entraide"
                     width={100}
                     height={100}
                     className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
-                <p className="whitespace-nowrap text-sm md:text-base">
-                  {hoveredValue1
-                    ? "Collaboration et esprit d'entraide"
-                    : "Entraide Collaboration"}
-                </p>
+                <div className="overflow-hidden h-full flex items-center">
+                  <p
+                    className={`text-sm md:text-base ${
+                      hoveredValue1
+                        ? "font-montserrat font-bold"
+                        : "font-montserrat font-extrabold whitespace-nowrap"
+                    } transition-all duration-300 text-left`}
+                  >
+                    {hoveredValue1 ? (
+                      <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation ullamco laboris nisi ut aliquip ex ea
+                        commodo consequat.
+                      </span>
+                    ) : (
+                      "Entraide Collaboration"
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
           </ScrollReveal>
@@ -403,31 +437,47 @@ export default function Equipe() {
                 className={`absolute rounded-l-full bg-[#00527A] text-white p-4 md:p-8 
                         w-[90%] h-[80px] md:h-[120px] right-0 z-10
                         transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue2 ? "w-[90vw]" : ""}`}
+                        ${hoveredValue2 ? "w-[80vw]" : ""}`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#006A9E] text-white p-4 md:p-8 
                         w-[90%] h-[80px] md:h-[120px] right-[-40px] z-20
                         transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue2 ? "w-[90vw] right-[-40px]" : ""}`}
+                        ${hoveredValue2 ? "w-[80vw] right-[-40px]" : ""}`}
               ></div>
 
               <div
-                className={`absolute rounded-l-full bg-[#0091D9] text-white p-4 md:p-8 
+                className={`absolute rounded-l-full bg-[#0091D9] text-white pr-4 md:pr-8 
                         flex items-center justify-end gap-4 cursor-pointer 
                         transition-all duration-300 ease-in-out max-w-none
                         w-[90%] h-[80px] md:h-[120px] right-[-80px] z-30
-                        ${hoveredValue2 ? "w-[90vw] right-[-80px]" : ""}`}
+                        ${hoveredValue2 ? "w-[80vw] right-[-80px]" : ""}`}
               >
-                <p className="whitespace-nowrap text-sm md:text-base">
-                  {hoveredValue2
-                    ? "Innovation et créativité sans limites"
-                    : "Innovation Créativité"}
-                </p>
+                <div className="overflow-hidden h-full flex items-center flex-grow justify-end">
+                  <p
+                    className={`text-sm md:text-base ${
+                      hoveredValue2
+                        ? "font-montserrat font-bold"
+                        : "font-montserrat font-extrabold whitespace-nowrap"
+                    } transition-all duration-300 text-right`}
+                  >
+                    {hoveredValue2 ? (
+                      <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation ullamco laboris nisi ut aliquip ex ea
+                        commodo consequat.
+                      </span>
+                    ) : (
+                      "Innovation Créativité"
+                    )}
+                  </p>
+                </div>
                 <div className="flex-shrink-0 mr-[60px] md:mr-[80px]">
                   <Image
-                    src="/images/valeur2.png"
+                    src="/images/valeur2.svg"
                     alt="Icon Innovation"
                     width={100}
                     height={100}
@@ -449,37 +499,53 @@ export default function Equipe() {
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
                         w-[90%]  h-[80px] md:h-[120px] left-0 z-10
                         transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue3 ? "w-[90vw]" : ""}`}
+                        ${hoveredValue3 ? "w-[80vw]" : ""}`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
                         w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
                         transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue3 ? "w-[90vw] left-[-40px]" : ""}`}
+                        ${hoveredValue3 ? "w-[80vw] left-[-40px]" : ""}`}
               ></div>
 
               <div
-                className={`absolute rounded-r-full bg-[#0091D9] text-white p-4 md:p-8 
+                className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
                         flex items-center gap-4 cursor-pointer 
                         transition-all duration-300 ease-in-out max-w-none
                         w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue3 ? "w-[90vw] left-[-80px]" : ""}`}
+                        ${hoveredValue3 ? "w-[80vw] left-[-80px]" : ""}`}
               >
                 <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
                   <Image
-                    src="/images/valeur3.png"
+                    src="/images/valeur3.svg"
                     alt="Icon Excellence"
                     width={100}
                     height={100}
                     className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
-                <p className="whitespace-nowrap text-sm md:text-base">
-                  {hoveredValue3
-                    ? "Excellence et qualité dans chaque projet"
-                    : "Excellence Qualité"}
-                </p>
+                <div className="overflow-hidden h-full flex items-center">
+                  <p
+                    className={`text-sm md:text-base ${
+                      hoveredValue3
+                        ? "font-montserrat font-bold"
+                        : "font-montserrat font-extrabold whitespace-nowrap"
+                    } transition-all duration-300 text-left`}
+                  >
+                    {hoveredValue3 ? (
+                      <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[65vw] font-montserrat font-bold">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore et dolore
+                        magna aliqua. Ut enim ad minim veniam, quis nostrud
+                        exercitation ullamco laboris nisi ut aliquip ex ea
+                        commodo consequat.
+                      </span>
+                    ) : (
+                      "Excellence Qualité"
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
           </ScrollReveal>
