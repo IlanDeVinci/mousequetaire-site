@@ -366,31 +366,31 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-right" delay={200} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 mb-16"
+              className="relative px-4 py-12 flex justify-center overflow-visible w-full"
               onMouseEnter={() => !isMobile && setHoveredValue1(true)}
               onMouseLeave={() => !isMobile && setHoveredValue1(false)}
               onClick={() => isMobile && setHoveredValue1(!hoveredValue1)}
             >
               <div
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
-                        w-[90%]  h-[80px] md:h-[120px] left-0 z-10
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue1 ? "w-[80vw]" : ""}`}
+                        h-[80px] md:h-[120px] left-0 z-10
+                        transition-all duration-300 ease-in-out
+                        ${hoveredValue1 ? "w-[80vw]" : "w-[45%]"}`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue1 ? "w-[80vw] left-[-40px]" : ""}`}
+                        h-[80px] md:h-[120px] left-[-40px] z-20
+                        transition-all duration-300 ease-in-out
+                        ${hoveredValue1 ? "w-[80vw]" : "w-[45%]"}`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
                         flex items-center gap-4 cursor-pointer 
-                        transition-all duration-300 ease-in-out max-w-none
-                        w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue1 ? "w-[80vw] left-[-80px]" : ""}`}
+                        transition-all duration-300 ease-in-out
+                        h-[80px] md:h-[120px] left-[-80px] z-30
+                        ${hoveredValue1 ? "w-[80vw]" : "w-[45%]"}`}
               >
                 <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
                   <Image
@@ -428,31 +428,31 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-left" delay={300} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 ml-auto mb-16"
+              className="relative px-4 py-12 flex justify-center overflow-visible w-full"
               onMouseEnter={() => !isMobile && setHoveredValue2(true)}
               onMouseLeave={() => !isMobile && setHoveredValue2(false)}
               onClick={() => isMobile && setHoveredValue2(!hoveredValue2)}
             >
               <div
                 className={`absolute rounded-l-full bg-[#00527A] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] right-0 z-10
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue2 ? "w-[80vw]" : ""}`}
+                        h-[80px] md:h-[120px] right-0 z-10
+                        transition-all duration-300 ease-in-out
+                        ${hoveredValue2 ? "w-[80vw]" : "w-[45%]"}`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#006A9E] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] right-[-40px] z-20
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue2 ? "w-[80vw] right-[-40px]" : ""}`}
+                        h-[80px] md:h-[120px] right-[-40px] z-20
+                        transition-all duration-300 ease-in-out
+                        ${hoveredValue2 ? "w-[80vw]" : "w-[45%]"}`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#0091D9] text-white pr-4 md:pr-8 
                         flex items-center justify-end gap-4 cursor-pointer 
-                        transition-all duration-300 ease-in-out max-w-none
-                        w-[90%] h-[80px] md:h-[120px] right-[-80px] z-30
-                        ${hoveredValue2 ? "w-[80vw] right-[-80px]" : ""}`}
+                        transition-all duration-300 ease-in-out
+                        h-[80px] md:h-[120px] right-[-80px] z-30
+                        ${hoveredValue2 ? "w-[80vw]" : "w-[45%]"}`}
               >
                 <div className="overflow-hidden h-full flex items-center flex-grow justify-end">
                   <p
@@ -490,31 +490,31 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-right" delay={400} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-1/2"
+              className="relative px-4 py-12 flex justify-center overflow-visible w-full"
               onMouseEnter={() => !isMobile && setHoveredValue3(true)}
               onMouseLeave={() => !isMobile && setHoveredValue3(false)}
               onClick={() => isMobile && setHoveredValue3(!hoveredValue3)}
             >
               <div
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
-                        w-[90%]  h-[80px] md:h-[120px] left-0 z-10
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue3 ? "w-[80vw]" : ""}`}
+                        h-[80px] md:h-[120px] left-0 z-10
+                        transition-all duration-300 ease-in-out
+                        ${hoveredValue3 ? "w-[80vw]" : "w-[45%]"}`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue3 ? "w-[80vw] left-[-40px]" : ""}`}
+                        h-[80px] md:h-[120px] left-[-40px] z-20
+                        transition-all duration-300 ease-in-out
+                        ${hoveredValue3 ? "w-[80vw]" : "w-[45%]"}`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
                         flex items-center gap-4 cursor-pointer 
-                        transition-all duration-300 ease-in-out max-w-none
-                        w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue3 ? "w-[80vw] left-[-80px]" : ""}`}
+                        transition-all duration-300 ease-in-out
+                        h-[80px] md:h-[120px] left-[-80px] z-30
+                        ${hoveredValue3 ? "w-[80vw]" : "w-[45%]"}`}
               >
                 <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
                   <Image

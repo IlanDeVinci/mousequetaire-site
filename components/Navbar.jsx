@@ -51,8 +51,8 @@ const Navbar = () => {
     // Get the current time
     const startTime = Date.now();
 
-    // Add delay for showing animation (250ms)
-    const delayMs = show ? 250 : 0;
+    // Remove the delay for showing animation to prevent flashing
+    const delayMs = show ? 0 : 200; // Only keep delay for hiding animation
 
     // Set animation parameters - make the hide animation longer
     const duration = show ? 1200 : 500; // Increased hide duration to 500ms for better visibility
@@ -73,18 +73,22 @@ const Navbar = () => {
       // Calculate progress (0 to 1), accounting for delay
       const elapsed = Date.now() - startTime;
 
-      // If we're still in the delay period, just render at 0 progress
-      if (show && elapsed < delayMs) {
-        // During delay, keep the arrow hidden
+      // If we're still in the delay period, handle appropriately
+      if (elapsed < delayMs) {
+        // During delay, keep arrow at full opacity for fade-out, or hidden for fade-in
         if (arrowRef.current) {
-          arrowRef.current.style.opacity = "0";
+          arrowRef.current.style.opacity = show ? "0" : "1";
+          // Keep position at start position during delay
+          arrowRef.current.style.transform = show
+            ? "translateY(-30px)"
+            : "translateY(0px)";
         }
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
 
       // Calculate actual animation progress after delay
-      const animationElapsed = elapsed - (show ? delayMs : 0);
+      const animationElapsed = elapsed - delayMs;
       const rawProgress = Math.min(animationElapsed / duration, 1);
 
       // Apply easing for better animation feel
@@ -96,18 +100,12 @@ const Navbar = () => {
         return;
       }
 
-      // Make sure visibility is set to visible once animation starts
-      if (show && arrowRef.current.style.visibility === "hidden") {
-        arrowRef.current.style.visibility = "visible";
-        arrowRef.current.classList.remove("invisible");
-      }
-
       // Apply transform and opacity based on direction
       if (show) {
         // Animate in with bounce: from -30px up and 0 opacity to 0px and 1 opacity
         let y = -30;
         if (progress < 0.8) {
-          // First part: come up more slowly (increased from 0.7 to 0.8)
+          // First part: come up more slowly
           y = -30 * (1 - progress / 0.8);
         } else {
           // Second part: gentler bounce
@@ -115,11 +113,10 @@ const Navbar = () => {
           y = 8 * Math.sin(bounceProgress * Math.PI); // Reduced bounce height from 10 to 8
         }
 
-        // More gradual fade in
-        const opacity = Math.min(1, progress * 1.5); // Slower fade-in curve with max of 0.9
+        // More gradual fade in - ensure it's purely controlled by the animation
+        const opacity = Math.min(progress * 1.2, 1); // Slightly faster fade-in but capped at 1
 
-        arrowRef.current.style.opacity = opacity;
-
+        arrowRef.current.style.opacity = opacity.toString();
         arrowRef.current.style.transform = `translateY(${y}px)`;
       } else {
         // Animate out: from 0px and 1 opacity to -30px and 0 opacity
@@ -139,6 +136,9 @@ const Navbar = () => {
           setTimeout(() => {
             setArrowState("hidden");
           }, 50); // Small delay to ensure animation completes
+        } else if (arrowRef.current) {
+          // Ensure full opacity when animation completes for showing
+          arrowRef.current.style.opacity = "1";
         }
       }
     };
@@ -159,51 +159,75 @@ const Navbar = () => {
       setScrolled(false);
     }
 
+    // Preserve opacity for modal-to-modal transitions
+    const keepOpacity =
+      arrowState !== "hidden" &&
+      newArrowState !== "hidden" &&
+      arrowState !== newArrowState;
+
+    // Save current opacity if needed
+    let currentOpacity = "1";
+    if (keepOpacity && arrowRef.current) {
+      currentOpacity = arrowRef.current.style.opacity || "1";
+    }
+
     // Handle state transitions
     if (newArrowState === "hidden") {
       // Only animate out if currently showing
       if (arrowState !== "hidden") {
         // Make sure arrow is fully visible before starting hide animation
         if (arrowRef.current) {
-          arrowRef.current.style.visibility = "visible";
           arrowRef.current.style.opacity = "1";
           arrowRef.current.style.transform = "translateY(0px)";
         }
-        // Run animation with a short delay to ensure visibility
-        setTimeout(() => {
-          animateArrow(false);
-        }, 50);
+        // Run animation to hide the arrow
+        animateArrow(false);
       }
     } else if (arrowState === "hidden") {
       // Arrow is hidden but should be shown - render component first
       setArrowState(newArrowState);
 
+      // Ensure initial opacity is 0 before animation starts
+      if (arrowRef.current) {
+        arrowRef.current.style.opacity = "0";
+        arrowRef.current.style.transform = "translateY(-30px)";
+      }
+
       // Use a small timeout to ensure the DOM has updated
       setTimeout(() => {
-        if (arrowRef.current) {
-          // Keep it invisible at first
-          arrowRef.current.style.opacity = "0";
-          arrowRef.current.style.transform = "translateY(-30px)";
-          arrowRef.current.style.visibility = "hidden";
+        // Start animation immediately
+        animateArrow(true);
+      }, 10);
+    } else if (arrowState !== newArrowState) {
+      // For all other state changes when arrow is already visible
 
-          // Start animation after a short delay
+      // Update state
+      setArrowState(newArrowState);
+
+      // Ensure opacity stays at 1 for modal-to-modal transitions
+      if (keepOpacity) {
+        // Use multiple techniques to ensure the style is preserved
+        if (arrowRef.current) {
+          // Immediate update
+          arrowRef.current.style.opacity = "1";
+          arrowRef.current.style.transform = "translateY(0px)";
+
+          // Follow-up with requestAnimationFrame to ensure it applies after React updates
+          requestAnimationFrame(() => {
+            if (arrowRef.current) {
+              arrowRef.current.style.opacity = "1";
+              arrowRef.current.style.transform = "translateY(0px)";
+            }
+          });
+
+          // And a final timeout for extra reliability
           setTimeout(() => {
             if (arrowRef.current) {
-              animateArrow(true);
+              arrowRef.current.style.opacity = "1";
+              arrowRef.current.style.transform = "translateY(0px)";
             }
           }, 50);
         }
-      }, 20);
-    } else if (arrowState !== newArrowState) {
-      // Arrow is already visible but state changed (e.g., from shown to nested)
-      // Just update state without re-animating
-      setArrowState(newArrowState);
-
-      // Make sure it stays visible during the transition
-      if (arrowRef.current) {
-        arrowRef.current.style.opacity = "1";
-        arrowRef.current.style.transform = "translateY(0px)";
-        arrowRef.current.style.visibility = "visible";
       }
     }
   }, [isModalOpen, isNestedModal, arrowState]);
@@ -281,12 +305,12 @@ const Navbar = () => {
     return (
       <div
         ref={arrowRef}
-        className="fixed flex mx-auto top-[50px] md:top-[50px] z-[-1] w-full justify-center items-center cursor-pointer opacity-0"
+        className="fixed flex mx-auto top-[50px] md:top-[50px] z-[-1] w-full justify-center items-center cursor-pointer"
         onClick={handleBackArrowClick}
         style={{
-          opacity: 0,
-          transform: "translateY(-20px)",
-          transition: "none",
+          opacity: 0, // Always start with opacity 0
+          transform: "translateY(-30px)",
+          transition: "none", // Ensure no CSS transitions interfere with our animation
         }}
       >
         {/* Invisible hit area for better click detection */}
@@ -325,10 +349,10 @@ const Navbar = () => {
   // Calculate navbar classes based on scroll state and screen size
   const getNavbarClasses = () => {
     // Always use pt-12 mt-4 for non-scrolled state
-    if (!scrolled) return "pt-12 mt-4";
+    if (!scrolled) return "pt-2 mt-0";
 
     // When scrolled, only remove padding/margin on large screens
-    return isLargeScreen ? "pt-0 mt-0" : "pt-12 mt-4";
+    return isLargeScreen ? "pt-2 mt-0" : "pt-2 mt-0";
   };
 
   return (

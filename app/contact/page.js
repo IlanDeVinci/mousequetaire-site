@@ -1115,7 +1115,7 @@ const contactOptions = [
               slidesPerView="auto"
               loop={true}
               autoplay={{
-                delay: 200000,
+                delay: 2000,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
