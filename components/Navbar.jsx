@@ -4,11 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useModal } from "@/context/ModalContext";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const { isModalOpen } = useModal();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +34,16 @@ const Navbar = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  // Set scrolled to true when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      setScrolled(true);
+    } else if (window.scrollY <= 20) {
+      // Only reset to false if we're actually at the top of the page
+      setScrolled(false);
+    }
+  }, [isModalOpen]);
 
   const pathname = usePathname();
 

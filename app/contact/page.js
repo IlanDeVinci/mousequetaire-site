@@ -1,6 +1,21 @@
 "use client";
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useModal } from "@/context/ModalContext";
+// Import Swiper components and required modules
+import { Swiper, SwiperSlide } from "swiper/react";
+import {
+  EffectCoverflow,
+  Navigation,
+  Pagination,
+  A11y,
+  Autoplay,
+} from "swiper/modules";
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-coverflow";
 
 // Move images array outside component to prevent recreation on each render
 const instagramSliderImages = [
@@ -9,18 +24,41 @@ const instagramSliderImages = [
   "/images/facebook-icon.svg",
 ];
 
-// Simplified Instagram Slider Component
+// Modified InstagramSlider component to include default loading state
 const InstagramSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slidesArray, setSlidesArray] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const originalImages = instagramSliderImages;
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
 
   // Ref to track if we're currently updating slides to avoid infinite loop
   const isUpdating = useRef(false);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        await Promise.all(
+          instagramSliderImages.map((src) => {
+            return new Promise((resolve, reject) => {
+              const img = window.Image
+                ? new window.Image()
+                : document.createElement("img");
+              img.src = src;
+              img.onload = resolve;
+              img.onerror = reject;
+            });
+          })
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadImage();
+  }, []);
 
   // Function to ensure we have enough slides ahead
   const ensureSufficientSlides = useCallback(
@@ -118,10 +156,10 @@ const InstagramSlider = () => {
       setIsTransitioning(true);
 
       setCurrentIndex(nextIndex);
-
       // After transition completes
-      timeoutRef.current = setTimeout(() => {
+      setTimeout(() => {
         setIsTransitioning(false);
+        console.log(`Transition complete, current index: ${nextIndex}`);
       }, 500);
     },
     [currentIndex, debouncedEnsureSlides]
@@ -177,6 +215,20 @@ const InstagramSlider = () => {
   ]);
   // Modified returnToInstagram to ensure we have enough slides before jumping
   const returnToInstagram = useCallback(() => {
+    // Wait until transitions are complete before proceeding
+    if (isTransitioning) {
+      const checkTransition = setInterval(() => {
+        console.log(`Checking transition state: ${isTransitioning}`);
+        if (!isTransitioning) {
+          clearInterval(checkTransition);
+          // Find how many slides until the next Instagram logo
+          console.log(`Transition complete, returning to Instagram logo`);
+          returnToInstagram();
+        }
+      }, 100);
+      return;
+    }
+
     // Find how many slides until the next Instagram logo
     const currentPosition = currentIndex % originalImages.length;
 
@@ -205,13 +257,14 @@ const InstagramSlider = () => {
       // After transition completes
       timeoutRef.current = setTimeout(() => {
         setIsTransitioning(false);
-      }, 500);
+      }, 300);
     }
   }, [
     currentIndex,
     originalImages.length,
     slidesArray.length,
     ensureSufficientSlides,
+    isTransitioning,
   ]);
 
   useEffect(() => {
@@ -220,7 +273,7 @@ const InstagramSlider = () => {
       // Start rotating through slides when hovered
       intervalRef.current = setInterval(() => {
         advanceSlide();
-      }, 1500);
+      }, 1000);
     } else {
       // When hover ends, return to Instagram logo by advancing forward
       clearTimeouts();
@@ -237,6 +290,20 @@ const InstagramSlider = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (intervalRef.current) clearInterval(intervalRef.current);
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Image
+          src="/images/instagram-icon.svg"
+          alt="Loading..."
+          width={120}
+          height={120}
+          style={{ width: "70%", height: "auto", opacity: 0.5 }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -527,24 +594,383 @@ const FormIconSVG = () => {
   );
 };
 
+// New SocialMediaLink component with centered-to-justified hover effect
+const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div
+        className={`relative flex items-center justify-center transition-all duration-300 ${
+          isHovered ? "w-32 h-16 -translate-x-24" : "w-32 h-16"
+        }`}
+      >
+        {/* Base icon */}
+        <div
+          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+            isHovered ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <Image
+            src={icon}
+            alt={handle}
+            width={90}
+            height={90}
+            className="opacity-100"
+          />
+        </div>
+        {/* Colored icon */}
+        <div
+          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Image
+            src={colorIcon}
+            alt={handle}
+            width={90}
+            height={90}
+            className="opacity-100"
+          />
+        </div>
+      </div>
+      {/* Handle text */}
+      <span
+        className={`text-lg font-medium transition-all duration-300 absolute
+          ${isHovered ? "opacity-100 translate-x-8" : "opacity-0 translate-y-0"}
+        `}
+      >
+        {handle}
+      </span>
+    </a>
+  );
+};
+
+// Updated ContactInfoLink component with centered-to-justified hover effect
+const ContactInfoLink = ({ icon, label, value, href }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <a
+      href={href}
+      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div
+        className={`relative flex items-center justify-center transition-all duration-300 ${
+          isHovered ? "w-16 h-16 -translate-x-28" : "w-16 h-16"
+        }`}
+      >
+        <Image
+          src={icon}
+          alt={label}
+          width={70}
+          height={70}
+          className="opacity-100"
+        />
+      </div>
+      <div
+        className={`absolute transition-all duration-300 text-center ${
+          isHovered ? "opacity-100 translate-x-12" : "opacity-0"
+        }`}
+      >
+        <p className="text-sm text-gray-300">{label}</p>
+        <span
+          className={`block text-lg ${
+            isHovered ? "text-[#7DD4FF]" : "text-white"
+          }`}
+        >
+          {value}
+        </span>
+      </div>
+    </a>
+  );
+};
+
+// Sample images for the Instagram modal slider
+const sampleImages = [
+  {
+    src: "/images/project1.jpg",
+    alt: "Sample image 1",
+    type: "instagram",
+  },
+  {
+    src: "/images/project2.jpg",
+    alt: "Sample image 2",
+    type: "linkedin",
+  },
+  {
+    src: "/images/project3.jpg",
+    alt: "Sample image 3",
+    type: "instagram",
+  },
+  {
+    src: "/images/project4.jpg",
+    alt: "Sample image 4",
+    type: "linkedin",
+  },
+];
+
 const contactOptions = [
   {
     title: "Instagram",
     description: "Appelez-nous directement",
     content: (
-      <div className="flex flex-col items-center gap-6">
-        <h3 className="text-2xl md:text-3xl font-bold mb-4">
-          Contact Téléphonique
-        </h3>
-        <p className="text-base md:text-lg mb-6">
-          Disponible du lundi au vendredi, de 9h à 18h
-        </p>
-        <a
-          href="tel:+33123456789"
-          className="text-xl md:text-2xl hover:text-[#7DD4FF]"
-        >
-          +33 1 23 45 67 89
-        </a>
+      <div className="flex flex-col items-center gap-8 w-[90%] md:w-[80%] lg:w-[70%] mx-auto">
+        {/* Contact info section with icons */}
+        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-6 md:gap-12 mb-4 mt-32 px-40">
+          <ContactInfoLink
+            icon="/images/phone-icon.svg"
+            label="APPELEZ-NOUS"
+            value="+33 1 23 45 67 89"
+            href="tel:+33123456789"
+          />
+          <ContactInfoLink
+            icon="/images/email-icon.svg"
+            label="ÉCRIVEZ-NOUS"
+            value="contact@mousequetaire.com"
+            href="mailto:contact@mousequetaire.com"
+          />
+        </div>
+        {/* Image slider section with improved Swiper configuration */}
+        <div className="w-full py-6">
+          <p className="text-lg mb-4 text-center">
+            Découvrez nos dernières publications
+          </p>
+          <div className="w-full relative" style={{ height: "30vh" }}>
+            {/* Left fade overlay - changed to white */}
+            <div
+              className="absolute left-0 top-0 h-full w-[25%] z-[2000] pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(0, 33, 50, 1) 10%, rgba(0, 33, 50, 0))",
+              }}
+            ></div>
+
+            <Swiper
+              modules={[EffectCoverflow, Navigation, Pagination, Autoplay]}
+              effect="coverflow"
+              grabCursor={true}
+              centeredSlides={true}
+              slidesPerView="auto"
+              loop={true}
+              autoplay={{
+                delay: 2000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+              }}
+              coverflowEffect={{
+                rotate: -10,
+                stretch: -80,
+                depth: 100,
+                modifier: 1.5,
+                slideShadows: true,
+              }}
+              navigation={{
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+              }}
+              pagination={{
+                clickable: true,
+                type: "bullets",
+              }}
+              className="swiper-container h-full rounded-lg"
+            >
+              {sampleImages.map((image, index) => (
+                <SwiperSlide
+                  key={index}
+                  className="h-full"
+                  style={{ width: "65%", maxWidth: "450px" }}
+                >
+                  <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg group">
+                    <Image
+                      src={image.src || "/images/placeholder.jpg"}
+                      alt={image.alt}
+                      fill
+                      className="object-cover transition-transform group-hover:scale-105 duration-500"
+                    />
+
+                    {/* Gradient overlay fading from bottom (opaque) to transparent */}
+                    <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-white to-transparent flex items-end justify-between px-4 py-4">
+                      <span className="text-black text-sm font-medium truncate">
+                        Projet {index + 1}
+                      </span>
+                      <div className="h-12 w-12">
+                        {image.type === "instagram" ? (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="black"
+                            className="w-full h-full"
+                          >
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                          </svg>
+                        ) : (
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="black"
+                            className="w-full h-full"
+                          >
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Fixed active slide glow effect - always visible, enhanced for active slide */}
+                    <div className="absolute inset-0 border-2 border-[#7DD4FF]/30 rounded-lg shadow-[0_0_12px_rgba(125,212,255,0.4)] transition-all duration-500 pointer-events-none"></div>
+                  </div>
+                </SwiperSlide>
+              ))}
+
+              {/* Update navigation buttons to be invisible until hover */}
+              <div className="swiper-button-next !hidden after:!content-none !w-14 !h-14 !bg-black/30 hover:!bg-black/50 !rounded-full transition-all duration-300 !right-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  className="w-6 h-6 mx-auto"
+                >
+                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                </svg>
+              </div>
+              <div className="swiper-button-prev !hidden after:!content-none !w-14 !h-14 !bg-black/30 hover:!bg-black/50 !rounded-full transition-all duration-300 !left-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  className="w-6 h-6 mx-auto"
+                >
+                  <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
+                </svg>
+              </div>
+            </Swiper>
+
+            {/* Right fade overlay - changed to white */}
+            <div
+              className="absolute right-0 top-0 h-full w-[25%] z-[2000] pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to left, rgba(0, 33, 50, 1) 10%, rgba(0, 33, 50, 0))",
+              }}
+            ></div>
+          </div>
+          <style jsx global>{`
+            @keyframes pulseGlow {
+              0% {
+                box-shadow: 0 0 15px 3px rgba(125, 212, 255, 0.5);
+              }
+              50% {
+                box-shadow: 0 0 40px 10px rgba(125, 212, 255, 0.8);
+              }
+              100% {
+                box-shadow: 0 0 15px 3px rgba(125, 212, 255, 0.5);
+              }
+            }
+
+            @keyframes borderPulse {
+              0% {
+                border-color: rgba(125, 212, 255, 0.3);
+                border-width: 2px;
+              }
+              50% {
+                border-color: rgba(125, 212, 255, 0.9);
+                border-width: 3px;
+              }
+              100% {
+                border-color: rgba(125, 212, 255, 0.3);
+                border-width: 2px;
+              }
+            }
+
+            @keyframes slideGlowPulse {
+              0% {
+                box-shadow: 0 0 15px rgba(125, 212, 255, 0.4);
+                border-color: rgba(125, 212, 255, 0.4);
+              }
+              50% {
+                box-shadow: 0 0 30px rgba(125, 212, 255, 0.8);
+                border-color: rgba(125, 212, 255, 0.9);
+              }
+              100% {
+                box-shadow: 0 0 15px rgba(125, 212, 255, 0.4);
+                border-color: rgba(125, 212, 255, 0.4);
+              }
+            }
+
+            .swiper-pagination-bullet {
+              width: 10px;
+              height: 10px;
+              background: rgba(255, 255, 255, 0.4);
+              opacity: 1;
+              margin: 0 4px !important;
+              transition: all 0.3s ease;
+            }
+            .swiper-pagination-bullet-active {
+              background: white;
+              transform: scale(1.3);
+            }
+            .swiper-pagination {
+              position: relative;
+              margin-top: 15px;
+            }
+            .swiper-container .swiper-slide-shadow-left,
+            .swiper-container .swiper-slide-shadow-right {
+              background-image: linear-gradient(
+                to left,
+                rgba(0, 0, 0, 0.3),
+                rgba(0, 0, 0, 0)
+              );
+            }
+            .swiper-button-next,
+            .swiper-button-prev {
+              backdrop-filter: blur(4px);
+              margin-top: -24px !important;
+              transition: all 0.3s ease !important;
+            }
+            .swiper-button-next::after,
+            .swiper-button-prev::after {
+              display: none !important;
+            }
+            .swiper-button-disabled {
+              opacity: 0 !important;
+            }
+            .swiper-slide-active {
+              z-index: 10;
+              transform: scale(1.05);
+              transition: transform 0.5s ease;
+            }
+            .swiper-slide-active .slide-glow-effect {
+              animation: slideGlowPulse 2s infinite;
+            }
+            .slide-glow-effect {
+              box-shadow: 0 0 12px rgba(125, 212, 255, 0.4);
+              transition: all 0.5s ease;
+            }
+          `}</style>
+        </div>
+        {/* Updated social media links section */}
+        <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 w-full py-8">
+          <SocialMediaLink
+            icon="/images/insta-icon.svg"
+            colorIcon="/images/insta-icon-color.svg"
+            handle="@mousequetaire"
+            href="https://instagram.com/mousequetaire"
+          />
+          <SocialMediaLink
+            icon="/images/linkedin-icon.svg"
+            colorIcon="/images/linkedin-icon-color.svg"
+            handle="@mousequetaire"
+            href="https://linkedin.com/company/mousequetaire"
+          />
+        </div>
       </div>
     ),
     bgColor: "#002132",
@@ -590,12 +1016,14 @@ export default function Contact() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [circlePosition, setCirclePosition] = useState(null);
+  const { setModalOpen } = useModal();
 
   const handleCircleClick = useCallback(
     (e, index) => {
       if (isAnimating) return;
       setIsAnimating(true);
       document.body.style.overflow = "hidden";
+      setModalOpen(true); // Set modal open state to true
 
       const rect = e.currentTarget.getBoundingClientRect();
       const windowCenter = {
@@ -613,7 +1041,7 @@ export default function Contact() {
             Math.max(
               window.innerWidth / rect.width,
               window.innerHeight / rect.height
-            ) * 1.1,
+            ) * 1.3,
         },
       });
 
@@ -623,13 +1051,14 @@ export default function Contact() {
         setTimeout(() => setIsAnimating(false), 500);
       });
     },
-    [isAnimating]
+    [isAnimating, setModalOpen]
   );
 
   const closeModal = useCallback(() => {
     if (isAnimating) return;
     setIsAnimating(true);
     setIsExpanded(false);
+    setModalOpen(false); // Set modal open state to false
 
     setTimeout(() => {
       setActiveModal(null);
@@ -637,7 +1066,7 @@ export default function Contact() {
       setIsAnimating(false);
       document.body.style.overflow = "auto";
     }, 300);
-  }, [isAnimating]);
+  }, [isAnimating, setModalOpen]);
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -674,12 +1103,8 @@ export default function Contact() {
               >
                 <div
                   onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                  className={`w-full h-full rounded-full flex items-center justify-center overflow-hidden
-                  ${
-                    !activeModal
-                      ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/20"
-                      : ""
-                  } 
+                  className={`w-full h-full rounded-full flex items-center justify-center overflow-visible
+                  ${!activeModal ? "cursor-pointer" : ""} 
                   transition-all duration-500 ease-in-out ${
                     option.hoverEffect || ""
                   }`}
@@ -690,7 +1115,9 @@ export default function Contact() {
                         ? `translate(${circlePosition?.transform.translateX}px, ${circlePosition?.transform.translateY}px) scale(${circlePosition?.transform.scale})`
                         : "none",
                     animation: !activeModal
-                      ? `float 3s ease-in-out infinite ${index * 0.5}s`
+                      ? `float 3s ease-in-out infinite ${
+                          index * 0.5
+                        }s, pulseGlow 3s infinite ${index * 0.3}s`
                       : "none",
                   }}
                 >
@@ -702,7 +1129,7 @@ export default function Contact() {
                     {option.customIcon}
                   </div>
                   {!activeModal && (
-                    <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20 pointer-events-none" />
+                    <div className="absolute inset-0 rounded-full border-2 border-[#7DD4FF]/50 animate-[borderPulse_3s_infinite] pointer-events-none" />
                   )}
                 </div>
               </div>
@@ -729,12 +1156,8 @@ export default function Contact() {
                 >
                   <div
                     onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                    className={`w-72 h-72 rounded-full flex items-center justify-center overflow-hidden
-                      ${
-                        !activeModal
-                          ? "cursor-pointer hover:shadow-2xl hover:shadow-[#7DD4FF]/30"
-                          : ""
-                      } 
+                    className={`w-72 h-72 rounded-full flex items-center justify-center overflow-visible
+                      ${!activeModal ? "cursor-pointer" : ""} 
                       transition-all duration-500 ease-in-out ${
                         option.hoverEffect || ""
                       }`}
@@ -745,7 +1168,9 @@ export default function Contact() {
                           ? `translate(${circlePosition?.transform.translateX}px, ${circlePosition?.transform.translateY}px) scale(${circlePosition?.transform.scale})`
                           : "none",
                       animation: !activeModal
-                        ? `float 3s ease-in-out infinite ${index * 0.5}s`
+                        ? `float 3s ease-in-out infinite ${
+                            index * 0.5
+                          }s, pulseGlow 3s infinite ${index * 0.3}s`
                         : "none",
                     }}
                   >
@@ -757,7 +1182,7 @@ export default function Contact() {
                       {option.customIcon}
                     </div>
                     {!activeModal && (
-                      <div className="absolute inset-0 rounded-full bg-white/5 hover:bg-transparent transition-all duration-300 hover:opacity-20 pointer-events-none" />
+                      <div className="absolute inset-0 rounded-full border-2 border-[#7DD4FF]/50 animate-[borderPulse_3s_infinite] pointer-events-none" />
                     )}
                   </div>
                 </div>
@@ -765,22 +1190,22 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Modal Overlay - responsive for all screens */}
+          {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="h-[100vh] w-full overflow-hidden fixed inset-0 z-[1000]">
+            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-hidden">
               <div
                 className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none overflow-hidden
-                  transition-opacity duration-300 px-4
+                  transition-opacity duration-300 
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
               >
                 <div
-                  className={`relative w-full max-w-4xl pointer-events-auto
+                  className={`relative w-full pointer-events-auto
                     transition-all duration-300 ${
                       isExpanded ? "scale-100" : "scale-95"
                     }
-                    bg-[#070b18]/95 rounded-2xl p-4 sm:p-6 md:p-8 m-0 sm:m-4 md:m-6
-                    fixed sm:relative inset-0 sm:inset-auto h-full sm:h-auto
-                    flex items-center justify-center`}
+                   rounded-2xl  m-0 
+                    fixed sm:relative inset-0 sm:inset-auto max-h-[100vh] sm:h-auto
+                    flex items-center justify-center overflow-hidden`}
                 >
                   <div className="text-white w-full flex items-center justify-center">
                     {contactOptions[activeModal].content}
