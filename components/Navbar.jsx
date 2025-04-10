@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useModal } from "@/context/ModalContext";
 
@@ -11,163 +11,195 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const { isModalOpen, isNestedModal, closeModal } = useModal();
-  const [isFirstRender, setIsFirstRender] = useState(true);
 
-  // Set default animation state to true to prevent showing "out" animation first
-  const [arrowVisible, setArrowVisible] = useState(false);
-  const [arrowAnimating, setArrowAnimating] = useState(true);
+  // Remove CSS animation and use pure JS approach
+  const [showArrow, setShowArrow] = useState(false);
+  const arrowRef = useRef(null);
+  const animationRef = useRef(null);
+  const isAnimatingRef = useRef(false);
+  const lastModalStateRef = useRef({ isOpen: false, isNested: false });
 
-  // Enhanced tracking to prevent animation issues
-  const currentAnimationRef = useRef(null);
-  const arrowElementRef = useRef(null);
-  const animationStateRef = useRef("initial");
-  const animationLockRef = useRef(false);
-  const processedModalStateRef = useRef(false);
-  const uniqueAnimationIdRef = useRef(Date.now());
-
+  // Basic scroll and resize handlers
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1450);
 
-    const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1450); // 768px is md breakpoint in Tailwind
-    };
-
-    // Initialize on mount
     handleResize();
-
-    // Add event listeners
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
 
-    // Clean up
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  // Set scrolled to true when modal is open
+  // Clean up any ongoing animations when component unmounts
   useEffect(() => {
-    if (isModalOpen) {
-      setScrolled(true);
-    } else if (window.scrollY <= 20) {
-      // Only reset to false if we're actually at the top of the page
-      setScrolled(false);
-    }
-  }, [isModalOpen]);
-
-  useEffect(() => {
-    // After first render, set isFirstRender to false
-    setIsFirstRender(false);
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, []);
 
-  // Completely rewritten animation controller with strict state control
+  // Enhanced arrow animation function with bounce effect
+  const animateArrow = (show) => {
+    // If we are already animating, cancel the current animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+
+    // Set a flag to indicate we're animating
+    isAnimatingRef.current = true;
+
+    // Make the arrow visible if showing
+    if (show && !showArrow) {
+      setShowArrow(true);
+    }
+
+    // Get the current time
+    const startTime = Date.now();
+
+    // Set animation parameters
+    const duration = show ? 800 : 300; // ms - longer for entrance with bounce
+
+    // Easing functions for better animation
+    const easeOutBack = (x) => {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+    };
+
+    const easeInOut = (x) => {
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    };
+
+    // Animation function
+    const animate = () => {
+      // Calculate progress (0 to 1)
+      const elapsed = Date.now() - startTime;
+      const rawProgress = Math.min(elapsed / duration, 1);
+
+      // Apply easing for better animation feel
+      const progress = show ? easeOutBack(rawProgress) : easeInOut(rawProgress);
+
+      // If element doesn't exist yet, stop animation
+      if (!arrowRef.current) {
+        if (show) {
+          // If showing, retry on next frame until element is available
+          animationRef.current = requestAnimationFrame(animate);
+        } else {
+          // If hiding and element doesn't exist, we're done
+          isAnimatingRef.current = false;
+        }
+        return;
+      }
+
+      // Apply transform and opacity based on direction
+      if (show) {
+        // Animate in with bounce: from -30px up and 0 opacity to 0px and 1 opacity
+        let y = 0;
+        if (progress < 0.7) {
+          // First part: come up quickly
+          y = -30 * (1 - progress / 0.7);
+        } else {
+          // Second part: small bounce
+          const bounceProgress = (progress - 0.7) / 0.3;
+          y = 10 * Math.sin(bounceProgress * Math.PI);
+        }
+
+        const opacity = Math.min(1, progress * 1.5); // Fade in faster than the animation
+        arrowRef.current.style.transform = `translateY(${y}px)`;
+        arrowRef.current.style.opacity = opacity;
+      } else {
+        // Animate out: from 0px and 1 opacity to -20px and 0 opacity
+        const y = -20 * progress;
+        const opacity = 1 - progress;
+        arrowRef.current.style.transform = `translateY(${y}px)`;
+        arrowRef.current.style.opacity = opacity;
+      }
+
+      // Continue if not finished
+      if (rawProgress < 1) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else {
+        // Animation complete
+        isAnimatingRef.current = false;
+
+        // If hiding, remove from DOM after animation
+        if (!show) {
+          setShowArrow(false);
+        }
+      }
+    };
+
+    // Start animation
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  // Modified modal state handler to manage nested modal transitions
   useEffect(() => {
-    if (isFirstRender) return;
+    // Track changes in modal state
+    const modalStateChanged =
+      isModalOpen !== lastModalStateRef.current.isOpen ||
+      isNestedModal !== lastModalStateRef.current.isNested;
 
-    // Important: Don't re-trigger animation logic if we're already processing this modal state
-    if (processedModalStateRef.current === isModalOpen) return;
-    processedModalStateRef.current = isModalOpen;
+    // Store the previous state for reference before updating
+    const wasOpen = lastModalStateRef.current.isOpen;
+    const wasNested = lastModalStateRef.current.isNested;
 
-    // Reset animation lock on each modal state change
-    animationLockRef.current = false;
-
-    // Function to handle animation cleanup
-    const clearAnimations = () => {
-      if (arrowElementRef.current) {
-        arrowElementRef.current.style.animation = "none";
-        arrowElementRef.current.classList.remove(
-          "animate-arrow-in",
-          "animate-arrow-out"
-        );
-        void arrowElementRef.current.offsetWidth;
-      }
-
-      if (currentAnimationRef.current) {
-        clearTimeout(currentAnimationRef.current);
-        currentAnimationRef.current = null;
-      }
+    // Update the reference to current state
+    lastModalStateRef.current = {
+      isOpen: isModalOpen,
+      isNested: isNestedModal,
     };
 
-    // Opening modal - with strict once-only execution
-    if (isModalOpen && !arrowVisible) {
-      // Skip if already animating or we're already in visible/entering state
-      if (
-        animationLockRef.current ||
-        animationStateRef.current === "entering" ||
-        animationStateRef.current === "visible"
-      ) {
-        return;
+    // Handle arrow visibility and animation
+    if (isModalOpen) {
+      setScrolled(true);
+
+      // For initial modal open, animate arrow entrance
+      if (!showArrow) {
+        console.log("Starting arrow entrance animation");
+        setTimeout(() => animateArrow(true), 100);
       }
+      // For transitions between modal states when arrow is already showing
+      else if (modalStateChanged) {
+        console.log("Modal state changed, ensuring arrow stays visible");
 
-      console.log("[Arrow Debug] Modal opened - Starting show sequence");
-      clearAnimations();
+        // Critical fix: Make sure arrow stays visible during all modal transitions
+        if (arrowRef.current) {
+          // Only update label without affecting visibility
+          const currentTransform = arrowRef.current.style.transform;
+          const currentOpacity = arrowRef.current.style.opacity;
 
-      // Set lock to prevent multiple animations
-      animationLockRef.current = true;
+          // Ensure opacity is at least 1 during transitions
+          if (parseFloat(currentOpacity) < 1) {
+            arrowRef.current.style.opacity = "1";
+          }
 
-      // Set internal state to track what we're doing
-      animationStateRef.current = "entering";
-      uniqueAnimationIdRef.current = Date.now();
-
-      // First make the arrow visible with the "in" animation ready
-      setArrowVisible(true);
-
-      // Apply animation state after a short delay to ensure DOM is updated
-      const animationId = uniqueAnimationIdRef.current;
-      currentAnimationRef.current = setTimeout(() => {
-        // Only proceed if this is still the active animation request
-        if (animationId === uniqueAnimationIdRef.current) {
-          setArrowAnimating(true);
-          console.log("[Arrow Debug] Arrow animation triggered");
+          // Ensure transform is in a good position
+          if (
+            !currentTransform ||
+            currentTransform.includes("translateY(-20px)")
+          ) {
+            arrowRef.current.style.transform = "translateY(0px)";
+          }
         }
-      }, 50);
-
-      // Mark animation as complete after full duration
-      currentAnimationRef.current = setTimeout(() => {
-        if (animationId === uniqueAnimationIdRef.current) {
-          console.log("[Arrow Debug] Entrance animation should be complete");
-          animationStateRef.current = "visible";
-          animationLockRef.current = false;
-        }
-      }, 850);
-    }
-    // Closing modal - with strict once-only execution
-    else if (!isModalOpen && arrowVisible) {
-      // Skip if already in exit animation
-      if (animationLockRef.current || animationStateRef.current === "exiting") {
-        return;
+      }
+    } else {
+      // Only animate exit when closing from a non-transitional state
+      if (showArrow) {
+        console.log("Starting arrow exit animation");
+        animateArrow(false);
       }
 
-      console.log("[Arrow Debug] Modal closed - Starting hide sequence");
-      clearAnimations();
-
-      // Set lock to prevent multiple animations
-      animationLockRef.current = true;
-
-      // Mark as exiting
-      animationStateRef.current = "exiting";
-
-      // Start exit animation
-      setArrowAnimating(false);
-
-      // Wait for exit animation to complete before hiding
-      currentAnimationRef.current = setTimeout(() => {
-        console.log("[Arrow Debug] Exit animation complete - Hiding arrow");
-        setArrowVisible(false);
-        animationStateRef.current = "hidden";
-        animationLockRef.current = false;
-      }, 350);
-    }
-
-    return () => {
-      if (currentAnimationRef.current) {
-        clearTimeout(currentAnimationRef.current);
+      if (window.scrollY <= 20) {
+        setScrolled(false);
       }
-    };
-  }, [isModalOpen, isFirstRender]);
+    }
+  }, [isModalOpen, isNestedModal, showArrow]);
 
   const pathname = usePathname();
 
@@ -186,9 +218,11 @@ const Navbar = () => {
   const handleBackArrowClick = () => {
     if (isNestedModal) {
       // If in a nested modal, go back to the previous step
+      console.log("Handling back arrow click for nested modal");
       closeModal(true); // Pass 'true' to indicate we're just going back one level, not closing completely
     } else if (isModalOpen) {
       // If in the main modal, close it
+      console.log("Handling back arrow click for main modal");
       closeModal();
     }
   };
@@ -220,43 +254,23 @@ const Navbar = () => {
     </div>
   );
 
-  // Back arrow component with memoization to prevent re-renders
-  const BackArrow = useCallback(() => {
-    // Don't render if not visible
-    if (!arrowVisible) return null;
+  // Back arrow component with improved animation and text updates
+  const BackArrow = () => {
+    if (!showArrow) return null;
 
     const arrowLabel = isNestedModal ? "Retour" : "Fermer";
-    const animationId = uniqueAnimationIdRef.current;
 
-    // Prevent duplicate animation events
-    const handleAnimationStart = (e) => {
-      if (e.animationName !== "arrowIn" && e.animationName !== "arrowOut")
-        return;
-      const animName = e.animationName === "arrowIn" ? "ENTER" : "EXIT";
-      console.log(`[Arrow Debug] Animation started: ${animName}`);
-    };
-
-    const handleAnimationEnd = (e) => {
-      if (e.animationName !== "arrowIn" && e.animationName !== "arrowOut")
-        return;
-      const animName = e.animationName === "arrowIn" ? "ENTER" : "EXIT";
-      console.log(`[Arrow Debug] Animation ended: ${animName}`);
-    };
-
-    // Use key prop to force complete remount when animation changes
     return (
       <div
-        ref={arrowElementRef}
-        key={`arrow-${arrowAnimating ? "in" : "out"}-${animationId}`}
-        className={`fixed flex mx-auto top-[50px] md:top-[70px] z-[-1] w-full justify-center items-center cursor-pointer ${
-          arrowAnimating ? "animate-arrow-in" : "animate-arrow-out"
-        }`}
+        ref={arrowRef}
+        className="fixed flex mx-auto top-[50px] md:top-[70px] z-[-1] w-full justify-center items-center cursor-pointer"
         onClick={handleBackArrowClick}
-        style={{ transform: "translateZ(-1px)" }}
+        style={{
+          transform: "translateY(-20px)",
+          opacity: 0,
+          transition: "none", // Disable CSS transitions
+        }}
         aria-label={arrowLabel}
-        onAnimationStart={handleAnimationStart}
-        onAnimationEnd={handleAnimationEnd}
-        data-animation-state={animationStateRef.current}
       >
         <div className="bg-[#04ACFF] rounded-full p-3 shadow-md flex w-28 items-center justify-center transition-transform hover:scale-105">
           <svg
@@ -279,13 +293,7 @@ const Navbar = () => {
         </span>
       </div>
     );
-  }, [
-    arrowVisible,
-    isNestedModal,
-    arrowAnimating,
-    uniqueAnimationIdRef.current,
-    handleBackArrowClick,
-  ]);
+  };
 
   // Calculate navbar classes based on scroll state and screen size
   const getNavbarClasses = () => {
@@ -415,69 +423,6 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-
-      {/* Add bounce-in and bounce-out animations to global styles */}
-      <style jsx global>{`
-        @keyframes arrowIn {
-          0% {
-            opacity: 0;
-            transform: translateY(-60px) scale(0.8);
-          }
-          50% {
-            opacity: 0.7;
-            transform: translateY(8px) scale(1.05);
-          }
-          75% {
-            transform: translateY(-4px) scale(0.98);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        @keyframes arrowOut {
-          0% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-60px) scale(0.8);
-          }
-        }
-
-        .animate-arrow-in {
-          will-change: transform, opacity;
-          animation-name: arrowIn !important;
-          animation-duration: 0.65s !important;
-          animation-timing-function: cubic-bezier(
-            0.34,
-            1.56,
-            0.64,
-            1
-          ) !important;
-          animation-delay: 0.5s !important;
-          animation-fill-mode: forwards !important;
-          animation-iteration-count: 1 !important;
-          opacity: 0;
-        }
-
-        .animate-arrow-out {
-          will-change: transform, opacity;
-          animation-name: arrowOut !important;
-          animation-duration: 0.3s !important;
-          animation-timing-function: cubic-bezier(
-            0.55,
-            0.085,
-            0.68,
-            0.53
-          ) !important;
-          animation-delay: 0s !important;
-          animation-fill-mode: forwards !important;
-          animation-iteration-count: 1 !important;
-        }
-      `}</style>
     </header>
   );
 };

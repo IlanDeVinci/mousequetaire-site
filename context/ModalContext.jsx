@@ -20,32 +20,46 @@ export const ModalProvider = ({ children }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isNestedModal, setNestedModal] = useState(false);
 
-  // Track state changes to debounce multiple calls
+  // Add a lock to prevent setting modal state more than once in quick succession
   const isChangingRef = useRef(false);
-  const timeoutRef = useRef(null);
 
-  // Prevent rapid state changes with debounced wrapper
-  const setModalOpenDebounced = useCallback((value) => {
+  // Simple function to prevent multiple rapid calls
+  const setModalOpenSafe = useCallback((value) => {
+    // Only allow state changes if we're not already changing
     if (isChangingRef.current) return;
 
     isChangingRef.current = true;
     setModalOpen(value);
 
-    // Reset the lock after a short delay
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
+    // Reset after a delay
+    setTimeout(() => {
       isChangingRef.current = false;
-    }, 100);
+    }, 500); // Long enough to prevent double triggers
   }, []);
 
-  // Add a placeholder closeModal function that can be overridden by components
+  // Enhanced setNestedModal with safety checks
+  const setNestedModalSafe = useCallback(
+    (value) => {
+      // Only allow nested modal changes when the main modal is open
+      if (value && !isModalOpen) {
+        console.warn("Cannot set nested modal when main modal is closed");
+        return;
+      }
+      setNestedModal(value);
+    },
+    [isModalOpen]
+  );
+
+  // Simple closeModal implementation with improved nested modal handling
   const [closeModal, setCloseModalFunc] = useState(
     () =>
       (isBackAction = false) => {
         if (isBackAction && isNestedModal) {
+          // When going back from nested modal, keep main modal open
           setNestedModal(false);
         } else {
-          setModalOpenDebounced(false);
+          // When closing completely, close both
+          setModalOpenSafe(false);
           setNestedModal(false);
         }
       }
@@ -56,22 +70,13 @@ export const ModalProvider = ({ children }) => {
     setCloseModalFunc(() => closeModalFunc);
   }, []);
 
-  // Clean up on unmount
-  useCallback(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
     <ModalContext.Provider
       value={{
         isModalOpen,
-        setModalOpen: setModalOpenDebounced,
+        setModalOpen: setModalOpenSafe,
         isNestedModal,
-        setNestedModal,
+        setNestedModal: setNestedModalSafe, // Use the safe version
         closeModal,
         registerCloseModal,
       }}
