@@ -73,10 +73,6 @@ const InstagramSlider = () => {
           // Always maintain 2 full sets of slides ahead of current position
           const remainingSlides = prevSlides.length - targetIndex - 1;
 
-          console.log(
-            `Checking slides: ${prevSlides.length} total, ${remainingSlides} ahead of position ${targetIndex}`
-          );
-
           // If we don't have enough slides ahead, add more
           if (remainingSlides < originalImages.length * 2) {
             // FIXED: Create unique timestamps for each set to prevent duplicate keys
@@ -103,14 +99,6 @@ const InstagramSlider = () => {
 
             // Combine without removing any slides that are still needed
             const result = [...prevSlides, ...newSlides];
-
-            console.log(
-              `Added ${newSlides.length} new slides. New total: ${
-                result.length
-              }, ${
-                result.length - targetIndex - 1
-              } ahead of position ${targetIndex}`
-            );
 
             return result;
           }
@@ -159,7 +147,6 @@ const InstagramSlider = () => {
       // After transition completes
       setTimeout(() => {
         setIsTransitioning(false);
-        console.log(`Transition complete, current index: ${nextIndex}`);
       }, 500);
     },
     [currentIndex, debouncedEnsureSlides]
@@ -180,7 +167,6 @@ const InstagramSlider = () => {
     }));
 
     setSlidesArray(initialSlides);
-    console.log(`Initialized with ${initialSlides.length} slides`);
   }, []);
 
   // Replace the safety check effect with a more conservative approach
@@ -218,11 +204,9 @@ const InstagramSlider = () => {
     // Wait until transitions are complete before proceeding
     if (isTransitioning) {
       const checkTransition = setInterval(() => {
-        console.log(`Checking transition state: ${isTransitioning}`);
         if (!isTransitioning) {
           clearInterval(checkTransition);
           // Find how many slides until the next Instagram logo
-          console.log(`Transition complete, returning to Instagram logo`);
           returnToInstagram();
         }
       }, 100);
@@ -232,26 +216,19 @@ const InstagramSlider = () => {
     // Find how many slides until the next Instagram logo
     const currentPosition = currentIndex % originalImages.length;
 
-    console.log(
-      `Return to Instagram: Current position in cycle: ${currentPosition}, Total slides: ${slidesArray.length}`
-    );
-
     // If not already on Instagram logo, advance to the next one
     if (currentPosition !== 0) {
       // Calculate steps needed to reach next Instagram logo by moving forward
       const stepsToNextLogo = originalImages.length - currentPosition;
-      console.log(`Steps to next Instagram logo: ${stepsToNextLogo}`);
 
       // Calculate the target position
       const nextInstagramPosition = currentIndex + stepsToNextLogo;
-      console.log(`Planning jump to position: ${nextInstagramPosition}`);
 
       // FIRST ensure we have enough slides for this jump
       ensureSufficientSlides(nextInstagramPosition);
 
       // Now start the transition
       setIsTransitioning(true);
-      console.log(`Jumping to position: ${nextInstagramPosition}`);
       setCurrentIndex(nextInstagramPosition);
 
       // After transition completes
@@ -1176,6 +1153,11 @@ const contactOptions = [
                       src={image.src || "/images/placeholder.jpg"}
                       alt={image.alt}
                       fill
+                      sizes="
+                        (max-width: 768px) 100vw,
+                        (max-width: 1200px) 50vw,
+                        33vw
+                      "
                       className="object-cover transition-transform group-hover:scale-105 duration-500"
                     />
 
@@ -1516,11 +1498,11 @@ export default function Contact() {
           </p>
 
           {/* Mobile view - stack circles vertically */}
-          <div className="md:hidden flex flex-col items-center gap-8 mb-0">
+          <div className="md:hidden flex flex-col items-center gap-16 mb-0">
             {contactOptions.map((option, index) => (
               <div
                 key={index}
-                className="w-[250px] h-[250px] relative transition-all duration-700"
+                className="w-[250px] h-[250px] relative transition-all duration-700 rounded-full"
                 style={{
                   opacity:
                     activeModal !== null && activeModal !== index ? 0 : 1,
