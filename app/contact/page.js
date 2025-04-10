@@ -594,7 +594,7 @@ const FormIconSVG = () => {
   );
 };
 
-// New SocialMediaLink component with centered-to-justified hover effect
+// New SocialMediaLink component with centered-to-justified hover effect and bigger hitbox
 const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -607,6 +607,9 @@ const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Invisible enlarged hitbox */}
+      <div className="absolute inset-0 w-full h-full -m-4 cursor-pointer" />
+
       <div
         className={`relative flex items-center justify-center transition-all duration-300 ${
           isHovered ? "w-32 h-16 -translate-x-24" : "w-32 h-16"
@@ -719,6 +722,379 @@ const sampleImages = [
   },
 ];
 
+// New component for background animation in the Email modal
+const BackgroundAnimation = () => {
+  const [animatedImages, setAnimatedImages] = useState([]);
+  const backgroundImgs = [
+    "/images/nuage1.svg",
+    "/images/nuage2.svg",
+    "/images/nuage3.svg",
+    "/images/nuage4.svg",
+  ];
+
+  // Define cleanupCompletedAnimations BEFORE it's used in useEffect
+  const cleanupCompletedAnimations = useCallback(() => {
+    setAnimatedImages((prev) => {
+      const now = Date.now();
+      return prev.filter((img) => {
+        // For other images, check if their duration has passed
+        const animationEndTime = img.createdAt + img.duration * 1000 - 1000; // 1 second buffer
+        // Remove images whose duration has elapsed
+        return now < animationEndTime;
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    // Create initial set of animated images with proper positioning
+    const initialImages = [
+      {
+        id: "initial-1",
+        src: backgroundImgs[0],
+        size: Math.floor(Math.random() * 120) + 400,
+        y: 20,
+        delay: 0,
+        duration: Math.floor(Math.random() * 10) + 8,
+        opacity: Math.random() * 0.2 + 0.7,
+        initialPosition: 20, // Start from left side
+        createdAt: Date.now(), // Add creation timestamp for tracking lifecycle
+      },
+      {
+        id: "initial-2",
+        src: backgroundImgs[1],
+        size: Math.floor(Math.random() * 120) + 400,
+        y: 50,
+        delay: 0,
+        duration: Math.floor(Math.random() * 10) + 8,
+        opacity: Math.random() * 0.2 + 0.7,
+        initialPosition: 40, // Position at 20% of screen width
+        createdAt: Date.now(), // Add creation timestamp for tracking lifecycle
+      },
+      {
+        id: "initial-3",
+        src: backgroundImgs[2],
+        size: Math.floor(Math.random() * 120) + 400,
+        y: 75,
+        delay: 0,
+        duration: Math.floor(Math.random() * 10) + 8,
+        opacity: Math.random() * 0.2 + 0.7,
+        initialPosition: 60, // Position at 40% of screen width
+        createdAt: Date.now(), // Add creation timestamp for tracking lifecycle
+      },
+      {
+        id: "initial-4",
+        src: backgroundImgs[3],
+        size: Math.floor(Math.random() * 120) + 400,
+        y: 30,
+        delay: 0,
+        duration: Math.floor(Math.random() * 10) + 8,
+        opacity: Math.random() * 0.2 + 0.7,
+        initialPosition: 80, // Position at 60% of screen width
+        createdAt: Date.now(), // Add creation timestamp for tracking lifecycle
+      },
+    ];
+    setAnimatedImages(initialImages);
+
+    // Create image generation function
+    const createImage = () => {
+      const randomImg =
+        backgroundImgs[Math.floor(Math.random() * backgroundImgs.length)];
+      const randomSize = Math.floor(Math.random() * 120) + 400; // Bigger: 80-200px
+      const randomY = Math.floor(Math.random() * 80) + 10; // 10-90% vertical position
+      const randomDuration = Math.floor(Math.random() * 10) + 8; // Faster: 8-18s
+      const opacity = Math.random() * 0.2 + 0.7; // Slightly more opacity
+
+      return {
+        id: Date.now() + Math.random(),
+        src: randomImg,
+        size: randomSize,
+        y: randomY,
+        delay: 0, // No delay for new images
+        duration: randomDuration,
+        initialPosition: null, // Will start from right edge (100%)
+        opacity,
+        createdAt: Date.now(), // Add creation timestamp for tracking lifecycle
+      };
+    };
+
+    // Set up interval for generating new images
+    const interval = setInterval(() => {
+      setAnimatedImages((prev) => {
+        // Always add a new image
+        return [...prev, createImage()];
+      });
+    }, 2500);
+
+    // Set up cleanup interval (run every second)
+    const cleanupInterval = setInterval(cleanupCompletedAnimations, 1000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(cleanupInterval);
+    };
+  }, [cleanupCompletedAnimations]); // Add cleanupCompletedAnimations to dependencies
+
+  return (
+    <div className="absolute inset-0 overflow-hidden z-0 opacity-80">
+      {animatedImages.map((img) => (
+        <div
+          key={img.id}
+          className="absolute"
+          style={{
+            top: `${img.y}%`,
+            animation: `floatRight ${img.duration}s linear infinite`,
+            // Completely separate styling for initial vs new images
+            ...(img.initialPosition !== null
+              ? {
+                  left: `${img.initialPosition}%`,
+                  right: "auto",
+                }
+              : {
+                  right: "-550px",
+                  left: "auto",
+                }),
+            zIndex: 0,
+          }}
+        >
+          <div
+            className="relative rounded-lg overflow-hidden"
+            style={{
+              opacity: img.opacity,
+            }}
+          >
+            <Image
+              src={img.src}
+              alt=""
+              className="object-cover"
+              width={img.size}
+              height={img.size}
+              style={{ height: "auto" }} // Add height: auto to maintain aspect ratio
+            />
+          </div>
+        </div>
+      ))}
+
+      <style jsx>{`
+        @keyframes floatRight {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-170vw);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Modified component for a contact box in the Email modal
+const ContactBox = ({
+  title,
+  description,
+  icon,
+  bgColor,
+  onClick,
+  hasInput = false,
+  inputPlaceholder = "",
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [showError, setShowError] = useState(false);
+
+  const handleClick = (e) => {
+    if (hasInput && !inputValue.trim()) {
+      setShowError(true);
+      return;
+    }
+    if (onClick) {
+      onClick(e, inputValue);
+    }
+  };
+
+  return (
+    <div
+      onClick={!hasInput ? handleClick : undefined}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setShowError(false);
+      }}
+      className="p-6 rounded-lg transition-all duration-300 flex flex-col items-center justify-center text-center cursor-pointer relative"
+      style={{
+        backgroundColor: bgColor || "#1E3A4C",
+        boxShadow: isHovered ? "0 0 0 12px rgba(170, 220, 255, 0.8)" : "none",
+        zIndex: isHovered ? 10 : 1,
+        transform: isHovered ? "scale(1.02)" : "scale(1)",
+      }}
+    >
+      <div className="w-full">
+        <div className="flex items-center justify-center mb-4">
+          {icon && <div className="w-8 h-8 mb-2 mr-3">{icon}</div>}
+          <h4 className="text-3xl font-bold mb-2 font-montserrat">{title}</h4>
+        </div>
+        <p className="text-white font-montserrat">{description}</p>
+
+        {hasInput && (
+          <div
+            className="overflow-hidden transition-all duration-300 absolute left-0 right-0 -bottom-2 -z-30"
+            style={{
+              height: isHovered ? "80px" : "0px",
+              opacity: isHovered ? 1 : 0,
+              transform: `translateY(${isHovered ? "65px" : "-10px"})`,
+            }}
+          >
+            <div className="bg-white p-4 rounded-b-lg shadow-lg">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleClick(e);
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    if (showError) setShowError(false);
+                  }}
+                  placeholder={inputPlaceholder}
+                  className={`w-full px-4 py-2 bg-gray-50 rounded-l outline-none border transition-colors ${
+                    showError
+                      ? "border-red-500"
+                      : "border-gray-300 focus:border-[#7DD4FF]"
+                  } text-gray-800 placeholder-gray-400`}
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-[#7DD4FF] hover:bg-[#5AA8D0] text-[#0E304A] font-bold rounded transition-colors"
+                >
+                  →
+                </button>
+              </form>
+              {showError && (
+                <p className="text-red-500 text-xs mb-5 absolute">
+                  Ce champ est requis
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// New expanded contact options for when a box is clicked
+const expandedContactOptions = [
+  {
+    title: "Support Technique",
+    description: "Assistance pour vos problèmes techniques",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
+      </svg>
+    ),
+    bgColor: "#1E3A4C",
+  },
+  {
+    title: "Service Client",
+    description: "Questions sur vos commandes et services",
+    icon: "",
+    bgColor: "#235A74",
+  },
+  {
+    title: "Ventes",
+    description: "Informations sur nos produits et services",
+    icon: "",
+    bgColor: "#286A89",
+  },
+  {
+    title: "Partenariats",
+    description: "Collaborations et opportunités d'affaires",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+      </svg>
+    ),
+    bgColor: "#2D7A9E",
+  },
+  {
+    title: "Médias",
+    description: "Demandes de presse et médias",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M22 3H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2zM8 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H2v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1zm3.85-4h1.64L21 16l-1.99 1.99c-1.31-.98-2.28-2.38-2.73-3.99-.18-.64-.28-1.31-.28-2s.1-1.36.28-2c.45-1.62 1.42-3.01 2.73-3.99L21 8l-1.51 2h-1.64c-.22.63-.35 1.3-.35 2s.13 1.37.35 2z" />
+      </svg>
+    ),
+    bgColor: "#328AB3",
+  },
+  {
+    title: "Retour",
+    description: "Revenir aux options principales",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z" />
+      </svg>
+    ),
+    bgColor: "#389AC7",
+  },
+];
+
+const contactGridItems = [
+  {
+    title: "Email Pro",
+    description: "Pour toute question concernant nos services professionnels",
+    buttonLink: "mailto:pro@mousequetaire.com",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8l8 5 8-5v10zm-8-7L4 6h16l-8 5z" />
+      </svg>
+    ),
+    bgColor: "#004A6F",
+  },
+  {
+    title: "Support",
+    description:
+      "Besoin d'aide avec un projet existant ou d'un support technique",
+    buttonLink: "mailto:support@mousequetaire.com",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-3.5h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z" />
+      </svg>
+    ),
+    bgColor: "#007EBD",
+  },
+  {
+    title: "Carrières",
+    description:
+      "Rejoignez notre équipe dynamique de professionnels passionnés",
+    buttonLink: "mailto:jobs@mousequetaire.com",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M10 16v-1H3.01L3 19c0 1.11.89 2 2 2h14c1.11 0 2-.89 2-2v-4h-7v1h-4zm10-9h-4.01V5l-2-2h-4l-2 2v2H4c-1.1 0-2 .9-2 2v3c0 1.11.89 2 2 2h6v-2h4v2h6c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-6 0h-4V5h4v2z" />
+      </svg>
+    ),
+    bgColor: "#0089CD",
+  },
+
+  {
+    title: "Autres",
+    description: "Pour toutes autres demandes",
+    buttonLink: "mailto:contact@mousequetaire.com",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
+      </svg>
+    ),
+    bgColor: "#48B1E5",
+    hasInput: true,
+    inputPlaceholder: "Votre message",
+  },
+];
+
 const contactOptions = [
   {
     title: "Instagram",
@@ -726,7 +1102,7 @@ const contactOptions = [
     content: (
       <div className="flex flex-col items-center gap-8 w-[90%] md:w-[80%] lg:w-[70%] mx-auto">
         {/* Contact info section with icons */}
-        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-6 md:gap-12 mb-2 mt-32 px-40">
+        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-6 md:gap-12 mb-2 mt-32 px-52">
           <ContactInfoLink
             icon="/images/phone-icon.svg"
             label="APPELEZ-NOUS"
@@ -745,7 +1121,7 @@ const contactOptions = [
           <p className="text-lg mb-2 text-center">
             Découvrez nos dernières publications
           </p>
-          <div className="w-full relative" style={{ height: "4  0vh" }}>
+          <div className="w-full relative" style={{ height: "40vh" }}>
             {/* Left fade overlay - changed to white */}
             <div
               className="absolute left-0 top-0 h-full w-[25%] z-[2000] pointer-events-none"
@@ -758,12 +1134,11 @@ const contactOptions = [
             <Swiper
               modules={[EffectCoverflow, Navigation, Pagination, Autoplay]}
               effect="coverflow"
-              grabCursor={true}
               centeredSlides={true}
               slidesPerView="auto"
               loop={true}
               autoplay={{
-                delay: 2000,
+                delay: 200000,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
@@ -782,20 +1157,21 @@ const contactOptions = [
                 clickable: true,
                 type: "bullets",
               }}
-              className="swiper-container h-full rounded-lg"
+              className="swiper-container h-full"
             >
               {sampleImages.map((image, index) => (
                 <SwiperSlide
                   key={index}
-                  className="h-[50%]"
+                  className="h-[45%]"
                   style={{
                     height: "70%",
                     width: "65%",
                     maxWidth: "450px",
-                    top: "20%",
+                    top: "15%",
+                    borderRadius: "25px",
                   }}
                 >
-                  <div className="relative w-full h-full rounded-lg overflow-x-hidden shadow-lg group">
+                  <div className="relative w-full h-full rounded-3xl overflow-hidden group">
                     <Image
                       src={image.src || "/images/placeholder.jpg"}
                       alt={image.alt}
@@ -828,9 +1204,6 @@ const contactOptions = [
                         )}
                       </div>
                     </div>
-
-                    {/* Replaced glow effect with direct styling - more reliable */}
-                    <div className="slide-glow-effect absolute inset-0 border-2 border-[#7DD4FF]/40 rounded-lg pointer-events-none"></div>
                   </div>
                 </SwiperSlide>
               ))}
@@ -933,7 +1306,7 @@ const contactOptions = [
               z-index: 10;
               transform: scale(1.05);
               transition: transform 0.5s ease;
-              box-shadow: 0 0 50px 8px rgba(255, 255, 255, 0.6) !important;
+              box-shadow: 0 0 40px 0px rgba(255, 255, 255, 0.6) !important;
             }
             .swiper-slide-active .slide-glow-effect {
               box-shadow: 0 0 25px rgba(125, 212, 255, 0.9);
@@ -943,10 +1316,21 @@ const contactOptions = [
               box-shadow: 0 0 12px rgba(125, 212, 255, 0.4);
               transition: all 0.5s ease;
             }
+            .swiper-container,
+            .swiper-wrapper,
+            .swiper-slide {
+              height: 100%;
+            }
+            .swiper-slide > div {
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
           `}</style>
         </div>
         {/* Updated social media links section */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 w-full py-8">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-16 md:gap-40 w-full py-8">
           <SocialMediaLink
             icon="/images/insta-icon.svg"
             colorIcon="/images/insta-icon-color.svg"
@@ -964,36 +1348,37 @@ const contactOptions = [
     ),
     bgColor: "#002132",
     customIcon: <InstagramSlider />,
-    //small brightness up effect on hover
     hoverEffect: "hover:brightness-110 ",
   },
   {
     title: "Email",
     description: "Contactez-nous par email",
     content: (
-      <div className="flex flex-col items-center gap-6">
-        <h3 className="text-2xl md:text-3xl font-bold mb-4">
-          Contact par Email
-        </h3>
-        <p className="text-base md:text-lg mb-6">
-          Envoyez-nous un message et nous vous répondrons dans les plus brefs
-          délais
-        </p>
-        <form className="w-full max-w-md flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Votre email"
-            className="w-full p-3 rounded bg-white/10 text-white border border-white/20"
-          />
-          <textarea
-            placeholder="Votre message"
-            rows={5}
-            className="w-full p-3 rounded bg-white/10 text-white border border-white/20"
-          />
-          <button className="bg-[#7DD4FF] text-[#002132] font-bold py-3 px-6 rounded">
-            Envoyer
-          </button>
-        </form>
+      <div className="flex flex-col w-full h-[100vh] relative">
+        {/* Animated background */}
+        <BackgroundAnimation />
+
+        {/* Content overlay */}
+        <div className="relative z-10 flex flex-col items-center gap-6 w-full mt-30">
+          <h3 className="text-2xl md:text-3xl font-bold mb-2">
+            Contactez-nous
+          </h3>
+
+          {/* Grid view for contact options */}
+          <div className="w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            {contactGridItems.map((item, index) => (
+              <ContactBox
+                key={index}
+                title={item.title}
+                description={item.description}
+                buttonLink={item.buttonLink}
+                icon={item.icon}
+                bgColor={item.bgColor}
+                isButton={true}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     ),
     bgColor: "#70C7F2",
@@ -1007,7 +1392,8 @@ export default function Contact() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [circlePosition, setCirclePosition] = useState(null);
-  const { setModalOpen } = useModal();
+  const { setModalOpen, setNestedModal, registerCloseModal } = useModal();
+  const [showExpandedOptions, setShowExpandedOptions] = useState(false);
 
   const handleCircleClick = useCallback(
     (e, index) => {
@@ -1023,6 +1409,7 @@ export default function Contact() {
       setIsAnimating(true);
       document.body.style.overflow = "hidden";
       setModalOpen(true); // Set modal open state to true
+      setNestedModal(false); // Reset nested modal state
 
       const rect = e.currentTarget.getBoundingClientRect();
       const windowCenter = {
@@ -1050,36 +1437,79 @@ export default function Contact() {
         setTimeout(() => setIsAnimating(false), 500);
       });
     },
-    [isAnimating, setModalOpen]
+    [isAnimating, setModalOpen, setNestedModal]
   );
 
-  const closeModal = useCallback(() => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setIsExpanded(false);
-    setModalOpen(false); // Set modal open state to false
+  const closeModal = useCallback(
+    (isBackAction = false) => {
+      if (isAnimating) return;
 
-    setTimeout(() => {
-      setActiveModal(null);
-      setCirclePosition(null);
-      setIsAnimating(false);
-      document.body.style.overflow = "auto";
-    }, 300);
-  }, [isAnimating, setModalOpen]);
+      if (isBackAction && showExpandedOptions) {
+        // If this is a back action and we're in expanded options, just go back to main options
+        setShowExpandedOptions(false);
+        setNestedModal(false);
+        return;
+      }
+
+      setIsAnimating(true);
+      setIsExpanded(false);
+      setModalOpen(false);
+      setNestedModal(false);
+
+      setTimeout(() => {
+        setActiveModal(null);
+        setCirclePosition(null);
+        setIsAnimating(false);
+        setShowExpandedOptions(false);
+        document.body.style.overflow = "auto";
+      }, 300);
+    },
+    [isAnimating, setModalOpen, setNestedModal, showExpandedOptions]
+  );
+
+  // Register our closeModal function with the context when component mounts or closeModal changes
+  useEffect(() => {
+    registerCloseModal(closeModal);
+    return () => {
+      // Reset the close modal function when component unmounts
+      registerCloseModal(() => {});
+    };
+  }, [closeModal, registerCloseModal]);
+
+  const handleContactBoxClick = (e, inputValue) => {
+    e.preventDefault();
+    if (inputValue) {
+      console.log("Input value:", inputValue);
+    }
+    setShowExpandedOptions(true);
+    setNestedModal(true); // Set nested modal state to true
+  };
+
+  const handleReturnClick = (e) => {
+    e.preventDefault();
+    setShowExpandedOptions(false);
+    setNestedModal(false); // Set nested modal state to false
+  };
 
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape" && !isAnimating && activeModal !== null) {
-        closeModal();
+      if (e.key === "Escape" && !isAnimating) {
+        if (showExpandedOptions) {
+          // If in expanded options, go back to main options
+          handleReturnClick(e);
+        } else if (activeModal !== null) {
+          // Otherwise, close the modal completely
+          closeModal();
+        }
       }
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isAnimating, activeModal, closeModal]);
+  }, [isAnimating, activeModal, closeModal, showExpandedOptions]);
 
   return (
     <>
-      <main className="pt-24 -pb-20 bg-[#050610] min-h-screen">
+      <main className="pt-24 -pb-20 bg-[#050610] min-h-screen font-montserrat">
         <div className="container mx-auto px-4">
           <p className="text-white text-center max-w-[400px] mx-auto font-montserrat font-semibold mb-8 md:mb-16 text-xl md:text-3xl px-4">
             Contactez-nous via ces différents médias :
@@ -1184,11 +1614,17 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-hidden ">
+            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-hidden">
               <div
                 className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none overflow-hidden
-                  transition-opacity duration-300 bg-[#002132]
+                  transition-opacity duration-300
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
+                style={{
+                  backgroundColor:
+                    activeModal !== null
+                      ? contactOptions[activeModal].bgColor
+                      : "#002132",
+                }}
               >
                 <div
                   className={`relative w-full pointer-events-auto
@@ -1200,15 +1636,59 @@ export default function Contact() {
                     flex items-center justify-center overflow-hidden`}
                 >
                   <div className="text-white w-full flex items-center justify-center">
-                    {contactOptions[activeModal].content}
+                    {activeModal === 1 && (
+                      <div className="flex flex-col w-full h-[100vh] relative">
+                        {/* Animated background */}
+                        <BackgroundAnimation />
+
+                        {/* Content overlay */}
+                        <div className="relative z-10 flex flex-col items-center gap-6 w-full mt-32">
+                          <h3 className="text-2xl md:text-3xl font-bold mb-2 mt-16">
+                            {!showExpandedOptions
+                              ? "Qui êtes-vous ?"
+                              : "Pourquoi voulez-vous nous contacter ?"}
+                          </h3>
+
+                          {/* Grid view for contact options */}
+                          <div
+                            className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 ${
+                              !showExpandedOptions ? "gap-20" : "gap-10"
+                            } mb-16`}
+                          >
+                            {!showExpandedOptions
+                              ? contactGridItems.map((item, index) => (
+                                  <ContactBox
+                                    key={index}
+                                    title={item.title}
+                                    description={item.description}
+                                    icon={item.icon}
+                                    bgColor={item.bgColor}
+                                    onClick={handleContactBoxClick}
+                                    hasInput={item.hasInput}
+                                    inputPlaceholder={item.inputPlaceholder}
+                                  />
+                                ))
+                              : expandedContactOptions.map((item, index) => (
+                                  <ContactBox
+                                    key={index}
+                                    title={item.title}
+                                    description={item.description}
+                                    icon={item.icon}
+                                    bgColor={item.bgColor}
+                                    onClick={
+                                      item.title === "Retour"
+                                        ? handleReturnClick
+                                        : undefined
+                                    }
+                                  />
+                                ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeModal === 0 && contactOptions[activeModal].content}
                   </div>
-                  <button
-                    onClick={!isAnimating ? closeModal : undefined}
-                    className="absolute top-4 right-4 sm:-top-2 sm:-right-2 text-white text-xl hover:text-[#7DD4FF] transition-colors p-2 sm:p-4 hover:bg-black/10 rounded-full z-[1002]"
-                    aria-label="Close modal"
-                  >
-                    ✕
-                  </button>
                 </div>
               </div>
             </div>
