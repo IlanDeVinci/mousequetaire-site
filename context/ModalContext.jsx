@@ -20,47 +20,90 @@ export const ModalProvider = ({ children }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isNestedModal, setNestedModal] = useState(false);
 
-  // Add a lock to prevent setting modal state more than once in quick succession
+  // Improved state locking system
   const isChangingRef = useRef(false);
+  const lockStateDuration = 300; // ms to lock state changes
 
-  // Simple function to prevent multiple rapid calls
-  const setModalOpenSafe = useCallback((value) => {
-    // Only allow state changes if we're not already changing
-    if (isChangingRef.current) return;
-
+  // Lock state changes for a specified duration
+  const lockState = useCallback(() => {
     isChangingRef.current = true;
-    setModalOpen(value);
-
-    // Reset after a delay
     setTimeout(() => {
       isChangingRef.current = false;
-    }, 500); // Long enough to prevent double triggers
+    }, lockStateDuration);
   }, []);
 
-  // Enhanced setNestedModal with safety checks
+  // Improved modal open function with better locking
+  const setModalOpenSafe = useCallback(
+    (value) => {
+      if (isChangingRef.current) {
+        console.log("State change blocked: too many rapid changes");
+        return;
+      }
+
+      // Set state and lock changes
+      lockState();
+      console.log(`Setting modal open: ${value}`);
+      setModalOpen(value);
+    },
+    [lockState]
+  );
+
+  // Completely rewritten nested modal handling
   const setNestedModalSafe = useCallback(
     (value) => {
-      // Only allow nested modal changes when the main modal is open
+      // Validate constraints
       if (value && !isModalOpen) {
         console.warn("Cannot set nested modal when main modal is closed");
         return;
       }
+
+      // Prevent excessive state changes
+      if (value === isNestedModal) {
+        return;
+      }
+
+      console.log(`Setting nested modal: ${isNestedModal} → ${value}`);
+
+      // Update state immediately
       setNestedModal(value);
     },
-    [isModalOpen]
+    [isModalOpen, isNestedModal]
   );
 
-  // Simple closeModal implementation with improved nested modal handling
+  // Completely rewritten closeModal with better animation coordination
   const [closeModal, setCloseModalFunc] = useState(
     () =>
       (isBackAction = false) => {
+        console.log(
+          `Close modal called: isBackAction=${isBackAction}, isNested=${isNestedModal}`
+        );
+
+        // Handle back action from nested modal
         if (isBackAction && isNestedModal) {
-          // When going back from nested modal, keep main modal open
+          console.log("Going back from nested modal to main modal");
+
+          // Update nested state immediately
           setNestedModal(false);
+          return;
+        }
+
+        // Handle complete modal closing
+        console.log("Closing modal completely");
+
+        if (isNestedModal) {
+          // First close nested modal
+          setNestedModal(false);
+
+          // Then close main modal after a delay
+          setTimeout(() => {
+            setModalOpenSafe(false);
+          }, 500); // Increased delay for smoother animation
         } else {
-          // When closing completely, close both
-          setModalOpenSafe(false);
-          setNestedModal(false);
+          // Just close the main modal with a short delay
+          // This delay allows the arrow animation to start
+          setTimeout(() => {
+            setModalOpenSafe(false);
+          }, 200);
         }
       }
   );

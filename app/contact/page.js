@@ -646,7 +646,7 @@ const ContactInfoLink = ({ icon, label, value, href }) => {
     >
       <div
         className={`relative flex items-center justify-center transition-all duration-300 ${
-          isHovered ? "w-16 h-16 -translate-x-28" : "w-16 h-16"
+          isHovered ? "w-16 h-16 -translate-x-32" : "w-16 h-16"
         }`}
       >
         <Image
@@ -1428,8 +1428,11 @@ export default function Contact() {
 
       if (isBackAction && showExpandedOptions) {
         // If this is a back action and we're in expanded options, just go back to main options
+        console.log(
+          "Back action in expanded options - returning to main options"
+        );
         setShowExpandedOptions(false);
-        setNestedModal(false);
+        setNestedModal(false); // Make sure to update modal context state
         return;
       }
 
@@ -1463,14 +1466,28 @@ export default function Contact() {
     if (inputValue) {
       console.log("Input value:", inputValue);
     }
+    console.log("Opening nested modal with expanded options");
+
+    // First set the expanded options state
     setShowExpandedOptions(true);
-    setNestedModal(true); // Set nested modal state to true
+
+    // Then, with a small delay, update the modal context to ensure proper transitions
+    setTimeout(() => {
+      setNestedModal(true);
+    }, 10);
   };
 
   const handleReturnClick = (e) => {
     e.preventDefault();
-    setShowExpandedOptions(false);
-    setNestedModal(false); // Set nested modal state to false
+    console.log("Returning from expanded options to main options");
+
+    // Update modal context first to ensure arrow changes immediately
+    setNestedModal(false);
+
+    // Then update local state with a slight delay to avoid flickering
+    setTimeout(() => {
+      setShowExpandedOptions(false);
+    }, 100);
   };
 
   useEffect(() => {
