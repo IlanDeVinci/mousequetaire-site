@@ -35,7 +35,7 @@ export default function BackToTop() {
     <ScrollReveal
       key={`back-to-top-${pathname}`}
       animation="fade-up"
-      delay={200}
+      delay={100}
     >
       <div className="relative bottom-8 left-0 right-0 flex justify-center z-50 mb-6">
         <button

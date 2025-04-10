@@ -726,7 +726,7 @@ const contactOptions = [
     content: (
       <div className="flex flex-col items-center gap-8 w-[90%] md:w-[80%] lg:w-[70%] mx-auto">
         {/* Contact info section with icons */}
-        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-6 md:gap-12 mb-4 mt-32 px-40">
+        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-6 md:gap-12 mb-2 mt-32 px-40">
           <ContactInfoLink
             icon="/images/phone-icon.svg"
             label="APPELEZ-NOUS"
@@ -741,11 +741,11 @@ const contactOptions = [
           />
         </div>
         {/* Image slider section with improved Swiper configuration */}
-        <div className="w-full py-6">
-          <p className="text-lg mb-4 text-center">
+        <div className="w-full py-4">
+          <p className="text-lg mb-2 text-center">
             Découvrez nos dernières publications
           </p>
-          <div className="w-full relative" style={{ height: "30vh" }}>
+          <div className="w-full relative" style={{ height: "4  0vh" }}>
             {/* Left fade overlay - changed to white */}
             <div
               className="absolute left-0 top-0 h-full w-[25%] z-[2000] pointer-events-none"
@@ -787,10 +787,15 @@ const contactOptions = [
               {sampleImages.map((image, index) => (
                 <SwiperSlide
                   key={index}
-                  className="h-full"
-                  style={{ width: "65%", maxWidth: "450px" }}
+                  className="h-[50%]"
+                  style={{
+                    height: "70%",
+                    width: "65%",
+                    maxWidth: "450px",
+                    top: "20%",
+                  }}
                 >
-                  <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg group">
+                  <div className="relative w-full h-full rounded-lg overflow-x-hidden shadow-lg group">
                     <Image
                       src={image.src || "/images/placeholder.jpg"}
                       alt={image.alt}
@@ -824,8 +829,8 @@ const contactOptions = [
                       </div>
                     </div>
 
-                    {/* Fixed active slide glow effect - always visible, enhanced for active slide */}
-                    <div className="absolute inset-0 border-2 border-[#7DD4FF]/30 rounded-lg shadow-[0_0_12px_rgba(125,212,255,0.4)] transition-all duration-500 pointer-events-none"></div>
+                    {/* Replaced glow effect with direct styling - more reliable */}
+                    <div className="slide-glow-effect absolute inset-0 border-2 border-[#7DD4FF]/40 rounded-lg pointer-events-none"></div>
                   </div>
                 </SwiperSlide>
               ))}
@@ -865,43 +870,25 @@ const contactOptions = [
           <style jsx global>{`
             @keyframes pulseGlow {
               0% {
-                box-shadow: 0 0 15px 3px rgba(125, 212, 255, 0.5);
+                box-shadow: 0 0 10px 0px rgba(125, 212, 255, 0.5);
               }
               50% {
-                box-shadow: 0 0 40px 10px rgba(125, 212, 255, 0.8);
+                box-shadow: 0 0 50px 20px rgba(125, 212, 255, 0.8);
               }
               100% {
-                box-shadow: 0 0 15px 3px rgba(125, 212, 255, 0.5);
+                box-shadow: 0 0 10px 0px rgba(125, 212, 255, 0.5);
               }
             }
 
             @keyframes borderPulse {
               0% {
                 border-color: rgba(125, 212, 255, 0.3);
-                border-width: 2px;
               }
               50% {
-                border-color: rgba(125, 212, 255, 0.9);
-                border-width: 3px;
+                border-color: rgba(125, 212, 255, 0.8);
               }
               100% {
                 border-color: rgba(125, 212, 255, 0.3);
-                border-width: 2px;
-              }
-            }
-
-            @keyframes slideGlowPulse {
-              0% {
-                box-shadow: 0 0 15px rgba(125, 212, 255, 0.4);
-                border-color: rgba(125, 212, 255, 0.4);
-              }
-              50% {
-                box-shadow: 0 0 30px rgba(125, 212, 255, 0.8);
-                border-color: rgba(125, 212, 255, 0.9);
-              }
-              100% {
-                box-shadow: 0 0 15px rgba(125, 212, 255, 0.4);
-                border-color: rgba(125, 212, 255, 0.4);
               }
             }
 
@@ -946,9 +933,11 @@ const contactOptions = [
               z-index: 10;
               transform: scale(1.05);
               transition: transform 0.5s ease;
+              box-shadow: 0 0 50px 8px rgba(255, 255, 255, 0.6) !important;
             }
             .swiper-slide-active .slide-glow-effect {
-              animation: slideGlowPulse 2s infinite;
+              box-shadow: 0 0 25px rgba(125, 212, 255, 0.9);
+              border-color: rgba(125, 212, 255, 0.8);
             }
             .slide-glow-effect {
               box-shadow: 0 0 12px rgba(125, 212, 255, 0.4);
@@ -975,7 +964,8 @@ const contactOptions = [
     ),
     bgColor: "#002132",
     customIcon: <InstagramSlider />,
-    hoverEffect: "hover:animate-pulse",
+    //small brightness up effect on hover
+    hoverEffect: "hover:brightness-110 ",
   },
   {
     title: "Email",
@@ -1008,6 +998,7 @@ const contactOptions = [
     ),
     bgColor: "#70C7F2",
     customIcon: <FormIconSVG />,
+    hoverEffect: "hover:brightness-110 ",
   },
 ];
 
@@ -1021,6 +1012,14 @@ export default function Contact() {
   const handleCircleClick = useCallback(
     (e, index) => {
       if (isAnimating) return;
+
+      // Scroll to top smoothly with fallback for browsers that don't support smooth scrolling
+      if (window.scrollY > 200) {
+        window.scrollTo({
+          top: 200,
+          left: 0,
+        });
+      }
       setIsAnimating(true);
       document.body.style.overflow = "hidden";
       setModalOpen(true); // Set modal open state to true
@@ -1080,14 +1079,14 @@ export default function Contact() {
 
   return (
     <>
-      <main className="pt-24 pb-16 bg-[#050610] min-h-screen">
+      <main className="pt-24 -pb-20 bg-[#050610] min-h-screen">
         <div className="container mx-auto px-4">
           <p className="text-white text-center max-w-[400px] mx-auto font-montserrat font-semibold mb-8 md:mb-16 text-xl md:text-3xl px-4">
             Contactez-nous via ces différents médias :
           </p>
 
           {/* Mobile view - stack circles vertically */}
-          <div className="md:hidden flex flex-col items-center gap-8 mb-16">
+          <div className="md:hidden flex flex-col items-center gap-8 mb-0">
             {contactOptions.map((option, index) => (
               <div
                 key={index}
@@ -1099,11 +1098,15 @@ export default function Contact() {
                     activeModal !== null && activeModal !== index
                       ? "300ms"
                       : "700ms",
+
+                  animation: !activeModal
+                    ? `circleGlow 3s infinite ${index * 0.3}s`
+                    : "none",
                 }}
               >
                 <div
                   onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                  className={`w-full h-full rounded-full flex items-center justify-center overflow-visible
+                  className={`w-full h-full rounded-full flex items-center justify-center overflow-hidden
                   ${!activeModal ? "cursor-pointer" : ""} 
                   transition-all duration-500 ease-in-out ${
                     option.hoverEffect || ""
@@ -1114,11 +1117,6 @@ export default function Contact() {
                       activeModal === index && isExpanded
                         ? `translate(${circlePosition?.transform.translateX}px, ${circlePosition?.transform.translateY}px) scale(${circlePosition?.transform.scale})`
                         : "none",
-                    animation: !activeModal
-                      ? `float 3s ease-in-out infinite ${
-                          index * 0.5
-                        }s, pulseGlow 3s infinite ${index * 0.3}s`
-                      : "none",
                   }}
                 >
                   {/* Circle Content */}
@@ -1128,9 +1126,6 @@ export default function Contact() {
                   >
                     {option.customIcon}
                   </div>
-                  {!activeModal && (
-                    <div className="absolute inset-0 rounded-full border-2 border-[#7DD4FF]/50 animate-[borderPulse_3s_infinite] pointer-events-none" />
-                  )}
                 </div>
               </div>
             ))}
@@ -1142,7 +1137,7 @@ export default function Contact() {
               {contactOptions.map((option, index) => (
                 <div
                   key={index}
-                  className="transition-all duration-700 absolute top-0"
+                  className="transition-all duration-700 absolute top-0 rounded-full"
                   style={{
                     width: "288px",
                     left: `${index * 500}px`,
@@ -1152,11 +1147,16 @@ export default function Contact() {
                       activeModal !== null && activeModal !== index
                         ? "300ms"
                         : "700ms",
+
+                    animation: !activeModal
+                      ? `circleGlow 3s infinite ${index * 0.3}s`
+                      : "none",
+                    borderRadius: "50%",
                   }}
                 >
                   <div
                     onClick={(e) => !activeModal && handleCircleClick(e, index)}
-                    className={`w-72 h-72 rounded-full flex items-center justify-center overflow-visible
+                    className={`w-72 h-72 rounded-full flex items-center justify-center overflow-hidden
                       ${!activeModal ? "cursor-pointer" : ""} 
                       transition-all duration-500 ease-in-out ${
                         option.hoverEffect || ""
@@ -1167,11 +1167,6 @@ export default function Contact() {
                         activeModal === index && isExpanded
                           ? `translate(${circlePosition?.transform.translateX}px, ${circlePosition?.transform.translateY}px) scale(${circlePosition?.transform.scale})`
                           : "none",
-                      animation: !activeModal
-                        ? `float 3s ease-in-out infinite ${
-                            index * 0.5
-                          }s, pulseGlow 3s infinite ${index * 0.3}s`
-                        : "none",
                     }}
                   >
                     {/* Circle Content */}
@@ -1181,9 +1176,6 @@ export default function Contact() {
                     >
                       {option.customIcon}
                     </div>
-                    {!activeModal && (
-                      <div className="absolute inset-0 rounded-full border-2 border-[#7DD4FF]/50 animate-[borderPulse_3s_infinite] pointer-events-none" />
-                    )}
                   </div>
                 </div>
               ))}
@@ -1192,10 +1184,10 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-hidden">
+            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-hidden ">
               <div
                 className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none overflow-hidden
-                  transition-opacity duration-300 
+                  transition-opacity duration-300 bg-[#002132]
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
               >
                 <div
@@ -1223,6 +1215,43 @@ export default function Contact() {
           )}
         </div>
       </main>
+      <style jsx global>{`
+        @keyframes boxShadowPulse {
+          0% {
+            box-shadow: 0 0 30px 0px rgba(125, 212, 255, 0.5);
+          }
+          50% {
+            box-shadow: 0 0 70px 0px rgba(125, 212, 255, 0.8);
+          }
+          100% {
+            box-shadow: 0 0 30px 0px rgba(125, 212, 255, 0.5);
+          }
+        }
+
+        @keyframes circleGlow {
+          0% {
+            box-shadow: 0 0 0 0px rgba(125, 212, 255, 0.5);
+          }
+          50% {
+            box-shadow: 0 0 0 30px rgba(125, 212, 255, 0.8);
+          }
+          100% {
+            box-shadow: 0 0 0 0px rgba(125, 212, 255, 0.5);
+          }
+        }
+
+        @keyframes borderPulse {
+          0% {
+            border-color: rgba(125, 212, 255, 0.3);
+          }
+          50% {
+            border-color: rgba(125, 212, 255, 0.8);
+          }
+          100% {
+            border-color: rgba(125, 212, 255, 0.3);
+          }
+        }
+      `}</style>{" "}
     </>
   );
 }

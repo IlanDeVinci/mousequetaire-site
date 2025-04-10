@@ -94,7 +94,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-40">
+    <header className="fixed top-0 left-0 w-full z-[3000]">
       <Logo />
 
       {/* Mobile hamburger menu button */}
