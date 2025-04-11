@@ -210,9 +210,9 @@ const teamMembers = [
   {
     id: 1,
     name: "Samuel Alhadef",
-    role: "CCO | Chief Communication Officer",
+    role: "CEO/CCO | Chief Communication Officer",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Je m'occupe de vous écouter et de comprendre vos besoins. En tant que responsable des clients, je suis là pour répondre à vos questions et m'assurer que votre projet avance bien. Vous parlez directement avec moi, du premier rendez-vous jusqu'à la fin ",
     image: "/images/photo-samuel.jpg",
   },
   {
@@ -220,7 +220,7 @@ const teamMembers = [
     name: "Célestin Godefroy",
     role: "COO | Chief Operational Officer",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Je coordonne toutes nos opérations et veille au bon déroulement de votre projet. Je m'assure que les délais sont respectés et que chaque étape est réalisée avec qualité. Pour toute question pratique, je suis votre interlocuteur.",
     image: "/images/photo-célestin.jpg",
   },
   {
@@ -228,15 +228,15 @@ const teamMembers = [
     name: "Ilan Maouchi",
     role: "CTO | Chief Technical Officer",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Expert technique de l'équipe, je conçois les solutions et choisis les technologies adaptées à votre projet. Je transforme vos idées en réalités numériques fonctionnelles et innovantes. Pour toute question technique, comptez sur mon expertise.",
     image: "/images/photo-ilan.jpeg",
   },
   {
     id: 4,
     name: "Dorian Collet",
-    role: "UI/UX Designer",
+    role: "Directeur Artistique",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Je suis le Directeur Artistique, responsable de toute l'identité visuelle de vos projets. Je supervise la création des designs, garantis leur cohérence et m'assure qu'ils reflètent parfaitement votre image de marque. Mon rôle est de transformer vos idées en expériences visuelles impactantes.",
     image: "/images/photo-dorian.png",
   },
   {
@@ -244,7 +244,7 @@ const teamMembers = [
     name: "Xavier d'Andurain",
     role: "UI/UX Designer",
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Je crée l'apparence visuelle de votre projet et m'assure qu'il soit beau et facile à utiliser. Mon travail est de concevoir des interfaces que vos utilisateurs aimeront et comprendront intuitivement. Je donne vie à votre marque à travers des designs attrayants et fonctionnels.",
     image: "/images/photo-xavier.png",
   },
 ];
@@ -257,11 +257,11 @@ function TeamMember({ image, name, role, description, reverse }) {
       threshold={0.1}
     >
       <article
-        className={`flex ${
-          reverse ? "flex-row-reverse" : "flex-row"
+        className={`flex flex-col ${
+          reverse ? "md:flex-row-reverse" : "md:flex-row"
         } items-center mb-8 md:mb-12`}
       >
-        <div className="rounded-full overflow-hidden flex-shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px]">
+        <div className="rounded-full overflow-hidden flex-shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
           <Image
             src={image}
             alt={`Photo de ${name}`}
@@ -272,8 +272,8 @@ function TeamMember({ image, name, role, description, reverse }) {
         </div>
         <div
           className={`${
-            reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
-          } ${reverse ? "text-right" : "text-left"} text-lg`}
+            reverse ? "md:mr-4 md:mr-6 lg:mr-12" : "md:ml-4 md:ml-6 lg:ml-12"
+          } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
           <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
@@ -330,8 +330,7 @@ export default function Equipe() {
               Qui sommes nous ?
             </h1>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor
+            Nous sommes trois passionnés qui, autour d'un bon repas et de discussions enflammées, avons donné vie à Mouse-quetaires en 2025. Notre histoire ? Celle d'amis qui partagent un rêve simple mais ambitieux : rendre la technologie et l'IA vraiment accessibles à tous, sans le jargon intimidant.
             </p>
           </header>
         </ScrollReveal>
@@ -359,51 +358,68 @@ export default function Equipe() {
           </section>
         </ScrollReveal>
 
-        <section className="text-center my-12 pb-20">
+        <section className="text-center my-16 pb-24 md:my-24 md:pb-32">
           <ScrollReveal animation="fade-up" delay={100}>
-            <h1 className="text-3xl md:text-4xl my-8 md:m-24">Nos valeurs</h1>
+            <h1 className="text-3xl md:text-4xl my-12 md:my-16 md:mb-24">
+              Nos valeurs
+            </h1>
           </ScrollReveal>
 
           <ScrollReveal animation="fade-right" delay={200} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 mb-16"
+              className="relative px-2 md:px-4 py-16 md:py-24 flex justify-center overflow-visible w-full cursor-pointer group"
               onMouseEnter={() => !isMobile && setHoveredValue1(true)}
               onMouseLeave={() => !isMobile && setHoveredValue1(false)}
               onClick={() => isMobile && setHoveredValue1(!hoveredValue1)}
             >
+              {/* Invisible hitbox layer that covers the entire area */}
+              <div className="absolute inset-0 z-40"></div>
+
               <div
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
-                        w-[90%]  h-[80px] md:h-[120px] left-0 z-10
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue1 ? "w-[80vw]" : ""}`}
+                        h-[90px] md:h-[130px] left-0 z-10
+                        transition-all duration-300 ease-in-out
+                        ${
+                          hoveredValue1
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue1 ? "w-[80vw] left-[-40px]" : ""}`}
+                        h-[90px] md:h-[130px] left-[-20px] md:left-[-40px] z-20
+                        transition-all duration-300 ease-in-out
+                        ${
+                          hoveredValue1
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
-                        flex items-center gap-4 cursor-pointer 
-                        transition-all duration-300 ease-in-out max-w-none
-                        w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue1 ? "w-[80vw] left-[-80px]" : ""}`}
+                        flex items-center gap-2 md:gap-4 
+                        transition-all duration-300 ease-in-out
+                        h-[90px] md:h-[130px] left-[-40px] md:left-[-80px] z-30
+                        ${
+                          hoveredValue1
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               >
-                <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
+                <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
                   <Image
                     src="/images/valeur1.svg"
                     alt="Icon Entraide"
                     width={100}
                     height={100}
-                    className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
                 <div className="overflow-hidden h-full flex items-center">
                   <p
-                    className={`text-sm md:text-base ${
+                    className={`text-xs sm:text-sm md:text-base ${
                       hoveredValue1
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
@@ -411,11 +427,7 @@ export default function Equipe() {
                   >
                     {hoveredValue1 ? (
                       <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Ut enim ad minim veniam, quis nostrud
-                        exercitation ullamco laboris nisi ut aliquip ex ea
-                        commodo consequat.
+                        L'entraide est au cœur de notre ADN, car nous savons que les meilleures solutions naissent du partage des idées et des compétences. Notre collaboration quotidienne nous permet de voir chaque défi sous plusieurs angles et d'y apporter des réponses plus innovantes. Ensemble, nous transformons vos projets en succès collectifs où la satisfaction de nos clients est notre plus belle récompense.
                       </span>
                     ) : (
                       "Entraide Collaboration"
@@ -428,35 +440,50 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-left" delay={300} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-1/2 ml-auto mb-16"
+              className="relative px-2 md:px-4 py-16 md:py-24 flex justify-center overflow-visible w-full cursor-pointer group"
               onMouseEnter={() => !isMobile && setHoveredValue2(true)}
               onMouseLeave={() => !isMobile && setHoveredValue2(false)}
               onClick={() => isMobile && setHoveredValue2(!hoveredValue2)}
             >
+              {/* Invisible hitbox layer that covers the entire area */}
+              <div className="absolute inset-0 z-40"></div>
+
               <div
                 className={`absolute rounded-l-full bg-[#00527A] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] right-0 z-10
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue2 ? "w-[80vw]" : ""}`}
+                        h-[90px] md:h-[130px] right-0 z-10
+                        transition-all duration-300 ease-in-out
+                        ${
+                          hoveredValue2
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#006A9E] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] right-[-40px] z-20
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue2 ? "w-[80vw] right-[-40px]" : ""}`}
+                        h-[90px] md:h-[130px] right-[-20px] md:right-[-40px] z-20
+                        transition-all duration-300 ease-in-out
+                        ${
+                          hoveredValue2
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#0091D9] text-white pr-4 md:pr-8 
-                        flex items-center justify-end gap-4 cursor-pointer 
-                        transition-all duration-300 ease-in-out max-w-none
-                        w-[90%] h-[80px] md:h-[120px] right-[-80px] z-30
-                        ${hoveredValue2 ? "w-[80vw] right-[-80px]" : ""}`}
+                        flex items-center justify-end gap-2 md:gap-4
+                        transition-all duration-300 ease-in-out
+                        h-[90px] md:h-[130px] right-[-40px] md:right-[-80px] z-30
+                        ${
+                          hoveredValue2
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               >
                 <div className="overflow-hidden h-full flex items-center flex-grow justify-end">
                   <p
-                    className={`text-sm md:text-base ${
+                    className={`text-xs sm:text-sm md:text-base ${
                       hoveredValue2
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
@@ -464,24 +491,20 @@ export default function Equipe() {
                   >
                     {hoveredValue2 ? (
                       <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Ut enim ad minim veniam, quis nostrud
-                        exercitation ullamco laboris nisi ut aliquip ex ea
-                        commodo consequat.
+                        L'innovation guide chacune de nos décisions, nous poussant constamment à explorer de nouvelles approches pour résoudre vos défis numériques. Notre créativité se nourrit de curiosité, d'expérimentation et d'une volonté de dépasser les solutions conventionnelles. Nous transformons les contraintes en opportunités créatives, apportant à vos projets cette étincelle qui les rend uniques et mémorables.
                       </span>
                     ) : (
                       "Innovation Créativité"
                     )}
                   </p>
                 </div>
-                <div className="flex-shrink-0 mr-[60px] md:mr-[80px]">
+                <div className="flex-shrink-0 mr-[40px] md:mr-[60px] lg:mr-[80px]">
                   <Image
                     src="/images/valeur2.svg"
                     alt="Icon Innovation"
                     width={100}
                     height={100}
-                    className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
               </div>
@@ -490,44 +513,59 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-right" delay={400} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-1/2"
+              className="relative px-2 md:px-4 py-16 md:py-24 flex justify-center overflow-visible w-full cursor-pointer group"
               onMouseEnter={() => !isMobile && setHoveredValue3(true)}
               onMouseLeave={() => !isMobile && setHoveredValue3(false)}
               onClick={() => isMobile && setHoveredValue3(!hoveredValue3)}
             >
+              {/* Invisible hitbox layer that covers the entire area */}
+              <div className="absolute inset-0 z-40"></div>
+
               <div
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
-                        w-[90%]  h-[80px] md:h-[120px] left-0 z-10
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue3 ? "w-[80vw]" : ""}`}
+                        h-[90px] md:h-[130px] left-0 z-10
+                        transition-all duration-300 ease-in-out
+                        ${
+                          hoveredValue3
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
-                        w-[90%] h-[80px] md:h-[120px] left-[-40px] z-20
-                        transition-all duration-300 ease-in-out max-w-none
-                        ${hoveredValue3 ? "w-[80vw] left-[-40px]" : ""}`}
+                        h-[90px] md:h-[130px] left-[-20px] md:left-[-40px] z-20
+                        transition-all duration-300 ease-in-out
+                        ${
+                          hoveredValue3
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
-                        flex items-center gap-4 cursor-pointer 
-                        transition-all duration-300 ease-in-out max-w-none
-                        w-[90%] h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue3 ? "w-[80vw] left-[-80px]" : ""}`}
+                        flex items-center gap-2 md:gap-4
+                        transition-all duration-300 ease-in-out
+                        h-[90px] md:h-[130px] left-[-40px] md:left-[-80px] z-30
+                        ${
+                          hoveredValue3
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               >
-                <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
+                <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
                   <Image
                     src="/images/valeur3.svg"
                     alt="Icon Excellence"
                     width={100}
                     height={100}
-                    className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
                 <div className="overflow-hidden h-full flex items-center">
                   <p
-                    className={`text-sm md:text-base ${
+                    className={`text-xs sm:text-sm md:text-base ${
                       hoveredValue3
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
@@ -535,11 +573,7 @@ export default function Equipe() {
                   >
                     {hoveredValue3 ? (
                       <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[65vw] font-montserrat font-bold">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor incididunt ut labore et dolore
-                        magna aliqua. Ut enim ad minim veniam, quis nostrud
-                        exercitation ullamco laboris nisi ut aliquip ex ea
-                        commodo consequat.
+                        L'excellence n'est pas négociable pour nous, chaque ligne de code et chaque pixel sont méticuleusement travaillés pour atteindre les plus hauts standards. Notre exigence de qualité se traduit par des tests rigoureux et une attention obsessionnelle aux détails que vous remarquerez dans le produit final. Nous ne livrons que des solutions dont nous sommes fiers, car votre satisfaction et la performance de votre projet sont notre véritable mesure de réussite.
                       </span>
                     ) : (
                       "Excellence Qualité"
