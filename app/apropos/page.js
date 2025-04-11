@@ -386,7 +386,7 @@ export default function Equipe() {
                         ${
                           hoveredValue1
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
@@ -397,7 +397,7 @@ export default function Equipe() {
                         ${
                           hoveredValue1
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
@@ -409,7 +409,7 @@ export default function Equipe() {
                         ${
                           hoveredValue1
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               >
                 <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
@@ -466,7 +466,7 @@ export default function Equipe() {
                         ${
                           hoveredValue2
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
@@ -477,7 +477,7 @@ export default function Equipe() {
                         ${
                           hoveredValue2
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
@@ -489,7 +489,7 @@ export default function Equipe() {
                         ${
                           hoveredValue2
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               >
                 <div className="overflow-hidden h-full flex items-center flex-grow justify-end">
@@ -546,7 +546,7 @@ export default function Equipe() {
                         ${
                           hoveredValue3
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
@@ -557,7 +557,7 @@ export default function Equipe() {
                         ${
                           hoveredValue3
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
@@ -569,7 +569,7 @@ export default function Equipe() {
                         ${
                           hoveredValue3
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[45%]"
+                            : "w-[60%] md:w-[30%]"
                         } group-hover:shadow-lg`}
               >
                 <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
