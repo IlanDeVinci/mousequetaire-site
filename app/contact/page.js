@@ -1446,7 +1446,7 @@ export default function Contact() {
         setCirclePosition(null);
         setIsAnimating(false);
         setShowExpandedOptions(false);
-        document.body.style.overflow = "auto";
+        document.body.style.overflow = "auto"; // Make sure this is set to auto when modal is closed
       }, 300);
     },
     [isAnimating, setModalOpen, setNestedModal, showExpandedOptions]
@@ -1460,6 +1460,14 @@ export default function Contact() {
       registerCloseModal(() => {});
     };
   }, [closeModal, registerCloseModal]);
+
+  // Modified - Add cleanup effect to ensure body overflow is reset when component unmounts
+  useEffect(() => {
+    // Clean up function to reset body overflow when component unmounts
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   const handleContactBoxClick = (e, inputValue) => {
     e.preventDefault();

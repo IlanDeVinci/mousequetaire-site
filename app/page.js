@@ -340,14 +340,14 @@ export default function Home() {
                   image: "/images/photo-samuel.jpg",
                 },
                 {
-                  name: "Célestin Godefroy",
-                  role: "CBO - Chief Branleur Officer",
-                  image: "/images/photo-célestin.jpg",
-                },
-                {
                   name: "Ilan Maouchi",
                   role: "CIO - Chief Information Officer",
                   image: "/images/photo-ilan.jpeg",
+                },
+                {
+                  name: "Dorian Collet",
+                  role: "Directeur Artistique",
+                  image: "/images/photo-dorian.png",
                 },
               ].map((member, index) => (
                 <ScrollReveal
@@ -414,7 +414,12 @@ export default function Home() {
                 <div className="flex justify-start">
                   <div className="w-4/5 md:w-2/3 text-gray-300">
                     <p className="text-lg">
-                    Nous sommes trois passionnés qui, autour d'un bon repas et de discussions enflammées, avons donné vie à Mouse-quetaires en 2025. Notre histoire ? Celle d'amis qui partagent un rêve simple mais ambitieux : rendre la technologie et le developement Web vraiment accessibles à tous, sans le jargon qui fait peur.
+                      Nous sommes trois passionnés qui, autour d&apos;un bon
+                      repas et de discussions enflammées, avons donné vie à
+                      Mouse-quetaires en 2025. Notre histoire ? Celle
+                      d&apos;amis qui partagent un rêve simple mais ambitieux :
+                      rendre la technologie et le developement Web vraiment
+                      accessibles à tous, sans le jargon qui fait peur.
                     </p>
                   </div>
                 </div>
@@ -424,7 +429,12 @@ export default function Home() {
                 <div className="flex justify-end">
                   <div className="w-4/5 md:w-2/3 text-gray-300">
                     <p className="text-lg">
-                    Ce qui nous fait vibrer chaque jour ? La qualité sans compromis, une créativité qui ne connaît pas de limites et cette honnêteté qui nous tient à cœur. Les solutions génériques ? Très peu pour nous ! Votre projet est unique et mérite toute notre attention, avec cette touche personnelle qui change tout.
+                      Ce qui nous fait vibrer chaque jour ? La qualité sans
+                      compromis, une créativité qui ne connaît pas de limites et
+                      cette honnêteté qui nous tient à cœur. Les solutions
+                      génériques ? Très peu pour nous ! Votre projet est unique
+                      et mérite toute notre attention, avec cette touche
+                      personnelle qui change tout.
                     </p>
                   </div>
                 </div>
@@ -434,7 +444,11 @@ export default function Home() {
                 <div className="flex justify-start">
                   <div className="w-4/5 md:w-2/3 text-gray-300">
                     <p className="text-lg">
-                    Nous travaillons en équipe soudée, où expertise technique et créativité se nourrissent mutuellement. C'est comme ça qu'on arrive à comprendre vos défis numériques et à imaginer des solutions qui vous ressemblent vraiment.
+                      Nous travaillons en équipe soudée, où expertise technique
+                      et créativité se nourrissent mutuellement. C&apos;est
+                      comme ça qu&apos;on arrive à comprendre vos défis
+                      numériques et à imaginer des solutions qui vous
+                      ressemblent vraiment.
                     </p>
                   </div>
                 </div>

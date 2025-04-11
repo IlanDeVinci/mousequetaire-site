@@ -330,7 +330,11 @@ export default function Equipe() {
               Qui sommes nous ?
             </h1>
             <p>
-            Nous sommes trois passionnés qui, autour d'un bon repas et de discussions enflammées, avons donné vie à Mouse-quetaires en 2025. Notre histoire ? Celle d'amis qui partagent un rêve simple mais ambitieux : rendre la technologie et l'IA vraiment accessibles à tous, sans le jargon intimidant.
+              Nous sommes trois passionnés qui, autour d&apos;un bon repas et de
+              discussions enflammées, avons donné vie à Mouse-quetaires en 2025.
+              Notre histoire ? Celle d&apos;amis qui partagent un rêve simple
+              mais ambitieux : rendre la technologie et l&apos;IA vraiment
+              accessibles à tous, sans le jargon intimidant.
             </p>
           </header>
         </ScrollReveal>
@@ -427,7 +431,14 @@ export default function Equipe() {
                   >
                     {hoveredValue1 ? (
                       <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
-                        L'entraide est au cœur de notre ADN, car nous savons que les meilleures solutions naissent du partage des idées et des compétences. Notre collaboration quotidienne nous permet de voir chaque défi sous plusieurs angles et d'y apporter des réponses plus innovantes. Ensemble, nous transformons vos projets en succès collectifs où la satisfaction de nos clients est notre plus belle récompense.
+                        L&apos;entraide est au cœur de notre ADN, car nous
+                        savons que les meilleures solutions naissent du partage
+                        des idées et des compétences. Notre collaboration
+                        quotidienne nous permet de voir chaque défi sous
+                        plusieurs angles et d&apos;y apporter des réponses plus
+                        innovantes. Ensemble, nous transformons vos projets en
+                        succès collectifs où la satisfaction de nos clients est
+                        notre plus belle récompense.
                       </span>
                     ) : (
                       "Entraide Collaboration"
@@ -491,7 +502,14 @@ export default function Equipe() {
                   >
                     {hoveredValue2 ? (
                       <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
-                        L'innovation guide chacune de nos décisions, nous poussant constamment à explorer de nouvelles approches pour résoudre vos défis numériques. Notre créativité se nourrit de curiosité, d'expérimentation et d'une volonté de dépasser les solutions conventionnelles. Nous transformons les contraintes en opportunités créatives, apportant à vos projets cette étincelle qui les rend uniques et mémorables.
+                        L&apos;innovation guide chacune de nos décisions, nous
+                        poussant constamment à explorer de nouvelles approches
+                        pour résoudre vos défis numériques. Notre créativité se
+                        nourrit de curiosité, d&apos;expérimentation et
+                        d&apos;une volonté de dépasser les solutions
+                        conventionnelles. Nous transformons les contraintes en
+                        opportunités créatives, apportant à vos projets cette
+                        étincelle qui les rend uniques et mémorables.
                       </span>
                     ) : (
                       "Innovation Créativité"
@@ -573,7 +591,15 @@ export default function Equipe() {
                   >
                     {hoveredValue3 ? (
                       <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[65vw] font-montserrat font-bold">
-                        L'excellence n'est pas négociable pour nous, chaque ligne de code et chaque pixel sont méticuleusement travaillés pour atteindre les plus hauts standards. Notre exigence de qualité se traduit par des tests rigoureux et une attention obsessionnelle aux détails que vous remarquerez dans le produit final. Nous ne livrons que des solutions dont nous sommes fiers, car votre satisfaction et la performance de votre projet sont notre véritable mesure de réussite.
+                        L&apos;excellence n&apos;est pas négociable pour nous,
+                        chaque ligne de code et chaque pixel sont
+                        méticuleusement travaillés pour atteindre les plus hauts
+                        standards. Notre exigence de qualité se traduit par des
+                        tests rigoureux et une attention obsessionnelle aux
+                        détails que vous remarquerez dans le produit final. Nous
+                        ne livrons que des solutions dont nous sommes fiers, car
+                        votre satisfaction et la performance de votre projet
+                        sont notre véritable mesure de réussite.
                       </span>
                     ) : (
                       "Excellence Qualité"
