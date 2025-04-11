@@ -580,7 +580,7 @@ const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300"
+      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300 mx-auto md:mx-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -640,7 +640,7 @@ const ContactInfoLink = ({ icon, label, value, href }) => {
   return (
     <a
       href={href}
-      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300"
+      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300 mx-auto md:mx-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -1077,9 +1077,9 @@ const contactOptions = [
     title: "Instagram",
     description: "Appelez-nous directement",
     content: (
-      <div className="flex flex-col items-center gap-8 w-[90%] md:w-[80%] lg:w-[70%] mx-auto">
+      <div className="flex flex-col items-center gap-8 w-[95%] md:w-[80%] lg:w-[70%] mx-auto">
         {/* Contact info section with icons */}
-        <div className="flex flex-col md:flex-row justify-between items-start w-full gap-6 md:gap-12 mb-2 mt-32 px-52">
+        <div className="flex flex-col md:flex-row justify-center items-center w-full gap-10 md:gap-12 mb-2 mt-20 md:mt-32 px-4 md:px-52">
           <ContactInfoLink
             icon="/images/phone-icon.svg"
             label="APPELEZ-NOUS"
@@ -1094,14 +1094,14 @@ const contactOptions = [
           />
         </div>
         {/* Image slider section with improved Swiper configuration */}
-        <div className="w-full py-4">
+        <div className="w-full py-4 px-2 md:px-0">
           <p className="text-lg mb-2 text-center">
             Découvrez nos dernières publications
           </p>
           <div className="w-full relative" style={{ height: "40vh" }}>
             {/* Left fade overlay - changed to white */}
             <div
-              className="absolute left-0 top-0 h-full w-[25%] z-[2000] pointer-events-none"
+              className="absolute left-0 top-0 h-full w-[15%] md:w-[25%] z-[2000] pointer-events-none"
               style={{
                 background:
                   "linear-gradient(to right, rgba(0, 33, 50, 1) 10%, rgba(0, 33, 50, 0))",
@@ -1215,7 +1215,7 @@ const contactOptions = [
 
             {/* Right fade overlay - changed to white */}
             <div
-              className="absolute right-0 top-0 h-full w-[25%] z-[2000] pointer-events-none"
+              className="absolute right-0 top-0 h-full w-[15%] md:w-[25%] z-[2000] pointer-events-none"
               style={{
                 background:
                   "linear-gradient(to left, rgba(0, 33, 50, 1) 10%, rgba(0, 33, 50, 0))",
@@ -1248,8 +1248,8 @@ const contactOptions = [
             }
 
             .swiper-pagination-bullet {
-              width: 10px;
-              height: 10px;
+              width: 8px;
+              height: 8px;
               background: rgba(255, 255, 255, 0.4);
               opacity: 1;
               margin: 0 4px !important;
@@ -1312,7 +1312,7 @@ const contactOptions = [
           `}</style>
         </div>
         {/* Updated social media links section */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-16 md:gap-40 w-full py-8">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-10 md:gap-40 w-full py-6 md:py-8">
           <SocialMediaLink
             icon="/images/insta-icon.svg"
             colorIcon="/images/insta-icon-color.svg"
@@ -1641,8 +1641,8 @@ export default function Contact() {
                         <BackgroundAnimation />
 
                         {/* Content overlay */}
-                        <div className="relative z-10 flex flex-col items-center gap-6 w-full mt-32">
-                          <h3 className="text-2xl md:text-3xl font-bold mb-2 mt-16">
+                        <div className="relative z-10 flex flex-col items-center gap-6 w-full mt-16 md:mt-32">
+                          <h3 className="text-2xl md:text-3xl font-bold mb-2 mt-16 px-4 text-center">
                             {!showExpandedOptions
                               ? "Qui êtes-vous ?"
                               : "Pourquoi voulez-vous nous contacter ?"}
@@ -1650,9 +1650,7 @@ export default function Contact() {
 
                           {/* Grid view for contact options */}
                           <div
-                            className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 ${
-                              !showExpandedOptions ? "gap-20" : "gap-10"
-                            } mb-16`}
+                            className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 mb-16`}
                           >
                             {!showExpandedOptions
                               ? contactGridItems.map((item, index) => (

@@ -257,11 +257,11 @@ function TeamMember({ image, name, role, description, reverse }) {
       threshold={0.1}
     >
       <article
-        className={`flex ${
-          reverse ? "flex-row-reverse" : "flex-row"
+        className={`flex flex-col ${
+          reverse ? "md:flex-row-reverse" : "md:flex-row"
         } items-center mb-8 md:mb-12`}
       >
-        <div className="rounded-full overflow-hidden flex-shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px]">
+        <div className="rounded-full overflow-hidden flex-shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
           <Image
             src={image}
             alt={`Photo de ${name}`}
@@ -272,8 +272,8 @@ function TeamMember({ image, name, role, description, reverse }) {
         </div>
         <div
           className={`${
-            reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
-          } ${reverse ? "text-right" : "text-left"} text-lg`}
+            reverse ? "md:mr-4 md:mr-6 lg:mr-12" : "md:ml-4 md:ml-6 lg:ml-12"
+          } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
           <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
@@ -329,7 +329,7 @@ export default function Equipe() {
             <h1 className="text-3xl md:text-5xl pb-4 md:pb-8">
               Qui sommes nous ?
             </h1>
-            <p>
+            <p className="px-4 md:px-0">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor
             </p>
@@ -359,58 +359,75 @@ export default function Equipe() {
           </section>
         </ScrollReveal>
 
-        <section className="text-center my-12 pb-20">
+        <section className="text-center my-16 pb-24 md:my-24 md:pb-32">
           <ScrollReveal animation="fade-up" delay={100}>
-            <h1 className="text-3xl md:text-4xl my-8 md:m-24">Nos valeurs</h1>
+            <h1 className="text-3xl md:text-4xl my-12 md:my-16 md:mb-24">
+              Nos valeurs
+            </h1>
           </ScrollReveal>
 
           <ScrollReveal animation="fade-right" delay={200} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-full"
+              className="relative px-2 md:px-4 py-16 md:py-24 flex justify-center overflow-visible w-full cursor-pointer group"
               onMouseEnter={() => !isMobile && setHoveredValue1(true)}
               onMouseLeave={() => !isMobile && setHoveredValue1(false)}
               onClick={() => isMobile && setHoveredValue1(!hoveredValue1)}
             >
+              {/* Invisible hitbox layer that covers the entire area */}
+              <div className="absolute inset-0 z-40"></div>
+
               <div
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
-                        h-[80px] md:h-[120px] left-0 z-10
+                        h-[90px] md:h-[130px] left-0 z-10
                         transition-all duration-300 ease-in-out
-                        ${hoveredValue1 ? "w-[80vw]" : "w-[45%]"}`}
+                        ${
+                          hoveredValue1
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
-                        h-[80px] md:h-[120px] left-[-40px] z-20
+                        h-[90px] md:h-[130px] left-[-20px] md:left-[-40px] z-20
                         transition-all duration-300 ease-in-out
-                        ${hoveredValue1 ? "w-[80vw]" : "w-[45%]"}`}
+                        ${
+                          hoveredValue1
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
-                        flex items-center gap-4 cursor-pointer 
+                        flex items-center gap-2 md:gap-4 
                         transition-all duration-300 ease-in-out
-                        h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue1 ? "w-[80vw]" : "w-[45%]"}`}
+                        h-[90px] md:h-[130px] left-[-40px] md:left-[-80px] z-30
+                        ${
+                          hoveredValue1
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               >
-                <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
+                <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
                   <Image
                     src="/images/valeur1.svg"
                     alt="Icon Entraide"
                     width={100}
                     height={100}
-                    className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
                 <div className="overflow-hidden h-full flex items-center">
                   <p
-                    className={`text-sm md:text-base ${
+                    className={`text-xs sm:text-sm md:text-base ${
                       hoveredValue1
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
                     } transition-all duration-300 text-left`}
                   >
                     {hoveredValue1 ? (
-                      <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
+                      <span className="animate-fadeIn overflow-y-auto max-h-[60px] sm:max-h-[150px] md:max-h-[200px] block w-[80vw] md:w-[60vw] font-montserrat font-bold">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                         sed do eiusmod tempor incididunt ut labore et dolore
                         magna aliqua. Ut enim ad minim veniam, quis nostrud
@@ -428,42 +445,57 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-left" delay={300} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-full"
+              className="relative px-2 md:px-4 py-16 md:py-24 flex justify-center overflow-visible w-full cursor-pointer group"
               onMouseEnter={() => !isMobile && setHoveredValue2(true)}
               onMouseLeave={() => !isMobile && setHoveredValue2(false)}
               onClick={() => isMobile && setHoveredValue2(!hoveredValue2)}
             >
+              {/* Invisible hitbox layer that covers the entire area */}
+              <div className="absolute inset-0 z-40"></div>
+
               <div
                 className={`absolute rounded-l-full bg-[#00527A] text-white p-4 md:p-8 
-                        h-[80px] md:h-[120px] right-0 z-10
+                        h-[90px] md:h-[130px] right-0 z-10
                         transition-all duration-300 ease-in-out
-                        ${hoveredValue2 ? "w-[80vw]" : "w-[45%]"}`}
+                        ${
+                          hoveredValue2
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#006A9E] text-white p-4 md:p-8 
-                        h-[80px] md:h-[120px] right-[-40px] z-20
+                        h-[90px] md:h-[130px] right-[-20px] md:right-[-40px] z-20
                         transition-all duration-300 ease-in-out
-                        ${hoveredValue2 ? "w-[80vw]" : "w-[45%]"}`}
+                        ${
+                          hoveredValue2
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-l-full bg-[#0091D9] text-white pr-4 md:pr-8 
-                        flex items-center justify-end gap-4 cursor-pointer 
+                        flex items-center justify-end gap-2 md:gap-4
                         transition-all duration-300 ease-in-out
-                        h-[80px] md:h-[120px] right-[-80px] z-30
-                        ${hoveredValue2 ? "w-[80vw]" : "w-[45%]"}`}
+                        h-[90px] md:h-[130px] right-[-40px] md:right-[-80px] z-30
+                        ${
+                          hoveredValue2
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               >
                 <div className="overflow-hidden h-full flex items-center flex-grow justify-end">
                   <p
-                    className={`text-sm md:text-base ${
+                    className={`text-xs sm:text-sm md:text-base ${
                       hoveredValue2
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
                     } transition-all duration-300 text-right`}
                   >
                     {hoveredValue2 ? (
-                      <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[60vw] font-montserrat font-bold">
+                      <span className="animate-fadeIn overflow-y-auto max-h-[60px] sm:max-h-[150px] md:max-h-[200px] block w-[80vw] md:w-[60vw] font-montserrat font-bold">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                         sed do eiusmod tempor incididunt ut labore et dolore
                         magna aliqua. Ut enim ad minim veniam, quis nostrud
@@ -475,13 +507,13 @@ export default function Equipe() {
                     )}
                   </p>
                 </div>
-                <div className="flex-shrink-0 mr-[60px] md:mr-[80px]">
+                <div className="flex-shrink-0 mr-[40px] md:mr-[60px] lg:mr-[80px]">
                   <Image
                     src="/images/valeur2.svg"
                     alt="Icon Innovation"
                     width={100}
                     height={100}
-                    className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
               </div>
@@ -490,51 +522,66 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-right" delay={400} threshold={0.2}>
             <div
-              className="relative px-4 py-12 flex justify-center overflow-visible w-full"
+              className="relative px-2 md:px-4 py-16 md:py-24 flex justify-center overflow-visible w-full cursor-pointer group"
               onMouseEnter={() => !isMobile && setHoveredValue3(true)}
               onMouseLeave={() => !isMobile && setHoveredValue3(false)}
               onClick={() => isMobile && setHoveredValue3(!hoveredValue3)}
             >
+              {/* Invisible hitbox layer that covers the entire area */}
+              <div className="absolute inset-0 z-40"></div>
+
               <div
                 className={`absolute rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
-                        h-[80px] md:h-[120px] left-0 z-10
+                        h-[90px] md:h-[130px] left-0 z-10
                         transition-all duration-300 ease-in-out
-                        ${hoveredValue3 ? "w-[80vw]" : "w-[45%]"}`}
+                        ${
+                          hoveredValue3
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
-                        h-[80px] md:h-[120px] left-[-40px] z-20
+                        h-[90px] md:h-[130px] left-[-20px] md:left-[-40px] z-20
                         transition-all duration-300 ease-in-out
-                        ${hoveredValue3 ? "w-[80vw]" : "w-[45%]"}`}
+                        ${
+                          hoveredValue3
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               ></div>
 
               <div
                 className={`absolute rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
-                        flex items-center gap-4 cursor-pointer 
+                        flex items-center gap-2 md:gap-4
                         transition-all duration-300 ease-in-out
-                        h-[80px] md:h-[120px] left-[-80px] z-30
-                        ${hoveredValue3 ? "w-[80vw]" : "w-[45%]"}`}
+                        h-[90px] md:h-[130px] left-[-40px] md:left-[-80px] z-30
+                        ${
+                          hoveredValue3
+                            ? "w-[95vw] md:w-[80vw]"
+                            : "w-[60%] md:w-[45%]"
+                        } group-hover:shadow-lg`}
               >
-                <div className="flex-shrink-0 ml-[60px] md:ml-[80px]">
+                <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
                   <Image
                     src="/images/valeur3.svg"
                     alt="Icon Excellence"
                     width={100}
                     height={100}
-                    className="w-[60px] h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
                   />
                 </div>
                 <div className="overflow-hidden h-full flex items-center">
                   <p
-                    className={`text-sm md:text-base ${
+                    className={`text-xs sm:text-sm md:text-base ${
                       hoveredValue3
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
                     } transition-all duration-300 text-left`}
                   >
                     {hoveredValue3 ? (
-                      <span className="animate-fadeIn overflow-y-auto max-h-[150px] md:max-h-[200px] block w-[65vw] font-montserrat font-bold">
+                      <span className="animate-fadeIn overflow-y-auto max-h-[60px] sm:max-h-[150px] md:max-h-[200px] block w-[80vw] md:w-[65vw] font-montserrat font-bold">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                         sed do eiusmod tempor incididunt ut labore et dolore
                         magna aliqua. Ut enim ad minim veniam, quis nostrud
