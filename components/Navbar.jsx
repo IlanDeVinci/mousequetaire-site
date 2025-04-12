@@ -10,6 +10,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
   const { isModalOpen, isNestedModal, closeModal } = useModal();
 
   // Simplified arrow state - only 3 possible states
@@ -20,7 +21,10 @@ const Navbar = () => {
   // Basic scroll and resize handlers
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1450);
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1450);
+      setIsMobileView(window.innerWidth < 768); // Match md breakpoint
+    };
 
     handleResize();
     window.addEventListener("scroll", handleScroll);
@@ -302,6 +306,40 @@ const Navbar = () => {
     // Determine label based on arrow state
     const arrowLabel = arrowState === "nested" ? "Retour" : "Fermer";
 
+    // Mobile version of back arrow
+    if (isMobileView) {
+      return (
+        <div
+          ref={arrowRef}
+          className="fixed flex top-8 right-16 z-50 cursor-pointer"
+          onClick={handleBackArrowClick}
+          style={{
+            opacity: 0, // Always start with opacity 0
+            transform: "translateY(-30px)",
+            transition: "none", // Ensure no CSS transitions interfere with our animation
+          }}
+        >
+          <div className="bg-white rounded-full p-2 shadow-md flex w-10 h-10 items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-[#002132]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+          </div>
+        </div>
+      );
+    }
+
+    // Desktop version of back arrow (original)
     return (
       <div
         ref={arrowRef}
