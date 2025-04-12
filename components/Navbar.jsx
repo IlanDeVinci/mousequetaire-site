@@ -12,6 +12,7 @@ const Navbar = () => {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const { isModalOpen, isNestedModal, closeModal } = useModal();
+  const [wasModalOpen, setWasModalOpen] = useState(false);
 
   // Simplified arrow state - only 3 possible states
   const [arrowState, setArrowState] = useState("hidden"); // "hidden", "shown", or "nested"
@@ -36,6 +37,19 @@ const Navbar = () => {
     };
   }, []);
 
+  // Track previous modal state for transitions
+  useEffect(() => {
+    if (isModalOpen) {
+      setWasModalOpen(true);
+    } else {
+      // Reset wasModalOpen with a delay to allow for animations
+      const timeout = setTimeout(() => {
+        setWasModalOpen(false);
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [isModalOpen]);
+
   // Clean up any ongoing animations when component unmounts
   useEffect(() => {
     return () => {
@@ -56,10 +70,10 @@ const Navbar = () => {
     const startTime = Date.now();
 
     // Remove the delay for showing animation to prevent flashing
-    const delayMs = show ? 0 : 200; // Only keep delay for hiding animation
+    const delayMs = show ? 0 : 100; // Only keep delay for hiding animation
 
     // Set animation parameters - make the hide animation longer
-    const duration = show ? 1200 : 500; // Increased hide duration to 500ms for better visibility
+    const duration = show ? 1000 : 500; // Increased hide duration to 500ms for better visibility
 
     // Easing functions for better animation
     const easeOutBack = (x) => {
@@ -105,7 +119,7 @@ const Navbar = () => {
       }
 
       // Apply transform and opacity based on direction
-      if (show) {
+      if (show & !isNestedModal & !wasModalOpen) {
         // Animate in with bounce: from -30px up and 0 opacity to 0px and 1 opacity
         let y = -30;
         if (progress < 0.8) {
@@ -139,7 +153,7 @@ const Navbar = () => {
           // If we were hiding, update the state to hidden AFTER animation completes
           setTimeout(() => {
             setArrowState("hidden");
-          }, 50); // Small delay to ensure animation completes
+          }, 100); // Small delay to ensure animation completes
         } else if (arrowRef.current) {
           // Ensure full opacity when animation completes for showing
           arrowRef.current.style.opacity = "1";
@@ -170,7 +184,7 @@ const Navbar = () => {
       arrowState !== newArrowState;
 
     // Save current opacity if needed
-    let currentOpacity = "1";
+    let currentOpacity = "0";
     if (keepOpacity && arrowRef.current) {
       currentOpacity = arrowRef.current.style.opacity || "1";
     }
@@ -201,7 +215,7 @@ const Navbar = () => {
       setTimeout(() => {
         // Start animation immediately
         animateArrow(true);
-      }, 10);
+      }, 50);
     } else if (arrowState !== newArrowState) {
       // For all other state changes when arrow is already visible
 
@@ -230,7 +244,7 @@ const Navbar = () => {
               arrowRef.current.style.opacity = "1";
               arrowRef.current.style.transform = "translateY(0px)";
             }
-          }, 50);
+          }, 1);
         }
       }
     }
@@ -249,8 +263,11 @@ const Navbar = () => {
     }
   };
 
-  // Back arrow function for modals - modified to delay state changes
+  // Back arrow function for modals - modified to handle non-clickable state
   const handleBackArrowClick = () => {
+    // Only process click if modal is actually open
+    if (!isModalOpen) return;
+
     // Start the animation first
     if (arrowRef.current) {
       // Make sure arrow is fully visible when clicked
@@ -290,8 +307,11 @@ const Navbar = () => {
             src="/images/logo.svg"
             alt="Mousequetaire Logo Dark"
             fill
-            className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.35)] filter"
-            style={{ filter: "drop-shadow(0 0 8px rgba(0, 0, 0, 0.35))" }}
+            className="object-contain"
+            style={{
+              filter:
+                "drop-shadow(0 0 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 15px rgba(0, 0, 0, 0.5))",
+            }}
             priority
           />
         </div>
@@ -301,25 +321,33 @@ const Navbar = () => {
 
   // Simplified Back arrow component
   const BackArrow = () => {
-    if (arrowState === "hidden") return null;
-
     // Determine label based on arrow state
     const arrowLabel = arrowState === "nested" ? "Retour" : "Fermer";
+
+    // Determine if arrow should be clickable
+    const isClickable = isModalOpen;
+    const cursorStyle = isClickable ? "cursor-pointer" : "cursor-default";
+    const pointerEvents = isClickable ? "auto" : "none";
 
     // Mobile version of back arrow
     if (isMobileView) {
       return (
         <div
           ref={arrowRef}
-          className="fixed flex top-8 right-16 z-50 cursor-pointer"
+          className={`fixed flex top-8 right-16 z-50 ${cursorStyle}`}
           onClick={handleBackArrowClick}
           style={{
             opacity: 0, // Always start with opacity 0
             transform: "translateY(-30px)",
             transition: "none", // Ensure no CSS transitions interfere with our animation
+            pointerEvents: pointerEvents,
           }}
         >
-          <div className="bg-white rounded-full p-2 shadow-md flex w-10 h-10 items-center justify-center transition-transform hover:scale-105 cursor-pointer">
+          <div
+            className={`bg-white rounded-full p-2 shadow-md flex w-10 h-10 items-center justify-center transition-transform ${
+              isClickable ? "hover:scale-105" : ""
+            } ${cursorStyle}`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-[#002132]"
@@ -343,18 +371,23 @@ const Navbar = () => {
     return (
       <div
         ref={arrowRef}
-        className="fixed flex mx-auto top-[50px] md:top-[50px] z-[-1] w-full justify-center items-center cursor-pointer"
+        className={`fixed flex mx-auto top-[50px] md:top-[50px] z-[-1] w-full justify-center items-center ${cursorStyle}`}
         onClick={handleBackArrowClick}
         style={{
-          opacity: 0, // Always start with opacity 0
+          opacity: isNestedModal ? 1 : 0, // Always start with opacity 0
           transform: "translateY(-30px)",
           transition: "none", // Ensure no CSS transitions interfere with our animation
+          pointerEvents: pointerEvents,
         }}
       >
         {/* Invisible hit area for better click detection */}
-        <div className="absolute inset-0 w-full h-28 cursor-pointer" />
+        <div className={`absolute inset-0 w-full h-28 ${cursorStyle}`} />
 
-        <div className="bg-[#04ACFF] rounded-full p-3 pt-8 shadow-md flex w-28 items-center justify-center transition-transform hover:scale-105 cursor-pointer relative">
+        <div
+          className={`bg-[#04ACFF] rounded-full p-3 pt-8 shadow-md flex w-28 items-center justify-center transition-transform ${
+            isClickable ? "hover:scale-105" : ""
+          } ${cursorStyle} relative`}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6 text-[#002132]"
@@ -386,11 +419,15 @@ const Navbar = () => {
 
   // Calculate navbar classes based on scroll state and screen size
   const getNavbarClasses = () => {
-    // Always use pt-12 mt-4 for non-scrolled state
+    // If not scrolled, return base padding
     if (!scrolled) return "pt-2 mt-0";
 
-    // When scrolled, only remove padding/margin on large screens
-    return isLargeScreen ? "pt-2 mt-0" : "pt-2 mt-0";
+    // When scrolled, check screen size
+    if (isLargeScreen) {
+      return "pt-2 mt-0"; // Large screens (≥1450px)
+    } else {
+      return "pt-14 mt-0"; // Smaller screens (<1450px) - added pt-14
+    }
   };
 
   return (

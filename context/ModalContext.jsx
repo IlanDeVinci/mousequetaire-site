@@ -14,15 +14,17 @@ const ModalContext = createContext({
   isNestedModal: false,
   setNestedModal: () => {},
   closeModal: () => {},
+  wasModalOpen: false,
 });
 
 export const ModalProvider = ({ children }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isNestedModal, setNestedModal] = useState(false);
+  const [wasModalOpen, setWasModalOpen] = useState(false);
 
   // Improved state locking system
   const isChangingRef = useRef(false);
-  const lockStateDuration = 300; // ms to lock state changes
+  const lockStateDuration = 5; // ms to lock state changes
 
   // Lock state changes for a specified duration
   const lockState = useCallback(() => {
@@ -38,6 +40,16 @@ export const ModalProvider = ({ children }) => {
       if (isChangingRef.current) {
         console.log("State change blocked: too many rapid changes");
         return;
+      }
+
+      // Update wasModalOpen state for transitions
+      if (value) {
+        setWasModalOpen(true);
+      } else {
+        // When closing, delay resetting wasModalOpen to allow for animations
+        setTimeout(() => {
+          setWasModalOpen(false);
+        }, 500);
       }
 
       // Set state and lock changes
@@ -122,6 +134,7 @@ export const ModalProvider = ({ children }) => {
         setNestedModal: setNestedModalSafe, // Use the safe version
         closeModal,
         registerCloseModal,
+        wasModalOpen,
       }}
     >
       {children}

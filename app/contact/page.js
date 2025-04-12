@@ -580,7 +580,7 @@ const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300 mx-auto md:mx-0"
+      className="group relative flex items-center justify-center w-full sm:w-44 md:w-56 h-12 sm:h-16 transition-all duration-300 mx-auto md:mx-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -589,7 +589,9 @@ const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
 
       <div
         className={`relative flex items-center justify-center transition-all duration-300 ${
-          isHovered ? "w-32 h-16 -translate-x-24" : "w-32 h-16"
+          isHovered
+            ? "w-24 sm:w-32 h-12 sm:h-16 -translate-x-16 sm:-translate-x-24"
+            : "w-24 sm:w-32 h-12 sm:h-16"
         }`}
       >
         {/* Base icon */}
@@ -603,7 +605,7 @@ const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
             alt={handle}
             width={90}
             height={90}
-            className="opacity-100"
+            className="opacity-100 w-[70%] sm:w-[80%] h-auto"
           />
         </div>
         {/* Colored icon */}
@@ -617,14 +619,18 @@ const SocialMediaLink = ({ icon, colorIcon, handle, href }) => {
             alt={handle}
             width={90}
             height={90}
-            className="opacity-100"
+            className="opacity-100 w-[70%] sm:w-[80%] h-auto"
           />
         </div>
       </div>
       {/* Handle text */}
       <span
-        className={`text-lg font-medium transition-all duration-300 absolute
-          ${isHovered ? "opacity-100 translate-x-8" : "opacity-0 translate-y-0"}
+        className={`text-sm sm:text-lg font-medium transition-all duration-300 absolute
+          ${
+            isHovered
+              ? "opacity-100 translate-x-6 sm:translate-x-8"
+              : "opacity-0 translate-y-0"
+          }
         `}
       >
         {handle}
@@ -640,13 +646,15 @@ const ContactInfoLink = ({ icon, label, value, href }) => {
   return (
     <a
       href={href}
-      className="group relative flex items-center justify-center w-56 h-16 transition-all duration-300 mx-auto md:mx-0"
+      className="group relative flex items-center justify-center w-full sm:w-44 md:w-56 h-12 sm:h-16 transition-all duration-300 mx-auto md:mx-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={`relative flex items-center justify-center transition-all duration-300 ${
-          isHovered ? "w-16 h-16 -translate-x-32" : "w-16 h-16"
+          isHovered
+            ? "w-12 sm:w-16 h-12 sm:h-16 -translate-x-16 sm:-translate-x-32"
+            : "w-12 sm:w-16 h-12 sm:h-16"
         }`}
       >
         <Image
@@ -654,17 +662,19 @@ const ContactInfoLink = ({ icon, label, value, href }) => {
           alt={label}
           width={70}
           height={70}
-          className="opacity-100"
+          className="opacity-100 w-[70%] sm:w-[80%] h-auto"
         />
       </div>
       <div
         className={`absolute transition-all duration-300 text-center ${
-          isHovered ? "opacity-100 translate-x-12" : "opacity-0"
+          isHovered
+            ? "opacity-100 translate-x-8 sm:translate-x-12"
+            : "opacity-0"
         }`}
       >
-        <p className="text-sm text-gray-300">{label}</p>
+        <p className="text-xs sm:text-sm text-gray-300">{label}</p>
         <span
-          className={`block text-lg ${
+          className={`block text-sm sm:text-lg ${
             isHovered ? "text-[#7DD4FF]" : "text-white"
           }`}
         >
@@ -897,7 +907,7 @@ const ContactBox = ({
         setIsHovered(false);
         setShowError(false);
       }}
-      className="p-6 rounded-lg transition-all duration-300 flex flex-col items-center justify-center text-center cursor-pointer relative"
+      className="p-4 sm:p-6 rounded-lg transition-all duration-300 flex flex-col items-center justify-center text-center cursor-pointer relative"
       style={{
         backgroundColor: bgColor || "#1E3A4C",
         boxShadow: isHovered ? "0 0 0 12px rgba(170, 220, 255, 0.8)" : "none",
@@ -906,11 +916,19 @@ const ContactBox = ({
       }}
     >
       <div className="w-full">
-        <div className="flex items-center justify-center mb-4">
-          {icon && <div className="w-8 h-8 mb-2 mr-3">{icon}</div>}
-          <h4 className="text-3xl font-bold mb-2 font-montserrat">{title}</h4>
+        <div className="flex items-center justify-center mb-2 sm:mb-4">
+          {icon && (
+            <div className="w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 mr-2 sm:mr-3">
+              {icon}
+            </div>
+          )}
+          <h4 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2 font-montserrat">
+            {title}
+          </h4>
         </div>
-        <p className="text-white font-montserrat">{description}</p>
+        <p className="text-white text-sm sm:text-base font-montserrat">
+          {description}
+        </p>
 
         {hasInput && (
           <div
@@ -921,7 +939,7 @@ const ContactBox = ({
               transform: `translateY(${isHovered ? "65px" : "-10px"})`,
             }}
           >
-            <div className="bg-white p-4 rounded-b-lg shadow-lg">
+            <div className="bg-white p-3 sm:p-4 rounded-b-lg shadow-lg">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -937,16 +955,16 @@ const ContactBox = ({
                     if (showError) setShowError(false);
                   }}
                   placeholder={inputPlaceholder}
-                  className={`w-full px-4 py-2 bg-gray-50 rounded-l outline-none border transition-colors ${
+                  className={`w-full px-3 sm:px-4 py-1 sm:py-2 bg-gray-50 rounded-l outline-none border transition-colors ${
                     showError
                       ? "border-red-500"
                       : "border-gray-300 focus:border-[#7DD4FF]"
-                  } text-gray-800 placeholder-gray-400`}
+                  } text-gray-800 placeholder-gray-400 text-sm sm:text-base`}
                   onClick={(e) => e.stopPropagation()}
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-[#7DD4FF] hover:bg-[#5AA8D0] text-[#0E304A] font-bold rounded transition-colors"
+                  className="px-4 sm:px-6 py-1 sm:py-2 bg-[#7DD4FF] hover:bg-[#5AA8D0] text-[#0E304A] font-bold rounded transition-colors"
                 >
                   →
                 </button>
@@ -1527,7 +1545,7 @@ export default function Contact() {
             {contactOptions.map((option, index) => (
               <div
                 key={index}
-                className="w-[250px] h-[250px] relative transition-all duration-700 rounded-full"
+                className="w-[200px] sm:w-[250px] h-[200px] sm:h-[250px] relative transition-all duration-700 rounded-full"
                 style={{
                   opacity:
                     activeModal !== null && activeModal !== index ? 0 : 1,
@@ -1621,9 +1639,9 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-hidden">
+            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-auto">
               <div
-                className={`fixed inset-0 z-[1001] flex items-center justify-center pointer-events-none overflow-hidden
+                className={`fixed inset-0 z-[1001] flex items-start md:items-center justify-center pointer-events-none overflow-auto
                   transition-opacity duration-300
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
                 style={{
@@ -1638,19 +1656,19 @@ export default function Contact() {
                     transition-all duration-300 ${
                       isExpanded ? "scale-100" : "scale-95"
                     }
-                   rounded-2xl  m-0 
-                    fixed sm:relative inset-0 sm:inset-auto max-h-[100vh] sm:h-auto
-                    flex items-center justify-center overflow-hidden`}
+                   rounded-2xl m-0 
+                    fixed sm:relative inset-0 sm:inset-auto max-h-full sm:h-auto
+                    flex items-start md:items-center justify-center overflow-auto pb-8 pt-4 md:pt-0 md:pb-0`}
                 >
                   <div className="text-white w-full flex items-center justify-center">
                     {activeModal === 1 && (
-                      <div className="flex flex-col w-full h-[100vh] relative">
+                      <div className="flex flex-col w-full min-h-[100vh] md:min-h-0 relative">
                         {/* Animated background */}
                         <BackgroundAnimation />
 
                         {/* Content overlay */}
-                        <div className="relative z-10 flex flex-col items-center gap-6 w-full mt-16 md:mt-32">
-                          <h3 className="text-2xl md:text-3xl font-bold mb-2 mt-16 px-4 text-center">
+                        <div className="relative z-10 flex flex-col items-center gap-4 md:gap-6 w-full mt-12 md:mt-32">
+                          <h3 className="text-xl md:text-3xl font-bold mb-2 mt-10 md:mt-16 px-4 text-center">
                             {!showExpandedOptions
                               ? "Qui êtes-vous ?"
                               : "Pourquoi voulez-vous nous contacter ?"}
@@ -1658,7 +1676,7 @@ export default function Contact() {
 
                           {/* Grid view for contact options */}
                           <div
-                            className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 mb-16`}
+                            className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-16`}
                           >
                             {!showExpandedOptions
                               ? contactGridItems.map((item, index) => (
@@ -1692,7 +1710,11 @@ export default function Contact() {
                       </div>
                     )}
 
-                    {activeModal === 0 && contactOptions[activeModal].content}
+                    {activeModal === 0 && (
+                      <div className="w-full min-h-[100vh] md:min-h-0 overflow-auto py-4 md:py-0">
+                        {contactOptions[activeModal].content}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
