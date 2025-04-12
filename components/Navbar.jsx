@@ -310,7 +310,7 @@ const Navbar = () => {
             className="object-contain"
             style={{
               filter:
-                "drop-shadow(0 0 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 15px rgba(0, 0, 0, 0.5))",
+                "drop-shadow(0 0 3px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.5))",
             }}
             priority
           />
@@ -375,7 +375,7 @@ const Navbar = () => {
         onClick={handleBackArrowClick}
         style={{
           opacity: isNestedModal ? 1 : 0, // Always start with opacity 0
-          transform: "translateY(-30px)",
+          transform: isNestedModal ? "translate(0px)" : "translateY(-30px)",
           transition: "none", // Ensure no CSS transitions interfere with our animation
           pointerEvents: pointerEvents,
         }}
