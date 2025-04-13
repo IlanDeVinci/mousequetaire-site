@@ -95,15 +95,26 @@ const Navbar = () => {
 
   // Simplified animation function with lock to prevent duplicate animations
   const animateArrow = (show) => {
+    // Enhanced animation cancellation - always ensure any running animation is properly stopped
+    const cancelExistingAnimation = () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+
     // Cancel any existing animation before checking lock
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
+    cancelExistingAnimation();
+
+    // High priority for opening animations - force reset animation lock
+    if (show) {
+      // Force release animation lock for show animations to ensure they always run
+      animationLockRef.current = false;
     }
 
     // Return early if animation is already in progress and is a new animation
-    // but allow interruption for modal-to-modal transitions
-    if (animationLockRef.current && !isModalToModalTransition()) {
+    // but allow interruption for modal-to-modal transitions or show animations
+    if (animationLockRef.current && !isModalToModalTransition() && !show) {
       return;
     }
 
@@ -271,6 +282,23 @@ const Navbar = () => {
     // Only show the arrow if we're on the contact page
     const isContactPage = pathname === "/contact";
 
+    // Function to cancel any ongoing animation
+    const cancelOngoingAnimation = () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+
+    // Function to reset all animation state - useful when a modal is opened
+    const resetAnimationState = () => {
+      // Cancel any ongoing animation
+      cancelOngoingAnimation();
+
+      // Reset animation lock
+      animationLockRef.current = false;
+    };
+
     // Special handling for modal transitions to prevent flickering
     const inTransition = isModalToModalTransition();
 
@@ -280,6 +308,9 @@ const Navbar = () => {
 
     // Check for modalOpenSource to distinguish different modal triggers
     if (isInitialModalOpen) {
+      // IMPORTANT: When a modal opens, immediately cancel any ongoing animation
+      resetAnimationState();
+
       // For first-time modal openings, track which modal is being opened
       if (isNestedModal) {
         modalOpenSourceRef.current = "nested";
@@ -320,11 +351,8 @@ const Navbar = () => {
     if (inTransition) {
       console.log("Modal-to-modal transition detected");
 
-      // 1. Cancel any ongoing animations to prevent conflicts
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = null;
-      }
+      // 1. Cancel any ongoing animations to prevent conflicts - enhanced cancellation
+      cancelOngoingAnimation();
 
       // 2. Release animation lock
       animationLockRef.current = false;
@@ -362,6 +390,9 @@ const Navbar = () => {
     }
     // Case: Arrow should be hidden (closing modal)
     else if (newArrowState === "hidden") {
+      // Cancel any existing animation before starting a new one
+      cancelOngoingAnimation();
+
       // Only animate out if currently showing and not already animating
       if (arrowState !== "hidden" && !animationLockRef.current) {
         // Run animation to hide the arrow - don't set any styles directly
@@ -370,6 +401,9 @@ const Navbar = () => {
     }
     // Case: Arrow should be shown but is currently hidden (opening modal for the first time)
     else if (arrowState === "hidden") {
+      // Cancel any existing animation before updating state
+      cancelOngoingAnimation();
+
       // FIX: Ensure the arrow is fully hidden BEFORE we update the state
       if (arrowRef.current) {
         arrowRef.current.style.transition = "none";
@@ -471,6 +505,9 @@ const Navbar = () => {
     }
     // Case: Arrow state changes while already visible
     else if (arrowState !== newArrowState) {
+      // Cancel any existing animation before just updating state
+      cancelOngoingAnimation();
+
       // Just update the state without animation
       setArrowState(newArrowState);
 
@@ -529,7 +566,8 @@ const Navbar = () => {
     const isContactPage = pathname === "/contact";
     if (!isModalOpen || !isContactPage) return;
 
-    // Cancel any ongoing animations immediately to prevent conflicts
+    // Enhanced animation cancellation - make sure it's always called
+    // and all animation state is properly reset
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
