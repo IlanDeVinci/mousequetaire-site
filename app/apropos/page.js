@@ -7,11 +7,27 @@ import ScrollReveal from "../../components/ScrollReveal";
 function DiscoverElement() {
   const [phase, setPhase] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       setIsLoaded(true);
     }, 500);
+  }, []);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobileView(window.innerWidth < 700);
+    };
+
+    // Check on initial load
+    checkIsMobile();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIsMobile);
+
+    // Clean up event listener
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
   const handleClick = () => {
@@ -123,87 +139,153 @@ function DiscoverElement() {
     }
   }, []);
 
-  return (
-    <div
-      onClick={handleClick}
-      className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()} ${
-        phase === 0 ? "animate-pulse-ring" : ""
-      }`}
-    >
-      {phase === 0 && (
-        <div className="absolute inset-0 rounded-full animate-pulse-light z-10 pointer-events-none"></div>
-      )}
+  // Mobile circle view rendering
+  const renderMobileView = () => {
+    const content = getContent();
 
+    return (
       <div
-        className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[40%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
+        onClick={handleClick}
+        className={`w-[75vw] h-[75vw] mx-auto relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 flex items-center justify-center text-center ${
+          phase === 0 ? "bg-gray-700 animate-pulse-ring" : getBackgroundColor()
+        }`}
       >
+        {phase === 0 && (
+          <div className="absolute inset-0 rounded-full animate-pulse-light z-10 pointer-events-none"></div>
+        )}
+
+        <div className="relative z-20 px-6">
+          <h3 className="text-xl font-bold mb-2 text-white text-shadow-lg">
+            {content.title}
+          </h3>
+          <p className="text-sm text-white/90 text-shadow-lg">{content.text}</p>
+        </div>
+
+        {/* No default image for phase 0, just using gray background */}
+        <Image
+          src="/images/contact1.svg"
+          alt="Our beginning"
+          width={200}
+          height={200}
+          className={`transition-all duration-700 ease-in-out z-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 object-contain ${
+            phase === 1 ? "opacity-70" : "opacity-0"
+          }`}
+        />
+        <Image
+          src="/images/contact2.svg"
+          alt="Our growth"
+          width={200}
+          height={200}
+          className={`transition-all duration-700 ease-in-out z-5 absolute bottom-[-10px] left-1/2 -translate-x-1/2 w-3/4 h-3/4 object-contain ${
+            phase === 2 ? "opacity-70" : "opacity-0"
+          }`}
+        />
+        <Image
+          src="/images/contact3.svg"
+          alt="Our vision"
+          width={200}
+          height={200}
+          className={`transition-all duration-700 ease-in-out z-5 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 object-contain ${
+            phase === 3 ? "opacity-70" : "opacity-0"
+          }`}
+        />
         <div
-          className={`${getSliderColor()} rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 shadow-lg h-full transition-all duration-700`}
+          className={`absolute inset-0 ${
+            phase === 0 ? "bg-black/20" : ""
+          } z-5 transition-opacity duration-500 ${
+            phase === 0 && !isLoaded ? "opacity-0" : ""
+          }`}
+        />
+      </div>
+    );
+  };
+
+  // Desktop slider view rendering
+  const renderDesktopView = () => {
+    return (
+      <div
+        onClick={handleClick}
+        className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()} ${
+          phase === 0 ? "animate-pulse-ring" : ""
+        }`}
+      >
+        {phase === 0 && (
+          <div className="absolute inset-0 rounded-full animate-pulse-light z-10 pointer-events-none"></div>
+        )}
+
+        <div
+          className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[40%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
         >
-          <div className="flex flex-col h-full justify-center text-center font-montserrat">
-            <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 md:mb-4 text-white">
-              {getContent().title}
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-5 sm:h-2/3 h-[52%] md:h-auto">
-              {getContent().text}
-            </p>
+          <div
+            className={`${getSliderColor()} rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 shadow-lg h-full transition-all duration-700`}
+          >
+            <div className="flex flex-col h-full justify-center text-center font-montserrat">
+              <h3 className="text-base sm:text-xl md:text-2xl font-bold mb-1 sm:mb-2 md:mb-4 text-white">
+                {getContent().title}
+              </h3>
+              <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white/90 line-clamp-5 sm:h-2/3 h-[52%] md:h-auto">
+                {getContent().text}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Image
-        src="/images/contact0.svg"
-        alt="Start discovery"
-        width={3320}
-        height={1136}
-        className={`transition-all duration-700 ease-in-out z-10 absolute inset-0 w-full h-full object-cover bg-white ${
-          phase === 0
-            ? `opacity-${isLoaded ? "100" : "0"}`
-            : "opacity-0 pointer-events-none"
-        }`}
-      />
-      <Image
-        src="/images/contact1.svg"
-        alt="Our beginning"
-        width={300}
-        height={300}
-        className={`transition-all duration-700 ease-in-out z-10 absolute right-0 top-1/2 -translate-y-1/2 w-[45%] h-[90%] object-contain ${
-          phase === 1
-            ? "opacity-100"
-            : "opacity-0 pointer-events-none translate-x-[-100px]"
-        }`}
-      />
-      <Image
-        src="/images/contact2.svg"
-        alt="Our growth"
-        width={300}
-        height={300}
-        className={`transition-all duration-700 ease-in-out z-10 absolute -left-10 sm:-left-10 md:-left-20 top-[60%] -translate-y-1/2 w-[45%] h-[85%] object-contain ${
-          phase === 2
-            ? "opacity-100"
-            : "opacity-0 pointer-events-none translate-x-[100px]"
-        }`}
-      />
-      <Image
-        src="/images/contact3.svg"
-        alt="Our vision"
-        width={300}
-        height={300}
-        className={`transition-all duration-700 ease-in-out z-10 absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 w-[45%] h-[90%] object-contain ${
-          phase === 3
-            ? "opacity-100"
-            : "opacity-0 pointer-events-none translate-x-[50px]"
-        }`}
-      />
-      <div
-        className={`absolute inset-0 ${
-          phase === 0 ? "bg-black/30" : ""
-        } z-5 transition-opacity duration-500 ${
-          phase === 0 && !isLoaded ? "opacity-0" : ""
-        }`}
-      />
-    </div>
-  );
+        <Image
+          src="/images/contact0.svg"
+          alt="Start discovery"
+          width={3320}
+          height={1136}
+          className={`transition-all duration-700 ease-in-out z-10 absolute inset-0 w-full h-full object-cover bg-white ${
+            phase === 0
+              ? `opacity-${isLoaded ? "100" : "0"}`
+              : "opacity-0 pointer-events-none"
+          }`}
+        />
+        <Image
+          src="/images/contact1.svg"
+          alt="Our beginning"
+          width={300}
+          height={300}
+          className={`transition-all duration-700 ease-in-out z-10 absolute right-0 top-1/2 -translate-y-1/2 w-[45%] h-[90%] object-contain ${
+            phase === 1
+              ? "opacity-100"
+              : "opacity-0 pointer-events-none translate-x-[-100px]"
+          }`}
+        />
+        <Image
+          src="/images/contact2.svg"
+          alt="Our growth"
+          width={300}
+          height={300}
+          className={`transition-all duration-700 ease-in-out z-10 absolute -left-10 sm:-left-10 md:-left-20 top-[60%] -translate-y-1/2 w-[45%] h-[85%] object-contain ${
+            phase === 2
+              ? "opacity-100"
+              : "opacity-0 pointer-events-none translate-x-[100px]"
+          }`}
+        />
+        <Image
+          src="/images/contact3.svg"
+          alt="Our vision"
+          width={300}
+          height={300}
+          className={`transition-all duration-700 ease-in-out z-10 absolute left-2 sm:left-3 md:left-4 top-1/2 -translate-y-1/2 w-[45%] h-[90%] object-contain ${
+            phase === 3
+              ? "opacity-100"
+              : "opacity-0 pointer-events-none translate-x-[50px]"
+          }`}
+        />
+        <div
+          className={`absolute inset-0 ${
+            phase === 0 ? "bg-black/30" : ""
+          } z-5 transition-opacity duration-500 ${
+            phase === 0 && !isLoaded ? "opacity-0" : ""
+          }`}
+        />
+      </div>
+    );
+  };
+
+  return isMobileView ? renderMobileView() : renderDesktopView();
 }
 
 const teamMembers = [
@@ -557,7 +639,7 @@ export default function Equipe() {
                         ${
                           hoveredValue3
                             ? "w-[95vw] md:w-[80vw]"
-                            : "w-[60%] md:w-[30%]"
+                            : "w-[60%] md:w/[30%]"
                         } group-hover:shadow-lg`}
               ></div>
 
