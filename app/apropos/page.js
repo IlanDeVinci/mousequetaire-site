@@ -155,10 +155,18 @@ function DiscoverElement() {
         )}
 
         <div className="relative z-20 px-6">
-          <h3 className="text-xl font-bold mb-2 text-white text-shadow-lg">
+          <h3
+            style={{ textShadow: "0 0 5px rgba(0, 0, 0, 0.7)" }}
+            className="text-xl font-bold mb-2 text-white"
+          >
             {content.title}
           </h3>
-          <p className="text-sm text-white/90 text-shadow-lg">{content.text}</p>
+          <p
+            style={{ textShadow: "0 0 5px rgba(0, 0, 0, 0.7)" }}
+            className="text-sm text-white/90"
+          >
+            {content.text}
+          </p>
         </div>
 
         {/* No default image for phase 0, just using gray background */}
@@ -660,7 +668,7 @@ export default function Equipe() {
                     alt="Icon Excellence"
                     width={100}
                     height={100}
-                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w-[100px] md:h-[100px] rounded-full"
+                    className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] md:w/[100px] md:h/[100px] rounded-full"
                   />
                 </div>
                 <div className="overflow-hidden h-full flex items-center">
