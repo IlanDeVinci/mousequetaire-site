@@ -255,6 +255,11 @@ export default function Home() {
                 .flip-card-container:hover .flip-card:not(.flipped) {
                   transform: translateZ(20px);
                 }
+
+                /* Force flip on hover for desktop */
+                .flip-card-container:hover .flip-card {
+                  transform: rotateY(180deg);
+                }
               }
 
               /* Animation for the cards entering */
@@ -383,7 +388,7 @@ export default function Home() {
           </div>
           <div className="mt-12 text-center">
             <Link href="/apropos">
-              <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto">
+              <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto cursor-pointer max-w-xs inline-flex">
                 <span className="text-[#060606] text-lg font-montserrat">
                   En savoir plus
                 </span>
@@ -547,7 +552,7 @@ export default function Home() {
                   threshold={0.2}
                 >
                   <div className="group relative overflow-hidden rounded-3xl aspect-square">
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050610] z-10" />
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#050610] z-10" />
                     <Image
                       src={project.image}
                       alt={project.title}
@@ -555,14 +560,14 @@ export default function Home() {
                       height={400}
                       className="object-cover w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050610]/40 to-[#050610] flex flex-col justify-end p-4 transition-all z-20"></div>
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent via-[#050610]/40 to-[#050610] flex flex-col justify-end p-4 transition-all z-20"></div>
                   </div>
                 </ScrollReveal>
               ))}
             </div>
             <div className="mt-12 text-center">
               <Link href="/portfolio">
-                <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto">
+                <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto cursor-pointer max-w-xs inline-flex">
                   <span className="text-[#060606] text-lg font-montserrat">
                     En savoir plus
                   </span>
@@ -598,26 +603,33 @@ function FlipCard({ frontContent, backContent, index }) {
 
   useEffect(() => {
     if (!initialized.current) {
-      const touchDevice =
-        "ontouchstart" in window ||
-        navigator.maxTouchPoints > 0 ||
-        window.matchMedia("(hover: none)").matches;
+      // Simplified hover detection
+      let touchDevice = false;
+      if (window.matchMedia("(any-hover:none)").matches) {
+        touchDevice = true;
+      }
       setIsTouchDevice(touchDevice);
       initialized.current = true;
+      console.log("Touch device detected:", touchDevice);
     }
   }, []);
 
   const handleClick = () => {
-    setIsFlipped(!isFlipped);
+    // For touch devices, toggle flip on click
+    if (isTouchDevice) {
+      setIsFlipped(!isFlipped);
+    }
   };
 
   const handleMouseEnter = () => {
+    // Only flip on hover for non-touch devices
     if (!isTouchDevice) {
       setIsFlipped(true);
     }
   };
 
   const handleMouseLeave = () => {
+    // Only unflip on mouse leave for non-touch devices
     if (!isTouchDevice) {
       setIsFlipped(false);
     }
@@ -791,7 +803,7 @@ function FlipCard({ frontContent, backContent, index }) {
             <h3 className="text-xl md:text-2xl font-bold text-white mb-6 pt-4">
               {frontContent}
             </h3>
-            <div className="flex-grow flex items-center justify-center">
+            <div className="grow flex items-center justify-center">
               <p className="text-base md:text-lg font-medium leading-relaxed pb-[10%]">
                 {backContent}
               </p>

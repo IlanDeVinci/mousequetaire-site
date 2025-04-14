@@ -351,7 +351,7 @@ function TeamMember({ image, name, role, description, reverse }) {
           reverse ? "md:flex-row-reverse" : "md:flex-row"
         } items-center mb-8 md:mb-12`}
       >
-        <div className="rounded-full overflow-hidden flex-shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
+        <div className="rounded-full overflow-hidden shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
           <Image
             src={image}
             alt={`Photo de ${name}`}
@@ -502,7 +502,7 @@ export default function Equipe() {
                             : "w-[70%] sm:w-[70%] md:w-[50%] lg:w-[36%]"
                         } group-hover:shadow-lg`}
               >
-                <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
+                <div className="shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
                   <Image
                     src="/images/valeur1.svg"
                     alt="Icon Entraide"
@@ -582,7 +582,7 @@ export default function Equipe() {
                             : "w-[70%] sm:w-[70%] md:w-[50%] lg:w-[36%]"
                         } group-hover:shadow-lg`}
               >
-                <div className="overflow-hidden h-full flex items-center flex-grow justify-end">
+                <div className="overflow-hidden h-full flex items-center grow justify-end">
                   <p
                     className={`text-[10px] xs:text-[11px] sm:text-xs md:text-sm lg:text-base ${
                       hoveredValue2
@@ -606,7 +606,7 @@ export default function Equipe() {
                     )}
                   </p>
                 </div>
-                <div className="flex-shrink-0 mr-[40px] md:mr-[60px] lg:mr-[80px]">
+                <div className="shrink-0 mr-[40px] md:mr-[60px] lg:mr-[80px]">
                   <Image
                     src="/images/valeur2.svg"
                     alt="Icon Innovation"
@@ -662,7 +662,7 @@ export default function Equipe() {
                             : "w-[70%] sm:w-[70%] md:w-[50%] lg:w-[36%]"
                         } group-hover:shadow-lg`}
               >
-                <div className="flex-shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
+                <div className="shrink-0 ml-[40px] md:ml-[60px] lg:ml-[80px]">
                   <Image
                     src="/images/valeur3.svg"
                     alt="Icon Excellence"

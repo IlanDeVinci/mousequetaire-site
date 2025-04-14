@@ -828,7 +828,7 @@ export default function Portfolio() {
       </h1>
 
       {error && (
-        <div className="bg-red-500 text-white p-4 mb-4 rounded max-w-6xl mx-auto">
+        <div className="bg-red-500 text-white p-4 mb-4 rounded-sm max-w-6xl mx-auto">
           Error: {error}
         </div>
       )}
@@ -836,13 +836,13 @@ export default function Portfolio() {
       <div className="mx-auto mb-6 flex justify-between items-center">
         <button
           onClick={() => setShowDebug(!showDebug)}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors hidden"
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-sm transition-colors hidden"
         >
           {showDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
 
         {showDebug && (
-          <div className="text-xs bg-gray-800 p-4 rounded">
+          <div className="text-xs bg-gray-800 p-4 rounded-sm">
             <h3 className="font-bold mb-2">Grid Stats</h3>
             <p>Total Cells Used: {debugInfo.cellsUsed}</p>
             <p>Total Width Used: {debugInfo.totalWidth || "N/A"}</p>
@@ -889,7 +889,7 @@ export default function Portfolio() {
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3 sm:p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
                     <h3 className="text-base sm:text-lg font-semibold text-blue-300">
@@ -999,7 +999,7 @@ export default function Portfolio() {
               />
 
               {/* Project title overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
+              <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/90 to-transparent p-6">
                 <h2 className="text-2xl md:text-3xl font-bold text-white">
                   {selectedProject.title}
                 </h2>
@@ -1074,7 +1074,7 @@ export default function Portfolio() {
               )}
             </div>
 
-            <div className="p-6 md:p-8 bg-gradient-to-b from-gray-900 to-gray-950 rounded-b-lg">
+            <div className="p-6 md:p-8 bg-linear-to-b from-gray-900 to-gray-950 rounded-b-lg">
               <div className="mb-6">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
                   {selectedProject.title}

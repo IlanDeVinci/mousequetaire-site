@@ -403,7 +403,7 @@ export default function ProjectDetails() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+        <div className="absolute inset-0 bg-linear-to-t from-black to-transparent"></div>
 
         <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 md:p-8 lg:p-16">
           <div className="max-w-6xl mx-auto">

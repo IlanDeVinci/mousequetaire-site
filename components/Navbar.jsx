@@ -814,8 +814,8 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[3000]">
-      <div className="relative z-[3000]">
+    <header className="fixed top-0 left-0 w-full z-3000">
+      <div className="relative z-3000">
         <Logo />
       </div>
       <div className="relative z-[-1]">

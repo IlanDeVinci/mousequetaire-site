@@ -955,7 +955,7 @@ const ContactBox = ({
                     if (showError) setShowError(false);
                   }}
                   placeholder={inputPlaceholder}
-                  className={`w-full px-3 sm:px-4 py-1 sm:py-2 bg-gray-50 rounded-l outline-none border transition-colors ${
+                  className={`w-full px-3 sm:px-4 py-1 sm:py-2 bg-gray-50 rounded-l outline-hidden border transition-colors ${
                     showError
                       ? "border-red-500"
                       : "border-gray-300 focus:border-[#7DD4FF]"
@@ -964,7 +964,7 @@ const ContactBox = ({
                 />
                 <button
                   type="submit"
-                  className="px-4 sm:px-6 py-1 sm:py-2 bg-[#7DD4FF] hover:bg-[#5AA8D0] text-[#0E304A] font-bold rounded transition-colors"
+                  className="px-4 sm:px-6 py-1 sm:py-2 bg-[#7DD4FF] hover:bg-[#5AA8D0] text-[#0E304A] font-bold rounded-sm transition-colors"
                 >
                   →
                 </button>
@@ -1119,7 +1119,7 @@ const contactOptions = [
           <div className="w-full relative" style={{ height: "40vh" }}>
             {/* Left fade overlay - changed to white */}
             <div
-              className="absolute left-0 top-0 h-full w-[15%] md:w-[25%] z-[2000] pointer-events-none"
+              className="absolute left-0 top-0 h-full w-[15%] md:w-[25%] z-2000 pointer-events-none"
               style={{
                 background:
                   "linear-gradient(to right, rgba(0, 33, 50, 1) 10%, rgba(0, 33, 50, 0))",
@@ -1180,7 +1180,7 @@ const contactOptions = [
                     />
 
                     {/* Gradient overlay fading from bottom (opaque) to transparent */}
-                    <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-white to-transparent flex items-end justify-between px-4 py-4">
+                    <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-linear-to-t from-white to-transparent flex items-end justify-between px-4 py-4">
                       <span className="text-black text-sm font-medium truncate">
                         Projet {index + 1}
                       </span>
@@ -1209,7 +1209,7 @@ const contactOptions = [
               ))}
 
               {/* Update navigation buttons to be invisible until hover */}
-              <div className="swiper-button-next !hidden after:!content-none !w-14 !h-14 !bg-black/30 hover:!bg-black/50 !rounded-full transition-all duration-300 !right-4">
+              <div className="swiper-button-next hidden! after:content-none! w-14! h-14! bg-black/30! hover:bg-black/50! rounded-full! transition-all duration-300 right-4!">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -1219,7 +1219,7 @@ const contactOptions = [
                   <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
                 </svg>
               </div>
-              <div className="swiper-button-prev !hidden after:!content-none !w-14 !h-14 !bg-black/30 hover:!bg-black/50 !rounded-full transition-all duration-300 !left-4">
+              <div className="swiper-button-prev hidden! after:content-none! w-14! h-14! bg-black/30! hover:bg-black/50! rounded-full! transition-all duration-300 left-4!">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -1233,7 +1233,7 @@ const contactOptions = [
 
             {/* Right fade overlay - changed to white */}
             <div
-              className="absolute right-0 top-0 h-full w-[15%] md:w-[25%] z-[2000] pointer-events-none"
+              className="absolute right-0 top-0 h-full w-[15%] md:w-[25%] z-2000 pointer-events-none"
               style={{
                 background:
                   "linear-gradient(to left, rgba(0, 33, 50, 1) 10%, rgba(0, 33, 50, 0))",
@@ -1639,9 +1639,9 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="fixed inset-0 z-[1000] h-screen w-screen overflow-auto">
+            <div className="fixed inset-0 z-1000 h-screen w-screen overflow-auto">
               <div
-                className={`fixed inset-0 z-[1001] flex items-start md:items-center justify-center pointer-events-none overflow-auto
+                className={`fixed inset-0 z-1001 flex items-start md:items-center justify-center pointer-events-none overflow-auto
                   transition-opacity duration-300
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
                 style={{

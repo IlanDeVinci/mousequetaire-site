@@ -1,222 +1,247 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --background: #002132;
-  --foreground: #ffffff;
-  --accent: #006a9e;
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-geist: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-montserrat: var(--font-montserrat);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@utility animate-fade-in {
+  animation: fadeIn 1s ease-in forwards;
 }
-
-/* Wind Animation Styles */
-.wind-svg {
-  position: absolute;
-  width: 100%;
-  top: 0;
-  left: 0;
-  z-index: 5;
-  overflow: visible;
-}
-
-.wind-path {
-  fill: none;
+@utility animate-fade-in-delayed {
+  animation: fadeIn 1s ease-in 0.5s forwards;
   opacity: 0;
-  stroke-linecap: round;
-  pointer-events: none;
-  stroke-width: 0; /* Start with zero width to prevent any visible dots */
-  transition: opacity 0.3s ease, stroke-width 0.3s ease;
 }
 
-.wind-path.visible {
-  opacity: 0.7;
-  stroke-width: 2.5;
-}
+@utility nav-link-hover {
+  @apply relative px-4 py-2 transition-all duration-300 ease-in-out;
 
-.wind-path.loop,
-.wind-path.doubleLoop {
-  opacity: 0.6;
-}
-
-/* Simplified transition for intersection markers - exactly 0.5s fade */
-.intersection-marker {
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
-  pointer-events: none;
-  will-change: opacity;
-  transform-origin: center center;
-}
-
-/* Animated gradient definitions for right path tree (blue theme) */
-@keyframes animateGradientRight {
-  0% {
-    stop-color: #87cefa;
-  }
-  50% {
-    stop-color: #1e90ff;
-  }
-  100% {
-    stop-color: #87cefa;
-  }
-}
-
-@keyframes animateGradientDarkRight {
-  0% {
-    stop-color: #00008b;
-  }
-  50% {
-    stop-color: #0000cd;
-  }
-  100% {
-    stop-color: #00008b;
-  }
-}
-
-/* Animated gradient definitions for left path tree (purple theme) */
-@keyframes animateGradientLeft {
-  0% {
-    stop-color: #87cefa;
-  }
-  50% {
-    stop-color: #1e90ff;
-  }
-  100% {
-    stop-color: #87cefa;
-  }
-}
-
-@keyframes animateGradientDarkLeft {
-  0% {
-    stop-color: #00008b;
-  }
-  50% {
-    stop-color: #0000cd;
-  }
-  100% {
-    stop-color: #00008b;
-  }
-}
-
-.animated-gradient-start-right {
-  animation: animateGradientRight 4s ease-in-out infinite;
-}
-
-.animated-gradient-end-right {
-  animation: animateGradientDarkRight 4s ease-in-out infinite;
-}
-
-.animated-gradient-start-left {
-  animation: animateGradientLeft 4s ease-in-out infinite;
-}
-
-.animated-gradient-end-left {
-  animation: animateGradientDarkLeft 4s ease-in-out infinite;
-}
-
-/* Legacy classes for backward compatibility */
-.animated-gradient-start {
-  animation: animateGradientRight 4s ease-in-out infinite;
-}
-
-.animated-gradient-end {
-  animation: animateGradientDarkRight 4s ease-in-out infinite;
-}
-
-/* Portfolio specific styles */
-.portfolio-item {
-  aspect-ratio: 1 / 1;
-  height: 100%;
-}
-
-.portfolio-overlay {
-  transform: translateY(100%);
-  transition: transform 0.3s ease;
-}
-
-.portfolio-item:hover .portfolio-overlay {
-  transform: translateY(0);
-}
-
-/* Debug styles */
-.debug-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.debug-panel {
-  background: rgba(30, 30, 30, 0.9);
-  border-radius: 0.25rem;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  font-family: monospace;
-}
-
-/* Portfolio responsive styles */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .portfolio-item {
-    grid-column: span 1 !important;
-    grid-row: span 1 !important;
-    aspect-ratio: 16 / 9;
-  }
-}
-
-/* Add new utility class for grid auto flow dense */
-.grid-auto-flow-dense {
-  grid-auto-flow: dense;
-}
-
-/* Rest of utility classes */
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 1s ease-in forwards;
-  }
-
-  .animate-fade-in-delayed {
-    animation: fadeIn 1s ease-in 0.5s forwards;
-    opacity: 0;
-  }
-}
-
-@layer components {
-  .nav-link-hover {
-    @apply relative px-4 py-2 transition-all duration-300 ease-in-out;
-  }
-
-  .nav-link-hover::before {
+  &::before {
     @apply content-[''] absolute inset-0 bg-white/0 rounded-full transition-all duration-300 ease-out opacity-0;
   }
 
-  .nav-link-hover:hover::before {
+  &:hover::before {
     @apply opacity-100 bg-white/10;
   }
+}
 
-  .nav-transition {
-    @apply transition-all duration-300 ease-in-out;
+@utility nav-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+@layer utilities {
+  :root {
+    --background: #002132;
+    --foreground: #ffffff;
+    --accent: #006a9e;
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+    }
+  }
+
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* Wind Animation Styles */
+  .wind-svg {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    overflow: visible;
+  }
+
+  .wind-path {
+    fill: none;
+    opacity: 0;
+    stroke-linecap: round;
+    pointer-events: none;
+    stroke-width: 0; /* Start with zero width to prevent any visible dots */
+    transition:
+      opacity 0.3s ease,
+      stroke-width 0.3s ease;
+  }
+
+  .wind-path.visible {
+    opacity: 0.7;
+    stroke-width: 2.5;
+  }
+
+  .wind-path.loop,
+  .wind-path.doubleLoop {
+    opacity: 0.6;
+  }
+
+  /* Simplified transition for intersection markers - exactly 0.5s fade */
+  .intersection-marker {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+    will-change: opacity;
+    transform-origin: center center;
+  }
+
+  /* Animated gradient definitions for right path tree (blue theme) */
+  @keyframes animateGradientRight {
+    0% {
+      stop-color: #87cefa;
+    }
+    50% {
+      stop-color: #1e90ff;
+    }
+    100% {
+      stop-color: #87cefa;
+    }
+  }
+
+  @keyframes animateGradientDarkRight {
+    0% {
+      stop-color: #00008b;
+    }
+    50% {
+      stop-color: #0000cd;
+    }
+    100% {
+      stop-color: #00008b;
+    }
+  }
+
+  /* Animated gradient definitions for left path tree (purple theme) */
+  @keyframes animateGradientLeft {
+    0% {
+      stop-color: #87cefa;
+    }
+    50% {
+      stop-color: #1e90ff;
+    }
+    100% {
+      stop-color: #87cefa;
+    }
+  }
+
+  @keyframes animateGradientDarkLeft {
+    0% {
+      stop-color: #00008b;
+    }
+    50% {
+      stop-color: #0000cd;
+    }
+    100% {
+      stop-color: #00008b;
+    }
+  }
+
+  .animated-gradient-start-right {
+    animation: animateGradientRight 4s ease-in-out infinite;
+  }
+
+  .animated-gradient-end-right {
+    animation: animateGradientDarkRight 4s ease-in-out infinite;
+  }
+
+  .animated-gradient-start-left {
+    animation: animateGradientLeft 4s ease-in-out infinite;
+  }
+
+  .animated-gradient-end-left {
+    animation: animateGradientDarkLeft 4s ease-in-out infinite;
+  }
+
+  /* Legacy classes for backward compatibility */
+  .animated-gradient-start {
+    animation: animateGradientRight 4s ease-in-out infinite;
+  }
+
+  .animated-gradient-end {
+    animation: animateGradientDarkRight 4s ease-in-out infinite;
+  }
+
+  /* Portfolio specific styles */
+  .portfolio-item {
+    aspect-ratio: 1 / 1;
+    height: 100%;
+  }
+
+  .portfolio-overlay {
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .portfolio-item:hover .portfolio-overlay {
+    transform: translateY(0);
+  }
+
+  /* Debug styles */
+  .debug-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .debug-panel {
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    font-family: monospace;
+  }
+
+  /* Portfolio responsive styles */
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .portfolio-item {
+      grid-column: span 1 !important;
+      grid-row: span 1 !important;
+      aspect-ratio: 16 / 9;
+    }
+  }
+
+  /* Add new utility class for grid auto flow dense */
+  .grid-auto-flow-dense {
+    grid-auto-flow: dense;
+  }
+
+  /* Rest of utility classes */
 }
 
 @keyframes fadeIn {

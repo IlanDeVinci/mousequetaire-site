@@ -1175,14 +1175,14 @@ class WindAnimation {
       "feGaussianBlur"
     );
     feGaussianBlur.setAttribute("stdDeviation", "20");
-    feGaussianBlur.setAttribute("result", "blur");
+    feGaussianBlur.setAttribute("result", "blur-sm");
 
     const feComposite = document.createElementNS(
       "http://www.w3.org/2000/svg",
       "feComposite"
     );
     feComposite.setAttribute("in", "SourceGraphic");
-    feComposite.setAttribute("in2", "blur");
+    feComposite.setAttribute("in2", "blur-sm");
     feComposite.setAttribute("operator", "over");
 
     glowFilter.appendChild(feGaussianBlur);
