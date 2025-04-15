@@ -75,7 +75,7 @@ const SvgBubblesAnimation = () => {
           />
           <div className="absolute">
             <div
-              className={`transition-all duration-700 translate-x-1/3 -scale-x-100 ${
+              className={`transition-all duration-700 sm:translate-x-[50px] translate-x-[20px] -scale-x-100 ${
                 visibleBubble === 1
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-1/2"
@@ -92,7 +92,7 @@ const SvgBubblesAnimation = () => {
           </div>
           <div className="absolute">
             <div
-              className={`transition-all duration-700 translate-x-[150%] -scale-x-100 ${
+              className={`transition-all duration-700 sm:translate-x-[150%] translate-x-[75%] -scale-x-100 ${
                 visibleBubble === 2
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-1/2"
@@ -109,7 +109,7 @@ const SvgBubblesAnimation = () => {
           </div>
           <div className="absolute">
             <div
-              className={`transition-all duration-700 translate-x-[100%] ${
+              className={`transition-all duration-700 sm:translate-x-[100%] translate-x-[60%] ${
                 visibleBubble === 3
                   ? "opacity-100 translate-y-1/4"
                   : "opacity-0 translate-y-1/2"
@@ -135,6 +135,8 @@ const TypewriterAnimation = () => {
   const [text, setText] = useState("");
   const [snippetIndex, setSnippetIndex] = useState(0);
   const [isTypingComplete, setIsTypingComplete] = useState(false); // Track if typing is done
+  const [snippetOrder, setSnippetOrder] = useState([]); // Store the randomized order of snippets
+  const [currentOrderIndex, setCurrentOrderIndex] = useState(0); // Track position in the order
   const codeSnippets = [
     `// Support monitoring
 function support24_7() {
@@ -784,6 +786,39 @@ class WebSolution {
     }
   };
 
+  // Generate a randomized order on component mount
+  useEffect(() => {
+    // Create an array of indices and shuffle it
+    const indices = Array.from({ length: codeSnippets.length }, (_, i) => i);
+    const shuffled = [...indices];
+
+    // Fisher-Yates shuffle algorithm
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    setSnippetOrder(shuffled);
+    setSnippetIndex(shuffled[0]); // Set initial snippet from the shuffled order
+  }, []);
+
+  // Add blinking cursor animation to Tailwind
+  useEffect(() => {
+    // Add keyframes for blinking cursor if they don't exist yet
+    if (!document.querySelector("style#blink-animation")) {
+      const style = document.createElement("style");
+      style.id = "blink-animation";
+      style.textContent = `
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  // Typing effect implementation with snippets following the randomized order
   useEffect(() => {
     let i = 0;
     setIsTypingComplete(false);
@@ -819,15 +854,16 @@ class WebSolution {
           setText("");
           i = 0;
           setIsTypingComplete(false); // Reset for next snippet
-          // Choose a random snippet instead of sequential rotation
-          const randomIndex = Math.floor(Math.random() * codeSnippets.length);
-          setSnippetIndex(randomIndex);
+
+          // Move to next snippet in the predetermined order
+          const nextOrderIndex = (currentOrderIndex + 1) % snippetOrder.length;
+          setCurrentOrderIndex(nextOrderIndex);
+          setSnippetIndex(snippetOrder[nextOrderIndex]);
         }, 3000);
       }
     }, speed);
-
     return () => clearInterval(typing);
-  }, [fullText, text.length === 0]);
+  }, [fullText, text.length == 0, snippetOrder, currentOrderIndex]);
 
   // Add blinking cursor animation to Tailwind
   useEffect(() => {
@@ -845,19 +881,15 @@ class WebSolution {
     }
   }, []);
 
-  // Set initial snippet randomly on component mount
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * codeSnippets.length);
-    setSnippetIndex(randomIndex);
-  }, []);
+  // Remove the individual random snippet selection function since we're now using the predetermined order
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-transparent rounded-xl overflow-hidden">
       <div className="bg-transparent p-4 rounded-lg shadow-lg w-full max-w-lg h-full flex items-center justify-center">
         <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          <pre className="text-sm md:text-base lg:text-lg p-4 font-mono bg-transparent max-h-full w-full">
+          <pre className="text-xs sm:text-sm md:text-base lg:text-lg p-2 sm:p-4 font-mono bg-transparent max-h-full w-full">
             <div className="h-full overflow-hidden flex flex-col justify-center">
-              <code className="block max-w-full h-[400px]">
+              <code className="block max-w-full h-[400px] text-[12px] xs:text-xs sm:text-sm md:text-base">
                 {processedText()}
               </code>
             </div>
