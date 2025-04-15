@@ -415,7 +415,7 @@ export default function Home() {
           </div>
           <div className="mt-12 text-center">
             <Link href="/apropos">
-              <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto cursor-pointer max-w-xs inline-flex">
+              <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 items-center justify-center mx-auto cursor-pointer max-w-xs inline-flex">
                 <span className="text-[#060606] text-lg font-montserrat">
                   En savoir plus
                 </span>
@@ -597,7 +597,7 @@ export default function Home() {
             </div>
             <div className="mt-12 text-center">
               <Link href="/portfolio">
-                <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center justify-center mx-auto cursor-pointer max-w-xs inline-flex">
+                <button className="bg-[#EBF2FA] hover:bg-[#256b90] text-white font-semibold py-3 px-6 rounded-full transition duration-300 items-center justify-center mx-auto cursor-pointer max-w-xs inline-flex">
                   <span className="text-[#060606] text-lg font-montserrat">
                     En savoir plus
                   </span>

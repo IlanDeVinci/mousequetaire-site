@@ -800,7 +800,7 @@ class WebSolution {
 
     setSnippetOrder(shuffled);
     setSnippetIndex(shuffled[0]); // Set initial snippet from the shuffled order
-  }, []);
+  }, [codeSnippets.length]);
 
   // Add blinking cursor animation to Tailwind
   useEffect(() => {
@@ -863,6 +863,7 @@ class WebSolution {
       }
     }, speed);
     return () => clearInterval(typing);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullText, text.length == 0, snippetOrder, currentOrderIndex]);
 
   // Add blinking cursor animation to Tailwind

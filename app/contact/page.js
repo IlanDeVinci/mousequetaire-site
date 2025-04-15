@@ -167,7 +167,7 @@ const InstagramSlider = () => {
     }));
 
     setSlidesArray(initialSlides);
-  }, []);
+  }, [originalImages]);
 
   // Replace the safety check effect with a more conservative approach
   useEffect(() => {
@@ -198,6 +198,7 @@ const InstagramSlider = () => {
     slidesArray.length,
     originalImages.length,
     isTransitioning,
+    originalImages,
   ]);
   // Modified returnToInstagram to ensure we have enough slides before jumping
   const returnToInstagram = useCallback(() => {
@@ -239,7 +240,6 @@ const InstagramSlider = () => {
   }, [
     currentIndex,
     originalImages.length,
-    slidesArray.length,
     ensureSufficientSlides,
     isTransitioning,
   ]);
@@ -331,7 +331,6 @@ const InstagramSlider = () => {
 const FormIconSVG = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [pathProgress, setPathProgress] = useState(0);
-  const lastProgressRef = useRef(0);
   const animationDirectionRef = useRef(null);
   const startProgressRef = useRef(0);
 
@@ -389,6 +388,7 @@ const FormIconSVG = () => {
         cancelAnimationFrame(animationFrame);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHovered]); // Remove the pathProgress dependency to prevent re-triggering
 
   // SVG constants
@@ -712,12 +712,6 @@ const sampleImages = [
 // New component for background animation in the Email modal
 const BackgroundAnimation = () => {
   const [animatedImages, setAnimatedImages] = useState([]);
-  const backgroundImgs = [
-    "/images/nuage1.svg",
-    "/images/nuage2.svg",
-    "/images/nuage3.svg",
-    "/images/nuage4.svg",
-  ];
 
   // Define cleanupCompletedAnimations BEFORE it's used in useEffect
   const cleanupCompletedAnimations = useCallback(() => {
@@ -733,6 +727,12 @@ const BackgroundAnimation = () => {
   }, []);
 
   useEffect(() => {
+    const backgroundImgs = [
+      "/images/nuage1.svg",
+      "/images/nuage2.svg",
+      "/images/nuage3.svg",
+      "/images/nuage4.svg",
+    ];
     // Create initial set of animated images with proper positioning
     const initialImages = [
       {
@@ -822,7 +822,7 @@ const BackgroundAnimation = () => {
   }, [cleanupCompletedAnimations]); // Add cleanupCompletedAnimations to dependencies
 
   return (
-    <div className="absolute inset-0 overflow-hidden z-0 opacity-80">
+    <div className="absolute inset-0 overflow-x-hidden z-0 opacity-80">
       {animatedImages.map((img) => (
         <div
           key={img.id}
@@ -1503,18 +1503,21 @@ export default function Contact() {
     }, 10);
   };
 
-  const handleReturnClick = (e) => {
-    e.preventDefault();
-    console.log("Returning from expanded options to main options");
+  const handleReturnClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      console.log("Returning from expanded options to main options");
 
-    // Update modal context first to ensure arrow changes immediately
-    setNestedModal(false);
+      // Update modal context first to ensure arrow changes immediately
+      setNestedModal(false);
 
-    // Then update local state with a slight delay to avoid flickering
-    setTimeout(() => {
-      setShowExpandedOptions(false);
-    }, 100);
-  };
+      // Then update local state with a slight delay to avoid flickering
+      setTimeout(() => {
+        setShowExpandedOptions(false);
+      }, 100);
+    },
+    [setNestedModal]
+  ); // Include setNestedModal in the dependency array
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -1530,7 +1533,13 @@ export default function Contact() {
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isAnimating, activeModal, closeModal, showExpandedOptions]);
+  }, [
+    isAnimating,
+    activeModal,
+    closeModal,
+    showExpandedOptions,
+    handleReturnClick,
+  ]);
 
   return (
     <>
@@ -1668,7 +1677,7 @@ export default function Contact() {
 
                         {/* Content overlay */}
                         <div className="relative z-10 flex flex-col items-center gap-4 md:gap-6 w-full mt-12 md:mt-32">
-                          <h3 className="text-xl md:text-3xl font-bold mb-2 mt-10 md:mt-16 px-4 text-center">
+                          <h3 className="text-xl md:text-3xl font-bold mb-2 mt-10 md:mt-16 px-4 text-center text-shadow-xs text-shadow-blue-950">
                             {!showExpandedOptions
                               ? "Qui êtes-vous ?"
                               : "Pourquoi voulez-vous nous contacter ?"}

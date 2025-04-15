@@ -374,7 +374,7 @@ function TeamMember({ image, name, role, description, reverse }) {
         </div>
         <div
           className={`${
-            reverse ? "md:mr-4 md:mr-6 lg:mr-12" : "md:ml-4 md:ml-6 lg:ml-12"
+            reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
           } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
