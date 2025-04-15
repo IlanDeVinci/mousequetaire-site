@@ -1555,7 +1555,7 @@ export default function Contact() {
                       : "700ms",
 
                   animation: !activeModal
-                    ? `circleGlow 3s infinite ${index * 0.3}s`
+                    ? `circleGlow 3s infinite ${index * 1.5}s`
                     : "none",
                 }}
               >
@@ -1604,7 +1604,7 @@ export default function Contact() {
                         : "700ms",
 
                     animation: !activeModal
-                      ? `circleGlow 3s infinite ${index * 0.3}s`
+                      ? `circleGlow 3s infinite ${index * 1.5}s`
                       : "none",
                     borderRadius: "50%",
                   }}
