@@ -91,8 +91,8 @@ function DiscoverElement() {
         };
       default:
         return {
-          title: "Découvrez notre histoire",
-          text: "Cliquez pour commencer le voyage",
+          title: "",
+          text: "",
         };
     }
   };
@@ -169,7 +169,19 @@ function DiscoverElement() {
           </p>
         </div>
 
-        {/* No default image for phase 0, just using gray background */}
+        {/* Mobile circular image for phase 0*/}
+        <Image
+          src="/images/contact0mobile.svg"
+          alt="Start discovery"
+          width={200}
+          height={200}
+          className={`transition-all duration-700 ease-in-out z-5 absolute inset-0 w-full h-full object-cover bg-white ${
+            phase === 0
+              ? `opacity-${isLoaded ? "100" : "0"}`
+              : "opacity-0 pointer-events-none"
+          }`}
+        />
+
         <Image
           src="/images/contact1.svg"
           alt="Our beginning"

@@ -27,7 +27,7 @@ const instagramSliderImages = [
 // Modified InstagramSlider component to include default loading state
 const InstagramSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slidesArray, setSlidesArray] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -285,8 +285,8 @@ const InstagramSlider = () => {
   return (
     <div
       className="w-full h-full flex items-center justify-center cursor-pointer overflow-hidden"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setIsHovered(false)}
+      onMouseLeave={() => setIsHovered(true)}
     >
       <div className="w-full h-full relative">
         {slidesArray.map((slide, index) => {
@@ -646,22 +646,22 @@ const ContactInfoLink = ({ icon, label, value, href }) => {
   return (
     <a
       href={href}
-      className="group relative flex items-center justify-center w-full sm:w-44 md:w-56 h-12 sm:h-16 transition-all duration-300 mx-auto md:mx-0"
+      className="group relative flex items-center justify-center w-full sm:w-44 md:w-56 h-16 sm:h-20 transition-all duration-300 mx-auto md:mx-0"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={`relative flex items-center justify-center transition-all duration-300 ${
           isHovered
-            ? "w-12 sm:w-16 h-12 sm:h-16 -translate-x-16 sm:-translate-x-32"
-            : "w-12 sm:w-16 h-12 sm:h-16"
+            ? "w-20 sm:w-24 h-20 sm:h-24 -translate-x-16 sm:-translate-x-32"
+            : "w-20 sm:w-24 h-20 sm:h-24"
         }`}
       >
         <Image
           src={icon}
           alt={label}
-          width={70}
-          height={70}
+          width={120}
+          height={120}
           className="opacity-100 w-[70%] sm:w-[80%] h-auto"
         />
       </div>
@@ -1097,7 +1097,7 @@ const contactOptions = [
     content: (
       <div className="flex flex-col items-center gap-8 w-[95%] md:w-[80%] lg:w-[70%] mx-auto">
         {/* Contact info section with icons */}
-        <div className="flex flex-col md:flex-row justify-center items-center w-full gap-10 md:gap-12 mb-2 mt-20 md:mt-32 px-4 md:px-52">
+        <div className="flex flex-col md:flex-row justify-center items-center w-full gap-10 md:gap-12 mb-8 mt-20 md:mt-48 px-4 md:px-52">
           <ContactInfoLink
             icon="/images/phone-icon.svg"
             label="APPELEZ-NOUS"
@@ -1107,8 +1107,8 @@ const contactOptions = [
           <ContactInfoLink
             icon="/images/email-icon.svg"
             label="ÉCRIVEZ-NOUS"
-            value="contact@mousequetaire.com"
-            href="mailto:contact@mousequetaire.com"
+            value="mousequetaires@gmail.com"
+            href="mailto:mousequetaires@gmail.com"
           />
         </div>
         {/* Image slider section with improved Swiper configuration */}
@@ -1330,7 +1330,7 @@ const contactOptions = [
           `}</style>
         </div>
         {/* Updated social media links section */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-10 md:gap-40 w-full py-6 md:py-8">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-10 md:gap-40 w-full py-6 mb-10 md:py-8">
           <SocialMediaLink
             icon="/images/insta-icon.svg"
             colorIcon="/images/insta-icon-color.svg"

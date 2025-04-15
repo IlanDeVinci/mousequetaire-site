@@ -19,7 +19,10 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-20">
           <div className="max-w-4xl mx-auto text-center">
             <div className="absolute -top-12 left-50 z-30 opacity-70 ">
-              <span className="text-gray-400 font-mono text-3xl">
+              <span
+                className="neon-blue-text text-3xl"
+                data-text="&lt;mouse-quetaires/&gt;"
+              >
                 &lt;mouse-quetaires/&gt;
               </span>
             </div>
@@ -41,6 +44,30 @@ export default function Home() {
                 }
                 100% {
                   opacity: 1;
+                }
+              }
+
+              @keyframes animateGradientRight {
+                0% {
+                  stop-color: #87cefa;
+                }
+                50% {
+                  stop-color: #1e90ff;
+                }
+                100% {
+                  stop-color: #87cefa;
+                }
+              }
+
+              @keyframes animateGradientDarkRight {
+                0% {
+                  stop-color: #00008b;
+                }
+                50% {
+                  stop-color: #0000cd;
+                }
+                100% {
+                  stop-color: #00008b;
                 }
               }
 
@@ -414,8 +441,12 @@ export default function Home() {
       <ScrollReveal animation="fade-right" threshold={0.1}>
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <h2 className="text-5xl font-light text-center mb-12 text-white">
-              Les MouseQuetaires, notre ambition...{" "}
+            <h2 className="text-3 xl md:text-5xl font-light text-center mb-12 text-white">
+              Les{" "}
+              <span className="neon-blue-text" data-text="MouseQuetaires">
+                MouseQuetaires
+              </span>
+              , notre ambition...{" "}
             </h2>
 
             <div className="max-w-5xl mx-auto space-y-10">
@@ -501,7 +532,6 @@ export default function Home() {
                           "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0))",
                         WebkitMaskImage:
                           "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0))",
-                        filter: "blur(1px)",
                         transition: "all 1.2s ease-out",
                       }}
                     ></div>
