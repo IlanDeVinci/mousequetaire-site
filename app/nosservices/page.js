@@ -134,154 +134,514 @@ const SvgBubblesAnimation = () => {
 const TypewriterAnimation = () => {
   const [text, setText] = useState("");
   const [snippetIndex, setSnippetIndex] = useState(0);
+  const [isTypingComplete, setIsTypingComplete] = useState(false); // Track if typing is done
   const codeSnippets = [
-    `function support24_7() {
-  const status = checkSystemStatus();
+    `// Support monitoring
+function support24_7() {
+  const status = checkStatus();
   if (status !== 'operational') {
-    notifyTechnicalTeam();
-    return initiateRecoveryProtocol();
+    notifyTeam();
+    return initiateRecovery();
   }
   
-  monitorPerformance();
-  return "All systems operational";
+  // Monitoring active
+  return "Systems operational";
 }`,
-    `class WebsiteSolution {
-  constructor(clientRequirements) {
-    this.requirements = clientRequirements;
-    this.technologies = this.selectTechnologies();
+    `// Web application
+class WebSolution {
+  constructor(clientReqs) {
+    this.requirements = clientReqs;
+    this.tech = this.selectTech();
   }
   
-  selectTechnologies() {
-    return ['React', 'Node.js', 'Tailwind CSS'];
+  selectTech() {
+    // Choose technologies
+    return ['React', 'Node'];
   }
-
 }`,
-    `async function deployApplication() {
+    `// Deployment
+async function deploy() {
   try {
     await runTests();
-    const buildResult = await buildProject();
-    return deployment.url;
-    }
+    const build = await buildProject();
+    
+    // Deployment info
+    return { url: 'app.example.com' };
   } catch (error) {
     logError(error);
   }
 }`,
+    `<!-- Responsive HTML Layout -->
+<section class="hero">
+  <div class="container">
+    <h1>Welcome</h1>
+    <p>Modern web solutions</p>
+    <button class="cta">
+      Get Started
+    </button>
+  </div>
+</section>`,
+    `/* Tailwind Styling */
+.card {
+  @apply rounded-lg shadow-lg;
+  @apply bg-white dark:bg-gray-800;
+  @apply p-6 m-4;
+  @apply transition-all duration-300;
+}
+
+.card:hover {
+  @apply transform -translate-y-2;
+  @apply shadow-xl;
+}`,
+    `// React Component
+const ServiceCard = ({ title, icon, desc }) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  return (
+    <div className="service-card" 
+         onClick={() => setExpanded(!expanded)}>
+      <img src={icon} alt={title} />
+      <h3>{title}</h3>
+      {expanded && <p>{desc}</p>}
+    </div>
+  );
+};`,
   ];
   const fullText = codeSnippets[snippetIndex];
   const speed = 50;
 
-  // Process text for syntax highlighting
+  // Process text for syntax highlighting with improved colors
   const processedText = () => {
     if (!text) return null;
 
-    const keywords = ["function", "const", "if", "return"];
-    const strings = ['"All systems operational"', "'operational'"];
+    const keywords = [
+      "function",
+      "const",
+      "let",
+      "var",
+      "if",
+      "return",
+      "await",
+      "async",
+      "try",
+      "catch",
+      "class",
+      "constructor",
+      "this",
+      "import",
+      "from",
+      "export",
+      "default",
+      "new",
+      "extends",
+      "useState",
+      "useEffect",
+      "useCallback",
+      "useRef",
+    ];
+    const types = [
+      "string",
+      "number",
+      "boolean",
+      "object",
+      "array",
+      "null",
+      "undefined",
+    ];
+    const comment = /\/\/.*$/gm;
+    const htmlComment = /<!--[\s\S]*?-->/gm;
+    const cssProperties = [
+      "@apply",
+      "rounded-lg",
+      "shadow-lg",
+      "bg-white",
+      "dark:bg-gray-800",
+      "p-6",
+      "m-4",
+      "transition-all",
+      "duration-300",
+      "transform",
+      "shadow-xl",
+      "service-card",
+      "className",
+    ];
+    const htmlTags = [
+      "section",
+      "div",
+      "container",
+      "h1",
+      "p",
+      "button",
+      "img",
+      "h3",
+      "cta",
+      "span",
+      "header",
+      "footer",
+      "nav",
+      "main",
+    ];
 
-    let result = [];
-    let currentWord = "";
-    let inString = false;
-    let stringDelimiter = "";
+    const strings = [
+      '"All systems operational"',
+      "'operational'",
+      "'React'",
+      "'Node'",
+      "'Tailwind'",
+      "'https://app.example.com'",
+      "'success'",
+    ];
+    const builtInFunctions = [
+      "checkStatus",
+      "notifyTeam",
+      "checkSystemStatus",
+      "notifyTechnicalTeam",
+      "initiateRecovery",
+      "monitorPerformance",
+      "selectTech",
+      "runTests",
+      "buildProject",
+      "logError",
+      "setExpanded",
+      "useState",
+      "setInterval",
+      "clearInterval",
+    ];
 
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
+    // Split text by lines to handle comments properly
+    const lines = text.split("\n");
+    const lastLineIndex = lines.length - 1;
 
-      // Check if we're entering or exiting a string
-      if ((char === '"' || char === "'") && (i === 0 || text[i - 1] !== "\\")) {
-        if (!inString) {
-          // Start of string
-          if (currentWord) {
+    // Detect language by looking at the content
+    const isHTML =
+      text.includes("</") || text.includes("/>") || text.includes("<div");
+    const isCSS =
+      text.includes("@apply") ||
+      text.includes(".card {") ||
+      (text.includes("{") && text.includes(";}"));
+    const isReact =
+      text.includes("useState") ||
+      text.includes("<div className=") ||
+      text.includes("props");
+
+    return lines.map((line, lineIndex) => {
+      // Check for comments first
+      const commentMatch =
+        line.match(comment) || (isHTML && line.match(htmlComment));
+      const isLastLine = lineIndex === lastLineIndex;
+
+      if (commentMatch) {
+        const commentIndex = line.indexOf("//");
+        const htmlCommentIndex = line.indexOf("<!--");
+        const actualIndex =
+          htmlCommentIndex !== -1
+            ? commentIndex !== -1
+              ? Math.min(commentIndex, htmlCommentIndex)
+              : htmlCommentIndex
+            : commentIndex;
+        const beforeComment = line.substring(0, actualIndex);
+        const commentText = line.substring(actualIndex);
+
+        return (
+          <div key={`line-${lineIndex}`} className="whitespace-pre">
+            {processLine(beforeComment)}
+            <span className="text-gray-400">
+              {commentText}
+              {isLastLine && isTypingComplete && (
+                <span className="inline-block w-2 h-4 md:h-5 bg-white animate-[blink_1s_infinite] ml-0.5 align-middle"></span>
+              )}
+              {isLastLine && !isTypingComplete && (
+                <span className="inline-block w-2 h-4 md:h-5 bg-white opacity-70 ml-0.5 align-middle"></span>
+              )}
+            </span>
+          </div>
+        );
+      }
+
+      return (
+        <div key={`line-${lineIndex}`} className="whitespace-pre">
+          {processLine(line)}
+          {isLastLine && isTypingComplete && (
+            <span className="inline-block w-2 h-4 md:h-5 bg-white animate-[blink_1s_infinite] ml-0.5 align-middle"></span>
+          )}
+          {isLastLine && !isTypingComplete && (
+            <span className="inline-block w-2 h-4 md:h-5 bg-white opacity-70 ml-0.5 align-middle"></span>
+          )}
+        </div>
+      );
+    });
+
+    function processLine(line) {
+      let result = [];
+      let currentWord = "";
+      let inString = false;
+      let stringDelimiter = "";
+      let inTag = false;
+      let inAttribute = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        // Handle HTML tags for JSX/HTML
+        if (isHTML || isReact) {
+          if (char === "<" && !inString) {
+            if (currentWord) {
+              result.push(getColoredSpan(currentWord, i));
+              currentWord = "";
+            }
+            inTag = true;
+            currentWord += char;
+            continue;
+          } else if (char === ">" && inTag && !inString) {
+            currentWord += char;
+            result.push(
+              <span key={`tag-${i}`} className="text-sky-400">
+                {currentWord}
+              </span>
+            );
+            currentWord = "";
+            inTag = false;
+            inAttribute = false;
+            continue;
+          } else if (inTag && char === "=" && !inString) {
+            // Handle attributes in tags
+            if (currentWord) {
+              result.push(
+                <span key={`attr-${i}`} className="text-yellow-300">
+                  {currentWord}
+                </span>
+              );
+              currentWord = "";
+            }
+            result.push(
+              <span key={`equals-${i}`} className="text-white">
+                =
+              </span>
+            );
+            inAttribute = true;
+            continue;
+          } else if (inTag) {
+            currentWord += char;
+            continue;
+          }
+        }
+
+        // Handle string literals
+        if (
+          (char === '"' || char === "'") &&
+          (i === 0 || line[i - 1] !== "\\")
+        ) {
+          if (!inString) {
+            if (currentWord) {
+              result.push(getColoredSpan(currentWord, i));
+              currentWord = "";
+            }
+            inString = true;
+            stringDelimiter = char;
+            currentWord += char;
+          } else if (char === stringDelimiter) {
+            currentWord += char;
             result.push(
               <span
-                key={`word-${i}`}
-                className={
-                  keywords.includes(currentWord)
-                    ? "text-purple-400"
-                    : "text-green-300"
-                }
+                key={`string-${i}`}
+                className={isReact ? "text-green-300" : "text-amber-300"}
               >
                 {currentWord}
               </span>
             );
             currentWord = "";
+            inString = false;
+          } else {
+            currentWord += char;
           }
-          inString = true;
-          stringDelimiter = char;
+        } else if (inString) {
           currentWord += char;
-        } else if (char === stringDelimiter) {
-          // End of string
-          currentWord += char;
-          result.push(
-            <span key={`string-${i}`} className="text-amber-300">
-              {currentWord}
-            </span>
-          );
-          currentWord = "";
-          inString = false;
+        } else if (/[\s\(\)\{\};:,\[\].]/.test(char)) {
+          if (currentWord) {
+            result.push(getColoredSpan(currentWord, i));
+            currentWord = "";
+          }
+          // Give specific colors to certain symbols
+          if (
+            char === "{" ||
+            char === "}" ||
+            char === "(" ||
+            char === ")" ||
+            char === "[" ||
+            char === "]"
+          ) {
+            result.push(
+              <span
+                key={`bracket-${i}`}
+                className={isCSS ? "text-pink-300" : "text-gray-300"}
+              >
+                {char}
+              </span>
+            );
+          } else if (char === ":" && isCSS) {
+            result.push(
+              <span key={`colon-${i}`} className="text-pink-300">
+                {char}
+              </span>
+            );
+          } else if (char === ";" && isCSS) {
+            result.push(
+              <span key={`semicolon-${i}`} className="text-pink-300">
+                {char}
+              </span>
+            );
+          } else {
+            result.push(
+              <span key={`punct-${i}`} className="text-white">
+                {char}
+              </span>
+            );
+          }
         } else {
-          // Just a quote inside a different type of string
           currentWord += char;
         }
-      } else if (inString) {
-        // Inside a string
-        currentWord += char;
-      } else if (/[\s\(\)\{\};]/.test(char)) {
-        // Whitespace or punctuation
-        if (currentWord) {
-          result.push(
-            <span
-              key={`word-${i}`}
-              className={
-                keywords.includes(currentWord)
-                  ? "text-purple-400"
-                  : "text-green-300"
-              }
-            >
-              {currentWord}
-            </span>
-          );
-          currentWord = "";
-        }
-        result.push(
-          <span key={`punct-${i}`} className="text-white">
-            {char}
+      }
+
+      if (currentWord) {
+        result.push(getColoredSpan(currentWord, line.length));
+      }
+
+      return result;
+    }
+
+    function getColoredSpan(word, position) {
+      // React/JSX specific
+      if (isReact && word.startsWith("<") && !word.includes(">")) {
+        return (
+          <span key={`jsx-tag-${position}`} className="text-sky-400">
+            {word}
           </span>
         );
-      } else {
-        // Part of a word
-        currentWord += char;
+      }
+
+      // HTML tags
+      if (
+        (isHTML || isReact) &&
+        htmlTags.some(
+          (tag) => word === tag || word === `<${tag}` || word === `</${tag}>`
+        )
+      ) {
+        return (
+          <span key={`html-${position}`} className="text-sky-400">
+            {word}
+          </span>
+        );
+      }
+
+      // CSS properties
+      if (isCSS && cssProperties.some((prop) => word.includes(prop))) {
+        return (
+          <span key={`css-prop-${position}`} className="text-cyan-300">
+            {word}
+          </span>
+        );
+      }
+
+      // Keywords
+      if (keywords.includes(word)) {
+        return (
+          <span key={`kw-${position}`} className="text-purple-400">
+            {word}
+          </span>
+        );
+      }
+
+      // Types
+      else if (types.includes(word)) {
+        return (
+          <span key={`type-${position}`} className="text-blue-300">
+            {word}
+          </span>
+        );
+      }
+
+      // Built-in functions
+      else if (builtInFunctions.includes(word)) {
+        return (
+          <span key={`func-${position}`} className="text-yellow-200">
+            {word}
+          </span>
+        );
+      }
+
+      // Variable/function names at definition
+      else if (
+        word.startsWith("const ") ||
+        word.startsWith("let ") ||
+        word.startsWith("var ") ||
+        word.startsWith("function ")
+      ) {
+        const parts = word.split(" ");
+        return (
+          <span key={`var-decl-${position}`}>
+            <span className="text-purple-400">{parts[0]} </span>
+            <span className="text-cyan-400">{parts.slice(1).join(" ")}</span>
+          </span>
+        );
+      }
+
+      // Booleans and numbers
+      else if (word === "true" || word === "false" || /^\d+$/.test(word)) {
+        return (
+          <span key={`literal-${position}`} className="text-orange-400">
+            {word}
+          </span>
+        );
+      }
+
+      // Object properties
+      else if (word.startsWith(".")) {
+        return (
+          <span key={`property-${position}`} className="text-cyan-300">
+            {word}
+          </span>
+        );
+      }
+
+      // React Components (capitalized)
+      else if (isReact && /^[A-Z][a-zA-Z0-9]*$/.test(word)) {
+        return (
+          <span key={`component-${position}`} className="text-yellow-400">
+            {word}
+          </span>
+        );
+      }
+
+      // Default case - mostly variable names and normal text
+      else {
+        return (
+          <span
+            key={`word-${position}`}
+            className={isCSS ? "text-pink-200" : "text-green-300"}
+          >
+            {word}
+          </span>
+        );
       }
     }
-
-    // Add any remaining text
-    if (currentWord) {
-      result.push(
-        <span
-          key="last-word"
-          className={
-            keywords.includes(currentWord)
-              ? "text-purple-400"
-              : "text-green-300"
-          }
-        >
-          {currentWord}
-        </span>
-      );
-    }
-
-    return result;
   };
 
   useEffect(() => {
     let i = 0;
+    setIsTypingComplete(false);
+
     const typing = setInterval(() => {
       if (i < fullText.length) {
         setText(fullText.slice(0, i + 1));
         i++;
       } else {
         clearInterval(typing);
+        setIsTypingComplete(true); // Mark typing as complete to start blinking
+
         setTimeout(() => {
           setText("");
           i = 0;
+          setIsTypingComplete(false); // Reset for next snippet
           // Move to next snippet
           setSnippetIndex((prev) => (prev + 1) % codeSnippets.length);
         }, 3000);
@@ -291,17 +651,32 @@ const TypewriterAnimation = () => {
     return () => clearInterval(typing);
   }, [fullText, text.length === 0]);
 
+  // Add blinking cursor animation to Tailwind
+  useEffect(() => {
+    // Add keyframes for blinking cursor if they don't exist yet
+    if (!document.querySelector("style#blink-animation")) {
+      const style = document.createElement("style");
+      style.id = "blink-animation";
+      style.textContent = `
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-transparent rounded-xl overflow-hidden">
       <div className="bg-transparent p-4 rounded-lg shadow-lg w-full max-w-lg h-full flex items-center justify-center">
-        {/* Fixed height container with vertical alignment to prevent layout shifts */}
-        <div className="w-full h-[280px] overflow-hidden flex items-center justify-center">
-          <pre className="text-sm md:text-base lg:text-lg p-4 font-mono bg-transparent max-h-full">
-            {/* Set a fixed height container for the code to prevent shifting */}
-            <div className="h-[230px] overflow-hidden flex items-center">
-              <code>
+        {/* Fixed height container with consistent dimensions */}
+        <div className="w-full h-full overflow-hidden flex items-center justify-center">
+          <pre className="text-sm md:text-base lg:text-lg p-4 font-mono bg-transparent max-h-full w-full">
+            <div className="h-full overflow-hidden flex flex-col justify-center">
+              <code className="block max-w-full h-[400px]">
                 {processedText()}
-                <span className="inline-block w-2 h-4 md:h-5 bg-white opacity-70 animate-pulse ml-0.5 align-middle"></span>
+                {/* Removed the cursor from here since we now add it at the end of the last line */}
               </code>
             </div>
           </pre>
