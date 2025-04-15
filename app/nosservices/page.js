@@ -143,8 +143,6 @@ function support24_7() {
     notifyTeam();
     return initiateRecovery();
   }
-  
-  // Monitoring active
   return "Systems operational";
 }`,
     `// Web application
@@ -155,57 +153,50 @@ class WebSolution {
   }
   
   selectTech() {
-    // Choose technologies
     return ['React', 'Node'];
   }
 }`,
-    `// Deployment
-async function deploy() {
+    `async function deploy() {
   try {
     await runTests();
     const build = await buildProject();
-    
-    // Deployment info
-    return { url: 'app.example.com' };
+    return { 
+      url: 'app.example.com',
+      status: 'success' 
+    };
   } catch (error) {
     logError(error);
   }
 }`,
-    `<!-- Responsive HTML Layout -->
+    `<!-- Responsive HTML -->
 <section class="hero">
   <div class="container">
     <h1>Welcome</h1>
     <p>Modern web solutions</p>
-    <button class="cta">
-      Get Started
-    </button>
+    <button class="cta">Get Started</button>
   </div>
 </section>`,
-    `/* Tailwind Styling */
+    `/* Tailwind CSS */
 .card {
   @apply rounded-lg shadow-lg;
   @apply bg-white dark:bg-gray-800;
   @apply p-6 m-4;
   @apply transition-all duration-300;
 }
-
 .card:hover {
   @apply transform -translate-y-2;
-  @apply shadow-xl;
 }`,
-    `// React Component
-const ServiceCard = ({ title, icon, desc }) => {
-  const [expanded, setExpanded] = useState(false);
-  
+    `const ServiceCard = ({ title,desc }) => {
+  const [expanded, setExpanded] = 
+    useState(false);
   return (
     <div className="service-card" 
-         onClick={() => setExpanded(!expanded)}>
-      <img src={icon} alt={title} />
+      onClick={() => setExpanded(!expanded)}>
       <h3>{title}</h3>
       {expanded && <p>{desc}</p>}
     </div>
   );
-};`,
+}`,
   ];
   const fullText = codeSnippets[snippetIndex];
   const speed = 50;
@@ -234,11 +225,17 @@ const ServiceCard = ({ title, icon, desc }) => {
       "default",
       "new",
       "extends",
+    ];
+
+    const reactKeywords = [
       "useState",
       "useEffect",
       "useCallback",
       "useRef",
+      "useMemo",
+      "useContext",
     ];
+
     const types = [
       "string",
       "number",
@@ -248,23 +245,26 @@ const ServiceCard = ({ title, icon, desc }) => {
       "null",
       "undefined",
     ];
+
     const comment = /\/\/.*$/gm;
     const htmlComment = /<!--[\s\S]*?-->/gm;
+    const cssComment = /\/\*[\s\S]*?\*\//gm;
+
     const cssProperties = [
       "@apply",
-      "rounded-lg",
-      "shadow-lg",
+      "rounded",
+      "shadow",
       "bg-white",
-      "dark:bg-gray-800",
-      "p-6",
-      "m-4",
-      "transition-all",
-      "duration-300",
+      "dark:",
+      "p-",
+      "m-",
+      "transition-",
+      "duration-",
       "transform",
       "shadow-xl",
-      "service-card",
-      "className",
+      "translate-y-",
     ];
+
     const htmlTags = [
       "section",
       "div",
@@ -282,22 +282,38 @@ const ServiceCard = ({ title, icon, desc }) => {
       "main",
     ];
 
-    const strings = [
-      '"All systems operational"',
-      "'operational'",
-      "'React'",
-      "'Node'",
-      "'Tailwind'",
-      "'https://app.example.com'",
-      "'success'",
+    const htmlAttributes = [
+      "class",
+      "id",
+      "src",
+      "alt",
+      "href",
+      "type",
+      "value",
+      "onClick",
+      "onChange",
+      "style",
+      "placeholder",
+      "title",
+      "aria-",
+      "data-",
     ];
+
+    const reactAttributes = [
+      "className",
+      "onClick",
+      "onChange",
+      "onSubmit",
+      "onFocus",
+      "onBlur",
+      "onMouseEnter",
+      "onMouseLeave",
+    ];
+
     const builtInFunctions = [
       "checkStatus",
       "notifyTeam",
-      "checkSystemStatus",
-      "notifyTechnicalTeam",
       "initiateRecovery",
-      "monitorPerformance",
       "selectTech",
       "runTests",
       "buildProject",
@@ -312,40 +328,59 @@ const ServiceCard = ({ title, icon, desc }) => {
     const lines = text.split("\n");
     const lastLineIndex = lines.length - 1;
 
-    // Detect language by looking at the content
+    // Detect language by analyzing content patterns
     const isHTML =
-      text.includes("</") || text.includes("/>") || text.includes("<div");
+      text.includes("</") ||
+      text.includes("/>") ||
+      text.includes("<div") ||
+      text.includes("<!--");
     const isCSS =
       text.includes("@apply") ||
       text.includes(".card {") ||
-      (text.includes("{") && text.includes(";}"));
+      (text.includes("{") && text.includes(";}")) ||
+      text.includes("/*");
     const isReact =
       text.includes("useState") ||
-      text.includes("<div className=") ||
-      text.includes("props");
+      text.includes("className=") ||
+      text.includes("props") ||
+      text.includes("=>") ||
+      text.includes("&&");
+    const isJavaScript = !isHTML && !isCSS; // JavaScript or React
 
     return lines.map((line, lineIndex) => {
       // Check for comments first
       const commentMatch =
-        line.match(comment) || (isHTML && line.match(htmlComment));
+        line.match(comment) ||
+        (isHTML && line.match(htmlComment)) ||
+        (isCSS && line.match(cssComment));
       const isLastLine = lineIndex === lastLineIndex;
 
       if (commentMatch) {
         const commentIndex = line.indexOf("//");
         const htmlCommentIndex = line.indexOf("<!--");
-        const actualIndex =
-          htmlCommentIndex !== -1
-            ? commentIndex !== -1
-              ? Math.min(commentIndex, htmlCommentIndex)
-              : htmlCommentIndex
-            : commentIndex;
+        const cssCommentIndex = line.indexOf("/*");
+
+        // Find the actual index of the comment
+        let actualIndex = -1;
+        if (commentIndex !== -1) actualIndex = commentIndex;
+        if (
+          htmlCommentIndex !== -1 &&
+          (htmlCommentIndex < actualIndex || actualIndex === -1)
+        )
+          actualIndex = htmlCommentIndex;
+        if (
+          cssCommentIndex !== -1 &&
+          (cssCommentIndex < actualIndex || actualIndex === -1)
+        )
+          actualIndex = cssCommentIndex;
+
         const beforeComment = line.substring(0, actualIndex);
         const commentText = line.substring(actualIndex);
 
         return (
           <div key={`line-${lineIndex}`} className="whitespace-pre">
             {processLine(beforeComment)}
-            <span className="text-gray-400">
+            <span className={isCSS ? "text-gray-500" : "text-gray-400"}>
               {commentText}
               {isLastLine && isTypingComplete && (
                 <span className="inline-block w-2 h-4 md:h-5 bg-white animate-[blink_1s_infinite] ml-0.5 align-middle"></span>
@@ -378,11 +413,12 @@ const ServiceCard = ({ title, icon, desc }) => {
       let stringDelimiter = "";
       let inTag = false;
       let inAttribute = false;
+      let inAttributeValue = false;
 
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
 
-        // Handle HTML tags for JSX/HTML
+        // Handle HTML/JSX tags
         if (isHTML || isReact) {
           if (char === "<" && !inString) {
             if (currentWord) {
@@ -395,17 +431,36 @@ const ServiceCard = ({ title, icon, desc }) => {
           } else if (char === ">" && inTag && !inString) {
             currentWord += char;
             result.push(
-              <span key={`tag-${i}`} className="text-sky-400">
+              <span key={`tag-${i}`} className="text-blue-400">
                 {currentWord}
               </span>
             );
             currentWord = "";
             inTag = false;
             inAttribute = false;
+            inAttributeValue = false;
             continue;
-          } else if (inTag && char === "=" && !inString) {
-            // Handle attributes in tags
+          } else if (
+            inTag &&
+            /\s/.test(char) &&
+            !inString &&
+            !inAttributeValue
+          ) {
             if (currentWord) {
+              // This is the tag name
+              result.push(
+                <span key={`tagname-${i}`} className="text-cyan-400">
+                  {currentWord}
+                </span>
+              );
+              currentWord = "";
+            }
+            result.push(<span key={`space-${i}`}> </span>);
+            inAttribute = true;
+            continue;
+          } else if (inTag && inAttribute && char === "=" && !inString) {
+            if (currentWord) {
+              // This is the attribute name
               result.push(
                 <span key={`attr-${i}`} className="text-yellow-300">
                   {currentWord}
@@ -418,7 +473,7 @@ const ServiceCard = ({ title, icon, desc }) => {
                 =
               </span>
             );
-            inAttribute = true;
+            inAttributeValue = true;
             continue;
           } else if (inTag) {
             currentWord += char;
@@ -441,27 +496,37 @@ const ServiceCard = ({ title, icon, desc }) => {
             currentWord += char;
           } else if (char === stringDelimiter) {
             currentWord += char;
+            // Use different colors for strings based on the language
+            const stringColor = isHTML
+              ? "text-green-400"
+              : isReact
+              ? "text-green-300"
+              : isCSS
+              ? "text-yellow-200"
+              : "text-amber-300";
+
             result.push(
-              <span
-                key={`string-${i}`}
-                className={isReact ? "text-green-300" : "text-amber-300"}
-              >
+              <span key={`string-${i}`} className={stringColor}>
                 {currentWord}
               </span>
             );
             currentWord = "";
             inString = false;
+            inAttributeValue = false;
           } else {
             currentWord += char;
           }
         } else if (inString) {
           currentWord += char;
-        } else if (/[\s\(\)\{\};:,\[\].]/.test(char)) {
+        }
+        // Handle special characters and separators
+        else if (/[\s\(\)\{\};:,\[\].]/.test(char)) {
           if (currentWord) {
             result.push(getColoredSpan(currentWord, i));
             currentWord = "";
           }
-          // Give specific colors to certain symbols
+
+          // Style different characters based on the language context
           if (
             char === "{" ||
             char === "}" ||
@@ -470,11 +535,15 @@ const ServiceCard = ({ title, icon, desc }) => {
             char === "[" ||
             char === "]"
           ) {
+            // Use different bracket colors for different languages
+            let bracketColor = "text-gray-300"; // default
+
+            if (isCSS) bracketColor = "text-pink-300";
+            else if (isReact && (char === "{" || char === "}"))
+              bracketColor = "text-orange-300";
+
             result.push(
-              <span
-                key={`bracket-${i}`}
-                className={isCSS ? "text-pink-300" : "text-gray-300"}
-              >
+              <span key={`bracket-${i}`} className={bracketColor}>
                 {char}
               </span>
             );
@@ -487,6 +556,12 @@ const ServiceCard = ({ title, icon, desc }) => {
           } else if (char === ";" && isCSS) {
             result.push(
               <span key={`semicolon-${i}`} className="text-pink-300">
+                {char}
+              </span>
+            );
+          } else if (char === ".") {
+            result.push(
+              <span key={`dot-${i}`} className="text-white">
                 {char}
               </span>
             );
@@ -510,24 +585,53 @@ const ServiceCard = ({ title, icon, desc }) => {
     }
 
     function getColoredSpan(word, position) {
-      // React/JSX specific
-      if (isReact && word.startsWith("<") && !word.includes(">")) {
+      // HTML tags
+      if (
+        (isHTML || isReact) &&
+        word.startsWith("<") &&
+        !word.includes(">") &&
+        !word.includes(" ")
+      ) {
         return (
-          <span key={`jsx-tag-${position}`} className="text-sky-400">
+          <span key={`jsx-tag-${position}`} className="text-blue-400">
             {word}
           </span>
         );
       }
 
-      // HTML tags
+      // HTML tag name after <
       if (
         (isHTML || isReact) &&
-        htmlTags.some(
-          (tag) => word === tag || word === `<${tag}` || word === `</${tag}>`
-        )
+        htmlTags.some((tag) => word === tag || word === tag + ">")
       ) {
         return (
-          <span key={`html-${position}`} className="text-sky-400">
+          <span key={`html-${position}`} className="text-cyan-400">
+            {word}
+          </span>
+        );
+      }
+
+      // HTML closing tags
+      if (
+        (isHTML || isReact) &&
+        word.startsWith("</") &&
+        htmlTags.some((tag) => word === `</${tag}>`)
+      ) {
+        return (
+          <span key={`html-closing-${position}`} className="text-blue-400">
+            {word}
+          </span>
+        );
+      }
+
+      // HTML/React attributes
+      if (
+        (isHTML || isReact) &&
+        (htmlAttributes.some((attr) => word === attr) ||
+          reactAttributes.some((attr) => word === attr))
+      ) {
+        return (
+          <span key={`attr-${position}`} className="text-yellow-300">
             {word}
           </span>
         );
@@ -542,7 +646,25 @@ const ServiceCard = ({ title, icon, desc }) => {
         );
       }
 
-      // Keywords
+      // CSS selectors
+      if (isCSS && word.startsWith(".")) {
+        return (
+          <span key={`css-selector-${position}`} className="text-yellow-300">
+            {word}
+          </span>
+        );
+      }
+
+      // React/JS keywords
+      if (reactKeywords.includes(word)) {
+        return (
+          <span key={`react-kw-${position}`} className="text-purple-500">
+            {word}
+          </span>
+        );
+      }
+
+      // General keywords
       if (keywords.includes(word)) {
         return (
           <span key={`kw-${position}`} className="text-purple-400">
@@ -586,7 +708,11 @@ const ServiceCard = ({ title, icon, desc }) => {
       }
 
       // Booleans and numbers
-      else if (word === "true" || word === "false" || /^\d+$/.test(word)) {
+      else if (
+        word === "true" ||
+        word === "false" ||
+        /^-?\d+(\.\d+)?$/.test(word)
+      ) {
         return (
           <span key={`literal-${position}`} className="text-orange-400">
             {word}
@@ -612,16 +738,48 @@ const ServiceCard = ({ title, icon, desc }) => {
         );
       }
 
-      // Default case - mostly variable names and normal text
+      // Arrow functions
+      else if (word === "=>" || word.includes("=>")) {
+        if (word === "=>") {
+          return (
+            <span key={`arrow-${position}`} className="text-purple-400">
+              {word}
+            </span>
+          );
+        } else {
+          const parts = word.split("=>");
+          return (
+            <span key={`arrow-fn-${position}`}>
+              <span className="text-green-300">{parts[0]}</span>
+              <span className="text-purple-400">&rArr;</span>
+              <span className="text-green-300">
+                {parts.slice(1).join("=>")}
+              </span>
+            </span>
+          );
+        }
+      }
+
+      // Default case - context-sensitive coloring
       else {
-        return (
-          <span
-            key={`word-${position}`}
-            className={isCSS ? "text-pink-200" : "text-green-300"}
-          >
-            {word}
-          </span>
-        );
+        if (isCSS)
+          return (
+            <span key={`css-word-${position}`} className="text-pink-200">
+              {word}
+            </span>
+          );
+        else if (isHTML)
+          return (
+            <span key={`html-word-${position}`} className="text-white">
+              {word}
+            </span>
+          );
+        else
+          return (
+            <span key={`word-${position}`} className="text-green-300">
+              {word}
+            </span>
+          );
       }
     }
   };
@@ -630,8 +788,27 @@ const ServiceCard = ({ title, icon, desc }) => {
     let i = 0;
     setIsTypingComplete(false);
 
+    // Helper function to check if we're at the beginning of a new line with whitespace
+    const shouldSkipWhitespace = (index) => {
+      // If this is a whitespace character
+      if (fullText[index] && /\s/.test(fullText[index])) {
+        // Check if previous character is a newline or beginning of string
+        const isPrevNewline = index === 0 || fullText[index - 1] === "\n";
+
+        if (isPrevNewline) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     const typing = setInterval(() => {
       if (i < fullText.length) {
+        // Skip whitespace at beginning of lines
+        while (shouldSkipWhitespace(i) && i < fullText.length) {
+          i++;
+        }
+
         setText(fullText.slice(0, i + 1));
         i++;
       } else {
@@ -642,8 +819,9 @@ const ServiceCard = ({ title, icon, desc }) => {
           setText("");
           i = 0;
           setIsTypingComplete(false); // Reset for next snippet
-          // Move to next snippet
-          setSnippetIndex((prev) => (prev + 1) % codeSnippets.length);
+          // Choose a random snippet instead of sequential rotation
+          const randomIndex = Math.floor(Math.random() * codeSnippets.length);
+          setSnippetIndex(randomIndex);
         }, 3000);
       }
     }, speed);
@@ -667,16 +845,20 @@ const ServiceCard = ({ title, icon, desc }) => {
     }
   }, []);
 
+  // Set initial snippet randomly on component mount
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * codeSnippets.length);
+    setSnippetIndex(randomIndex);
+  }, []);
+
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-transparent rounded-xl overflow-hidden">
       <div className="bg-transparent p-4 rounded-lg shadow-lg w-full max-w-lg h-full flex items-center justify-center">
-        {/* Fixed height container with consistent dimensions */}
         <div className="w-full h-full overflow-hidden flex items-center justify-center">
           <pre className="text-sm md:text-base lg:text-lg p-4 font-mono bg-transparent max-h-full w-full">
             <div className="h-full overflow-hidden flex flex-col justify-center">
               <code className="block max-w-full h-[400px]">
                 {processedText()}
-                {/* Removed the cursor from here since we now add it at the end of the last line */}
               </code>
             </div>
           </pre>
