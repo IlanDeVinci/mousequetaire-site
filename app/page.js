@@ -442,11 +442,7 @@ export default function Home() {
         <section className="py-16">
           <div className="container mx-auto px-4">
             <h2 className="text-3 xl md:text-5xl font-light text-center mb-12 text-white">
-              Les{" "}
-              <span className="neon-blue-text" data-text="MouseQuetaires">
-                MouseQuetaires
-              </span>
-              , notre ambition...{" "}
+              Les Mousequetaires, notre ambition...{" "}
             </h2>
 
             <div className="max-w-5xl mx-auto space-y-10">

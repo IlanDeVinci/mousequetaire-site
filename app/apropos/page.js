@@ -352,6 +352,8 @@ const teamMembers = [
 ];
 
 function TeamMember({ image, name, role, description, reverse }) {
+  const isDorian = name === "Dorian Collet";
+
   return (
     <ScrollReveal
       animation={reverse ? "fade-left" : "fade-right"}
@@ -369,7 +371,9 @@ function TeamMember({ image, name, role, description, reverse }) {
             alt={`Photo de ${name}`}
             width={200}
             height={200}
-            className="w-full h-full object-cover object-top"
+            className={`w-full h-full object-cover object-top ${
+              isDorian ? "scale-125" : ""
+            }`}
           />
         </div>
         <div

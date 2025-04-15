@@ -929,6 +929,8 @@ const GridElementsAnimation = () => {
     { from: "rgb(99, 102, 241)", to: "rgb(96, 165, 250)" },
     { from: "rgb(96, 165, 250)", to: "rgb(168, 85, 247)" },
   ]);
+  // Track rotation for each element (in degrees)
+  const [rotations, setRotations] = useState(Array(9).fill(0));
 
   // Updated elements with more varied rounded corners
   const elements = [
@@ -1000,7 +1002,7 @@ const GridElementsAnimation = () => {
     return () => clearInterval(interval);
   }, [showingPseudo]);
 
-  // Swap elements smoothly
+  // Swap elements and apply random rotations
   useEffect(() => {
     const interval = setInterval(() => {
       const idx1 = Math.floor(Math.random() * 9);
@@ -1023,8 +1025,35 @@ const GridElementsAnimation = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Add rotation animation effect
+  useEffect(() => {
+    const rotationInterval = setInterval(() => {
+      // Pick a random element to rotate
+      const elementIndex = Math.floor(Math.random() * 9);
+
+      // Skip rotation for the letter 'A' (element with index 4)
+      if (elements[elementIndex].hasLetter) return;
+
+      // Choose a random rotation amount (90, 180, or 360 degrees)
+      const rotationOptions = [90, 180, 360];
+      const rotationAmount =
+        rotationOptions[Math.floor(Math.random() * rotationOptions.length)];
+
+      setRotations((prevRotations) => {
+        const newRotations = [...prevRotations];
+        // Add the rotation to the current rotation value to make it cumulative
+        newRotations[elementIndex] =
+          (newRotations[elementIndex] + rotationAmount) % 360;
+        return newRotations;
+      });
+    }, 4000); // Separate timing from the swap effect
+
+    return () => clearInterval(rotationInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-4 overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center p-4 overflow-visible  ">
       <div className="relative w-full max-w-[400px] aspect-square">
         {elements.map((element, index) => {
           const { col, row } = calculatePosition(index);
@@ -1063,7 +1092,7 @@ const GridElementsAnimation = () => {
             );
           }
 
-          // Standard shape elements
+          // Standard shape elements with rotation
           return (
             <div
               key={element.id}
@@ -1079,6 +1108,7 @@ const GridElementsAnimation = () => {
                 backgroundSize: "100%",
                 backgroundColor: "transparent",
                 zIndex: 1,
+                transform: `rotate(${rotations[index]}deg)`, // Apply rotation
               }}
             >
               {/* Pseudo-element replacement using absolute positioning */}
@@ -1250,7 +1280,7 @@ export default function Services() {
           {/* Desktop Interactive Circles */}
           <ScrollReveal animation="zoom-in">
             <div className="hidden md:flex justify-center mb-16 lg:mb-24 relative h-72">
-              <div className="w-full max-w-[1000px] relative">
+              <div className="w-full min-w-[900px] max-w-[1000px] relative">
                 {services.map((service, index) => (
                   <div
                     key={index}
@@ -1322,11 +1352,11 @@ export default function Services() {
             >
               <div
                 className={`flex flex-col ${
-                  section.isReversed ? "md:flex-row-reverse" : "md:flex-row"
+                  section.isReversed ? "lg:flex-row-reverse" : "lg:flex-row"
                 } items-center gap-6 sm:gap-8 md:gap-12 mb-12 sm:mb-16 md:mb-24`}
               >
                 <div className="flex-1 w-full">
-                  <div className="relative h-[400px] w-full rounded-xl overflow-hidden">
+                  <div className="relative h-[400px] w-full rounded-xl overflow-visible">
                     {renderAnimation(section.animationType)}
                   </div>
                 </div>
