@@ -1074,19 +1074,33 @@ const GridElementsAnimation = () => {
                 }}
               >
                 <span
-                  className="text-7xl md:text-9xl font-bold"
+                  className="text-7xl md:text-9xl font-bold relative"
                   style={{
-                    backgroundImage: showingPseudo[index]
-                      ? `linear-gradient(135deg, ${pseudoGradients[index].from}, ${pseudoGradients[index].to})`
-                      : `linear-gradient(135deg, ${gradients[index].from}, ${gradients[index].to})`,
+                    backgroundImage: `linear-gradient(135deg, ${gradients[index].from}, ${gradients[index].to})`,
                     WebkitBackgroundClip: "text",
                     backgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     color: "transparent",
                     transition: "all 1s ease-in-out",
+                    zIndex: 1,
                   }}
                 >
-                  A
+                  A{/* Pseudo-element replacement for the letter A */}
+                  <span
+                    className="absolute inset-0 text-7xl md:text-9xl font-bold"
+                    style={{
+                      backgroundImage: `linear-gradient(135deg, ${pseudoGradients[index].from}, ${pseudoGradients[index].to})`,
+                      WebkitBackgroundClip: "text",
+                      backgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      color: "transparent",
+                      opacity: showingPseudo[index] ? 1 : 0,
+                      transition: "opacity 1s ease-in-out",
+                      zIndex: 2,
+                    }}
+                  >
+                    A
+                  </span>
                 </span>
               </div>
             );
