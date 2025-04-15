@@ -18,9 +18,9 @@ export default function Home() {
         {/* Logo in top left */}
         <div className="container mx-auto px-4 relative z-20">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="absolute -top-12 left-50 z-30 opacity-70 ">
+            <div className="absolute -top-2 md:-top-12 left-4 md:left-50 z-30 opacity-70 ">
               <span
-                className="neon-blue-text text-3xl"
+                className="neon-blue-text text-lg md:text-3xl"
                 data-text="&lt;mouse-quetaires/&gt;"
               >
                 &lt;mouse-quetaires/&gt;
@@ -822,11 +822,6 @@ function FlipCard({ frontContent, backContent, index }) {
               </svg>
             )}
           </div>
-          {isTouchDevice && (
-            <div className="text-xs text-[#87D7FF]/60 mt-4">
-              Touchez pour plus d&apos;infos
-            </div>
-          )}
         </div>
         <div className="flip-card-back">
           <div className="flip-card-back-content">
