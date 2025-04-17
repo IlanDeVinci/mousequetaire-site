@@ -201,7 +201,7 @@ class WebSolution {
 }`,
   ];
   const fullText = codeSnippets[snippetIndex];
-  const speed = 50;
+  const speed = 20;
 
   // Process text for syntax highlighting with improved colors
   const processedText = () => {
