@@ -24,19 +24,37 @@ const instagramSliderImages = [
   "/images/facebook-icon.svg",
 ];
 
-// Modified InstagramSlider component to include default loading state
+// Modified InstagramSlider component to include default loading state and focus detection
 const InstagramSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slidesArray, setSlidesArray] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isWindowFocused, setIsWindowFocused] = useState(true); // Track window focus
   const originalImages = instagramSliderImages;
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
 
   // Ref to track if we're currently updating slides to avoid infinite loop
   const isUpdating = useRef(false);
+
+  // Add effect to track document visibility
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsWindowFocused(!document.hidden);
+    };
+
+    // Add visibility change listener
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Set initial state based on current visibility
+    setIsWindowFocused(!document.hidden);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   useEffect(() => {
     const loadImage = async () => {
@@ -245,22 +263,24 @@ const InstagramSlider = () => {
   ]);
 
   useEffect(() => {
-    // Handle hover state changes
-    if (isHovered) {
-      // Start rotating through slides when hovered
+    // Modified to account for window focus state
+    if (isHovered && isWindowFocused) {
+      // Start rotating through slides when hovered AND window is focused
       intervalRef.current = setInterval(() => {
         advanceSlide();
       }, 1000);
     } else {
-      // When hover ends, return to Instagram logo by advancing forward
+      // When hover ends or window loses focus, return to Instagram logo
       clearTimeouts();
-      returnToInstagram();
+      if (!isHovered) {
+        returnToInstagram();
+      }
     }
 
     return () => {
       clearTimeouts();
     };
-  }, [isHovered, advanceSlide, returnToInstagram]);
+  }, [isHovered, isWindowFocused, advanceSlide, returnToInstagram]);
 
   // Clear any timeouts to prevent memory leaks
   const clearTimeouts = () => {
@@ -1057,7 +1077,7 @@ const contactGridItems = [
     buttonLink: "mailto:support@mousequetaire.com",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-3.5h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z" />
+        <path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-3.5h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
       </svg>
     ),
     bgColor: "#007EBD",
@@ -1191,7 +1211,7 @@ const contactOptions = [
                             fill="black"
                             className="w-full h-full"
                           >
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z" />
                           </svg>
                         ) : (
                           <svg
@@ -1440,15 +1460,15 @@ export default function Contact() {
     [isAnimating, setModalOpen, setNestedModal]
   );
 
+  // Updated closeModal function with better animation protection
   const closeModal = useCallback(
     (isBackAction = false) => {
-      if (isAnimating) return;
+      if (isAnimating) {
+        return; // Prevent any interruption during animation
+      }
 
       if (isBackAction && showExpandedOptions) {
         // If this is a back action and we're in expanded options, just go back to main options
-        console.log(
-          "Back action in expanded options - returning to main options"
-        );
         setShowExpandedOptions(false);
         setNestedModal(false); // Make sure to update modal context state
         return;
@@ -1456,16 +1476,21 @@ export default function Contact() {
 
       setIsAnimating(true);
       setIsExpanded(false);
-      setModalOpen(false);
-      setNestedModal(false);
 
+      // Postpone setting modalOpen false until animation starts
+      requestAnimationFrame(() => {
+        setModalOpen(false);
+        setNestedModal(false);
+      });
+
+      // Use a precise timing that matches the CSS transition duration
       setTimeout(() => {
         setActiveModal(null);
         setCirclePosition(null);
         setIsAnimating(false);
         setShowExpandedOptions(false);
         document.body.style.overflow = "auto"; // Make sure this is set to auto when modal is closed
-      }, 300);
+      }, 300); // This should match the transition-duration defined in your CSS
     },
     [isAnimating, setModalOpen, setNestedModal, showExpandedOptions]
   );
@@ -1521,7 +1546,13 @@ export default function Contact() {
 
   useEffect(() => {
     const handleEsc = (e) => {
-      if (e.key === "Escape" && !isAnimating) {
+      if (e.key === "Escape") {
+        if (isAnimating) {
+          // Prevent any action during animations
+          e.preventDefault();
+          return;
+        }
+
         if (showExpandedOptions) {
           // If in expanded options, go back to main options
           handleReturnClick(e);
@@ -1648,10 +1679,10 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="fixed inset-0 z-1000 h-screen w-screen overflow-auto">
+            <div className="fixed inset-0 z-1000 h-screen w-screen overflow-hidden">
               <div
-                className={`fixed inset-0 z-1001 flex items-start md:items-center justify-center pointer-events-none overflow-auto
-                  transition-opacity duration-300
+                className={`fixed inset-0 z-1001 flex items-start md:items-center justify-center pointer-events-none overflow-hidden
+                  transition-opacity duration-300 ease-in-out
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
                 style={{
                   backgroundColor:
