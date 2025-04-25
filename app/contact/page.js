@@ -807,7 +807,7 @@ const BackgroundAnimation = () => {
       const randomImg =
         backgroundImgs[Math.floor(Math.random() * backgroundImgs.length)];
       const randomSize = Math.floor(Math.random() * 120) + 400; // Bigger: 80-200px
-      const randomY = Math.floor(Math.random() * 80) + 10; // 10-90% vertical position
+      const randomY = Math.floor(Math.random() * 70) + 5; // 10-90% vertical position
       const randomDuration = Math.floor(Math.random() * 10) + 8; // Faster: 8-18s
       const opacity = Math.random() * 0.2 + 0.7; // Slightly more opacity
 
@@ -1679,9 +1679,9 @@ export default function Contact() {
 
           {/* Modal Overlay - responsive for all screens with hidden scrollbar */}
           {activeModal !== null && (
-            <div className="fixed inset-0 z-1000 h-screen w-screen overflow-hidden">
+            <div className="fixed inset-0 z-1000 h-screen w-screen overflow-x-hidden">
               <div
-                className={`fixed inset-0 z-1001 flex items-start md:items-center justify-center pointer-events-none overflow-hidden
+                className={`fixed inset-0 z-1001 flex items-start md:items-center justify-center pointer-events-none overflow-x-hidden
                   transition-opacity duration-300 ease-in-out
                   ${isExpanded && !isAnimating ? "opacity-100" : "opacity-0"}`}
                 style={{
@@ -1707,7 +1707,7 @@ export default function Contact() {
                         <BackgroundAnimation />
 
                         {/* Content overlay */}
-                        <div className="relative z-10 flex flex-col items-center gap-4 md:gap-6 w-full mt-12 md:mt-32">
+                        <div className="relative z-10 flex flex-col items-center min-h-screen gap-4 md:gap-6 w-full mt-24 md:mt-54">
                           <h3 className="text-xl md:text-3xl font-bold mb-2 mt-10 md:mt-16 px-4 text-center text-shadow-xs text-shadow-blue-950">
                             {!showExpandedOptions
                               ? "Qui êtes-vous ?"
@@ -1751,7 +1751,7 @@ export default function Contact() {
                     )}
 
                     {activeModal === 0 && (
-                      <div className="w-full min-h-[100vh] md:min-h-0 overflow-auto py-4 md:py-0">
+                      <div className="w-full min-h-[100vh] md:min-h-0 overflow-x-hidden ">
                         {contactOptions[activeModal].content}
                       </div>
                     )}

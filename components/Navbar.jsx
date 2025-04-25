@@ -25,6 +25,29 @@ const Navbar = () => {
   const arrowRef = useRef(null);
   const animationRef = useRef(null);
 
+  // Add new state object for animation tracking
+  const arrowAnimationState = useRef({
+    // Current position and target values
+    currentY: -30,
+    targetY: -30,
+    currentOpacity: 0,
+    targetOpacity: 0,
+
+    // Animation timing
+    startTime: null,
+    duration: 500,
+
+    // State flags
+    isAnimating: false,
+    animationType: null, // "showing", "hiding", "transitioning"
+
+    // Last known modal state for comparison
+    lastModalState: {
+      isOpen: false,
+      isNested: false,
+    },
+  });
+
   // Lock to prevent double animations
   const animationLockRef = useRef(false);
 
@@ -83,6 +106,12 @@ const Navbar = () => {
     };
   }, []);
 
+  // Track if we've recently handled a click to prevent multiple rapid clicks
+  const clickHandledRef = useRef(false);
+
+  // Track if an exit animation is currently in progress
+  const exitAnimationInProgressRef = useRef(false);
+
   // Check if we're in a modal-to-modal transition
   const isModalToModalTransition = () => {
     return (
@@ -93,175 +122,249 @@ const Navbar = () => {
     );
   };
 
-  // Simplified animation function with lock to prevent duplicate animations
-  const animateArrow = (show) => {
-    // Cancel any existing animation before checking lock
+  // Enhanced animation function with better interruption handling
+  const startArrowAnimation = () => {
+    // Clear any existing animation
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
 
-    // Return early if animation is already in progress and is a new animation
-    // but allow interruption for modal-to-modal transitions
-    if (animationLockRef.current && !isModalToModalTransition()) {
+    // Animation state machine with improved handling for interrupted animations
+    const animateArrowFrame = (timestamp) => {
+      if (!arrowRef.current) return;
+
+      const animState = arrowAnimationState.current;
+
+      // Initialize startTime on first frame
+      if (!animState.startTime) {
+        animState.startTime = timestamp;
+
+        // For hiding animations, always ensure we start from visible state
+        if (animState.animationType === "hiding") {
+          // Ensure we're starting from a visible state for smooth exit
+          animState.currentY = 0;
+          animState.currentOpacity = 1;
+
+          // Mark that an exit animation is in progress
+          exitAnimationInProgressRef.current = true;
+        }
+      }
+
+      // Calculate progress
+      const elapsed = timestamp - animState.startTime;
+
+      // Use longer duration for exit animations to ensure visibility
+      const effectiveDuration =
+        animState.animationType === "hiding"
+          ? Math.max(animState.duration, 600) // Minimum 600ms for exit
+          : animState.duration;
+
+      const progress = Math.min(elapsed / effectiveDuration, 1);
+
+      // Easing function for smoother animation
+      const easeOutBack = (x) => {
+        // Enhanced springiness for showing animation with more pronounced overshoot
+        const c1 = 2.5; // Increased from 1.70158 for more bounciness
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      };
+
+      // Custom elastic/spring easing for entrance animation
+      const elasticOut = (x) => {
+        // Reduced elastic bounce parameters for smoother animation
+        const amplitude = 0.6; // Reduced from 1.0 for less pronounced bounce
+        const period = 0.4; // Increased from 0.3 for fewer bounces
+        const decay = 8; // Increased from 6 for faster decay of bounces
+
+        // If we're at the end of the animation, ensure we return exactly 1
+        if (x >= 1) return 1;
+
+        // Calculate the elastic bounce with smoother physics
+        return (
+          1 +
+          amplitude *
+            Math.pow(2, -decay * x) *
+            Math.sin((x * Math.PI * 2) / period)
+        );
+      };
+
+      // Use different easing based on animation type
+      let easedProgress;
+      if (animState.animationType === "showing") {
+        // For showing animations, implement smoother elastic behavior
+
+        // First part approaches target with less overshoot (0-30%)
+        if (progress < 0.3) {
+          // Reduced overshoot
+          easedProgress = (progress / 0.3) * 1.1; // 10% overshoot instead of 20%
+        }
+        // Second part is gentler elastic bounce (30-100%)
+        else {
+          // Map remaining progress to elastic bounce
+          const bounceProgress = (progress - 0.3) / 0.7;
+
+          // Calculate elastic bounce with smoother overshoots
+          const elasticValue = elasticOut(bounceProgress);
+
+          // Apply elastic bounce with less dramatic overshooting
+          // Scale the bounces down for smoother effect
+          easedProgress = 1 + (elasticValue - 1) * 0.2; // Reduced from 0.3
+        }
+      } else {
+        // Use cubic ease-in-out for hiding and transitions
+        easedProgress =
+          progress < 0.5
+            ? 4 * progress * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      }
+
+      // Calculate current position and opacity
+      if (animState.animationType === "showing") {
+        // Convert eased progress into Y position with proper overshoots
+        const startY = -80;
+        const targetY = animState.targetY; // Should be 0
+        const range = targetY - startY;
+
+        // Apply eased progress to position calculation
+        // This allows for going beyond targetY (overshoot) based on easedProgress value
+        animState.currentY = startY + range * easedProgress;
+
+        // Opacity reaches full quickly but doesn't overshoot
+        animState.currentOpacity = Math.min(1, progress * 2.5);
+      } else {
+        // Regular interpolation for other animations
+        animState.currentY =
+          animState.currentY +
+          (animState.targetY - animState.currentY) * easedProgress;
+        animState.currentOpacity =
+          animState.currentOpacity +
+          (animState.targetOpacity - animState.currentOpacity) * easedProgress;
+      }
+
+      // Apply to DOM with string conversion for opacity to ensure proper CSS value
+      arrowRef.current.style.transform = `translateY(${animState.currentY}px)`;
+      arrowRef.current.style.opacity = String(animState.currentOpacity);
+
+      // Continue animation if not complete
+      if (progress < 1) {
+        animState.isAnimating = true;
+        animationRef.current = requestAnimationFrame(animateArrowFrame);
+      } else {
+        // Animation complete
+        animState.isAnimating = false;
+        animState.startTime = null;
+
+        // Ensure final values are exact
+        animState.currentY = animState.targetY;
+        animState.currentOpacity = animState.targetOpacity;
+        arrowRef.current.style.transform = `translateY(${animState.targetY}px)`;
+        arrowRef.current.style.opacity = String(animState.targetOpacity);
+
+        // Reset animation lock
+        animationLockRef.current = false;
+
+        // Reset animation flags
+        if (animState.animationType === "showing") {
+          openingAnimationInProgressRef.current = false;
+        } else if (animState.animationType === "hiding") {
+          exitAnimationInProgressRef.current = false;
+        }
+
+        // Update arrow state if hiding completed and fully hidden
+        if (animState.animationType === "hiding" && animState.targetY === -30) {
+          // Use timeout to ensure the DOM has updated before changing state
+          setTimeout(() => {
+            setArrowState("hidden");
+          }, 50);
+        }
+      }
+    };
+
+    // Start the animation loop
+    animationRef.current = requestAnimationFrame(animateArrowFrame);
+  };
+
+  // Enhanced function to update arrow target state with better safeguards
+  const updateArrowTargetState = (type) => {
+    const animState = arrowAnimationState.current;
+
+    // Special handling for hiding animations to ensure they complete
+    if (type === "hiding") {
+      // Cancel any existing animations
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+
+      // Reset animation states
+      animState.isAnimating = false;
+      animState.startTime = null;
+
+      // Ensure we're starting from visible position for smoothness
+      animState.currentY = 0;
+      animState.currentOpacity = 1;
+
+      // Explicitly set the starting position to ensure clean animation
+      if (arrowRef.current) {
+        arrowRef.current.style.transform = "translateY(0px)";
+        arrowRef.current.style.opacity = "1";
+        void arrowRef.current.offsetWidth; // Force reflow
+      }
+    }
+    // Don't start new animation if one is already running of the same type
+    else if (animState.isAnimating && animState.animationType === type) {
       return;
     }
 
-    // Lock animations to prevent duplicates
-    animationLockRef.current = true;
+    // Set animation parameters based on type
+    switch (type) {
+      case "showing":
+        animState.targetY = 0;
+        animState.targetOpacity = 1;
+        animState.duration = 1000; // Reduced from 1800 for more snappy animation
+        break;
+      case "hiding":
+        animState.targetY = -30;
+        animState.targetOpacity = 0;
+        animState.duration = 600; // Extended duration for exit animations
+        break;
+      case "transitioning":
+        // For modal-to-modal transitions, just reset to visible
+        animState.currentY = 0;
+        animState.targetY = 0;
+        animState.currentOpacity = 1;
+        animState.targetOpacity = 1;
 
-    // Set opening animation flag if this is a show animation
-    if (show) {
+        // Apply immediately without animation
+        if (arrowRef.current) {
+          arrowRef.current.style.transform = `translateY(0px)`;
+          arrowRef.current.style.opacity = 1;
+        }
+        return; // Exit without starting animation
+    }
+
+    // Set animation type
+    animState.animationType = type;
+
+    // For showing animations, always start from hidden position
+    if (type === "showing") {
+      animState.currentY = -80; // Start from much higher for more dramatic effect
+      animState.currentOpacity = 0;
+
+      if (arrowRef.current) {
+        arrowRef.current.style.transition = "none";
+        arrowRef.current.style.transform = "translateY(-80px)";
+        arrowRef.current.style.opacity = "0";
+        void arrowRef.current.offsetWidth; // Force reflow
+      }
+
+      // Set opening animation flag
       openingAnimationInProgressRef.current = true;
     }
 
-    // Get the current time
-    const startTime = Date.now();
-
-    // Remove the delay for showing animation to prevent flashing
-    const delayMs = show ? 0 : 100; // Only keep delay for hiding animation
-
-    // Set animation parameters - make the hide animation longer
-    const duration = show ? 1000 : 500; // Increased hide duration to 500ms for better visibility
-
-    // Easing functions for better animation
-    const easeOutBack = (x) => {
-      const c1 = 1.70158;
-      const c3 = c1 + 1;
-      return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
-    };
-
-    const easeInOut = (x) => {
-      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-    };
-
-    // Ensure starting position before animation begins
-    // Capture the current position and opacity before starting the animation
-    let startOpacity = 0;
-    let startY = -30;
-
-    if (arrowRef.current) {
-      // For "show" animations, ALWAYS force start from hidden position
-      if (show) {
-        startOpacity = 0;
-        startY = -30;
-        // Reset to starting position and ensure it's applied immediately
-        arrowRef.current.style.transition = "none";
-        arrowRef.current.style.opacity = "0";
-        arrowRef.current.style.transform = "translateY(-30px)";
-        // Force reflow to ensure styles are applied
-        void arrowRef.current.offsetWidth;
-      } else {
-        // For hide animation, get current position if available
-        const currentTransform = arrowRef.current.style.transform;
-        const currentOpacity = arrowRef.current.style.opacity;
-
-        if (currentTransform && currentOpacity) {
-          startOpacity = parseFloat(currentOpacity) || 0;
-
-          // Try to extract Y position from transform
-          const match = currentTransform.match(/translateY\(([-0-9.]+)px\)/);
-          if (match && match[1]) {
-            startY = parseFloat(match[1]);
-          }
-        }
-
-        // For hide animation, if not already visible, start visible
-        if (startOpacity < 0.5) {
-          startOpacity = 1;
-          startY = 0;
-          arrowRef.current.style.opacity = "1";
-          arrowRef.current.style.transform = "translateY(0px)";
-        }
-      }
-    }
-
-    // Animation function
-    const animate = () => {
-      // Stop animation if the arrow element no longer exists
-      if (!arrowRef.current) {
-        animationLockRef.current = false;
-        return;
-      }
-
-      // Calculate progress (0 to 1), accounting for delay
-      const elapsed = Date.now() - startTime;
-
-      // If we're still in the delay period, handle appropriately
-      if (elapsed < delayMs) {
-        // During delay, keep arrow at current position
-        animationRef.current = requestAnimationFrame(animate);
-        return;
-      }
-
-      // Calculate actual animation progress after delay
-      const animationElapsed = elapsed - delayMs;
-      const rawProgress = Math.min(animationElapsed / duration, 1);
-
-      // Apply easing for better animation feel
-      const progress = show ? easeOutBack(rawProgress) : easeInOut(rawProgress);
-
-      // Apply transform and opacity based on direction
-      if (show && !isNestedModal && !wasModalOpen) {
-        // Animate in with bounce: from start position up to 0px and 1 opacity
-        let y;
-
-        if (progress < 0.8) {
-          // First part: come up more slowly
-          y = startY * (1 - progress / 0.8);
-        } else {
-          // Second part: gentler bounce
-          const bounceProgress = (progress - 0.8) / 0.2;
-          y = 8 * Math.sin(bounceProgress * Math.PI); // Reduced bounce height from 10 to 8
-        }
-
-        // More gradual fade in - ensure it's purely controlled by the animation
-        const opacity =
-          startOpacity + (1 - startOpacity) * Math.min(progress * 1.2, 1);
-
-        arrowRef.current.style.opacity = opacity.toString();
-        arrowRef.current.style.transform = `translateY(${y}px)`;
-      } else {
-        // Animate out: from current position to -30px and 0 opacity
-        const targetY = -30;
-        const y = startY + (targetY - startY) * progress;
-        const opacity = startOpacity * (1 - progress);
-
-        arrowRef.current.style.transform = `translateY(${y}px)`;
-        arrowRef.current.style.opacity = opacity.toString();
-      }
-
-      // Continue if not finished
-      if (rawProgress < 1) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        // Animation complete - ENFORCE FINAL VALUES
-        if (!show) {
-          // If we were hiding, update the state to hidden AFTER animation completes
-          // Enforce final state for hiding
-          if (arrowRef.current) {
-            arrowRef.current.style.opacity = "0";
-            arrowRef.current.style.transform = "translateY(-30px)";
-          }
-          setTimeout(() => {
-            setArrowState("hidden");
-            // Release animation lock after state change
-            animationLockRef.current = false;
-          }, 100); // Small delay to ensure animation completes
-        } else if (arrowRef.current) {
-          // Ensure full opacity and position when animation completes for showing
-          arrowRef.current.style.opacity = "1";
-          arrowRef.current.style.transform = "translateY(0px)";
-          // Release animation lock after animation completes
-          animationLockRef.current = false;
-          // Reset opening animation flag when animation completes
-          openingAnimationInProgressRef.current = false;
-        }
-      }
-    };
-
     // Start animation
-    animationRef.current = requestAnimationFrame(animate);
+    startArrowAnimation();
   };
 
   const pathname = usePathname();
@@ -277,6 +380,11 @@ const Navbar = () => {
     // Detect initial modal open state
     const wasModalClosed = !lastModalStateRef.current.isModalOpen;
     const isInitialModalOpen = isModalOpen && wasModalClosed;
+
+    // Update our animation state reference
+    const animState = arrowAnimationState.current;
+    animState.lastModalState.isOpen = isModalOpen;
+    animState.lastModalState.isNested = isNestedModal;
 
     // Check for modalOpenSource to distinguish different modal triggers
     if (isInitialModalOpen) {
@@ -332,40 +440,15 @@ const Navbar = () => {
       // 3. Update arrow state without triggering animations
       setArrowState(newArrowState);
 
-      // 4. Force arrow to remain fully visible with no transition
-      if (arrowRef.current) {
-        // Ensure no transition is active
-        arrowRef.current.style.transition = "none";
-        // Force visibility
-        arrowRef.current.style.opacity = "1";
-        arrowRef.current.style.transform = "translateY(0px)";
-
-        // Apply changes immediately
-        void arrowRef.current.offsetWidth; // Force reflow
-
-        // Add redundant updates to ensure styles are applied across all browsers
-        requestAnimationFrame(() => {
-          if (arrowRef.current) {
-            arrowRef.current.style.opacity = "1";
-            arrowRef.current.style.transform = "translateY(0px)";
-          }
-        });
-
-        // Additional timeout as a fallback guarantee
-        setTimeout(() => {
-          if (arrowRef.current) {
-            arrowRef.current.style.opacity = "1";
-            arrowRef.current.style.transform = "translateY(0px)";
-          }
-        }, 10);
-      }
+      // 4. Handle transition in our new system
+      updateArrowTargetState("transitioning");
     }
     // Case: Arrow should be hidden (closing modal)
     else if (newArrowState === "hidden") {
-      // Only animate out if currently showing and not already animating
-      if (arrowState !== "hidden" && !animationLockRef.current) {
-        // Run animation to hide the arrow - don't set any styles directly
-        animateArrow(false);
+      // Only animate out if currently showing
+      if (arrowState !== "hidden") {
+        // Run animation to hide the arrow
+        updateArrowTargetState("hiding");
       }
     }
     // Case: Arrow should be shown but is currently hidden (opening modal for the first time)
@@ -379,95 +462,13 @@ const Navbar = () => {
         void arrowRef.current.offsetWidth;
       }
 
-      // Update arrow state AFTER ensuring it's hidden
+      // Update arrow state
       setArrowState(newArrowState);
 
-      // For first-time modal opening, ensure the arrow starts from the hidden position again
-      // This is redundant with the earlier check but important to guarantee hidden start state
-      if (isInitialModalOpen && arrowRef.current) {
-        // Reset to hidden position
-        arrowRef.current.style.transition = "none";
-        arrowRef.current.style.opacity = "0";
-        arrowRef.current.style.transform = "translateY(-30px)";
-        // Force reflow to ensure starting position is applied
-        void arrowRef.current.offsetWidth;
-      }
-
-      // Check if this is the Instagram modal (special case)
-      const isInstagramModal =
-        modalOpenSourceRef.current === "main" &&
-        !isNestedModal &&
-        !wasModalOpen;
-
-      // Only trigger animation if not locked and either:
-      // 1. This is the first open event, or
-      // 2. This is not the Instagram modal case
-      const shouldRunAnimation =
-        !animationLockRef.current &&
-        (isFirstOpenRef.current || !isInstagramModal);
-
-      // Reset first open flag
-      if (isFirstOpenRef.current) {
-        isFirstOpenRef.current = false;
-      }
-
-      // For Instagram modal, use CSS transition instead of animation
-      if (isInstagramModal && !shouldRunAnimation) {
-        // Lock to prevent other animations
-        animationLockRef.current = true;
-        // Set opening animation flag
-        openingAnimationInProgressRef.current = true;
-
-        // Use a small delay to ensure state is updated first
-        setTimeout(() => {
-          if (arrowRef.current) {
-            // First confirm the arrow is in the initial position
-            arrowRef.current.style.opacity = "0";
-            arrowRef.current.style.transform = "translateY(-30px)";
-
-            // Force reflow to ensure initial position is applied
-            void arrowRef.current.offsetWidth;
-
-            // Now apply the transition
-            arrowRef.current.style.transition =
-              "opacity 350ms ease-out, transform 350ms ease-out";
-            arrowRef.current.style.opacity = "1";
-            arrowRef.current.style.transform = "translateY(0px)";
-
-            // Reset transition and unlock after animation completes
-            setTimeout(() => {
-              if (arrowRef.current) {
-                arrowRef.current.style.transition = "none";
-              }
-              animationLockRef.current = false;
-              // Reset opening animation flag
-              openingAnimationInProgressRef.current = false;
-            }, 350);
-          }
-        }, 50); // Increased delay to ensure hidden state is visible first
-      }
-      // For regular animation case
-      else if (shouldRunAnimation) {
-        // FIX: Make sure we reset the animation lock
-        animationLockRef.current = false;
-
-        // Use a slightly longer timeout to ensure DOM updates and hidden state is visible first
-        setTimeout(() => {
-          // Double-check animation hasn't been locked in the meantime
-          if (!animationLockRef.current) {
-            // Final check to ensure arrow starts hidden
-            if (arrowRef.current) {
-              arrowRef.current.style.transition = "none";
-              arrowRef.current.style.opacity = "0";
-              arrowRef.current.style.transform = "translateY(-30px)";
-              void arrowRef.current.offsetWidth;
-            }
-
-            // Run animation, which will now force starting from hidden state
-            animateArrow(true);
-          }
-        }, 50); // Increased from 10ms to 50ms
-      }
+      // Use a short delay to ensure DOM updates before starting animation
+      setTimeout(() => {
+        updateArrowTargetState("showing");
+      }, 50);
     }
     // Case: Arrow state changes while already visible
     else if (arrowState !== newArrowState) {
@@ -523,52 +524,47 @@ const Navbar = () => {
     previousPathRef.current = pathname;
   }, [pathname, setModalOpen, setNestedModal]);
 
-  // Back arrow function for modals - modified to handle non-clickable state
+  // Improved back arrow click handler with debounce
   const handleBackArrowClick = () => {
-    // Only process click if modal is actually open and we're on the contact page
+    // Only process click if modal is open, on contact page, and not already handling a click
     const isContactPage = pathname === "/contact";
-    if (!isModalOpen || !isContactPage) return;
+    if (!isModalOpen || !isContactPage || clickHandledRef.current) return;
 
-    // Cancel any ongoing animations immediately to prevent conflicts
+    // Set click handled flag to prevent multiple rapid clicks
+    clickHandledRef.current = true;
+
+    // Clear flag after a short delay
+    setTimeout(() => {
+      clickHandledRef.current = false;
+    }, 300); // 300ms debounce
+
+    // Cancel any ongoing animations immediately
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
     }
 
-    // Release animation lock if it's set
+    // Reset animation references
     animationLockRef.current = false;
-    // Reset opening animation flag
     openingAnimationInProgressRef.current = false;
 
-    // Get current animation state and style properties
-    let currentOpacity = "1";
-    let currentTransform = "translateY(0px)";
-
-    // Try to read current styles, fallback to defaults if not available
+    // Force arrow to be fully visible during transition
     if (arrowRef.current) {
-      if (arrowRef.current.style.opacity) {
-        currentOpacity = arrowRef.current.style.opacity;
-      }
-      if (arrowRef.current.style.transform) {
-        currentTransform = arrowRef.current.style.transform;
-      }
-
-      // Force arrow to be fully visible during transition
       arrowRef.current.style.transition = "none";
       arrowRef.current.style.opacity = "1";
       arrowRef.current.style.transform = "translateY(0px)";
+      void arrowRef.current.offsetWidth; // Force reflow
 
-      // Force reflow
-      void arrowRef.current.offsetWidth;
+      // Also update our animation state tracker
+      arrowAnimationState.current.currentY = 0;
+      arrowAnimationState.current.currentOpacity = 1;
     }
 
-    // Now start the closing animation if needed, or just close
+    // Handle modal closing based on current state
     if (arrowState === "nested") {
-      // If in a nested modal, go back to the previous step
       console.log("Handling back arrow click for nested modal");
       closeModal(true);
     } else {
-      // If in the main modal, close it
       console.log("Handling back arrow click for main modal");
       closeModal();
     }
@@ -670,42 +666,20 @@ const Navbar = () => {
     // Check for modal transition for special rendering
     const inTransition = isModalToModalTransition();
 
-    // Detect if this is an initial render or a modal-to-modal transition
-    // This ensures we don't override the animation start position on first render
-    const wasModalClosed = !lastModalStateRef.current.isModalOpen;
-    const isInitialModalOpen = isModalOpen && wasModalClosed;
-
-    // CRITICAL FIX: Check if an opening animation is in progress
-    const isOpeningAnimation = openingAnimationInProgressRef.current;
-
-    // Mobile version of back arrow
+    // Mobile version of back arrow - keep original behavior for mobile
     if (isMobileView) {
+      // Use the values from our animation state for consistency
+      const { currentY, currentOpacity } = arrowAnimationState.current;
+
       return (
         <div
           ref={arrowRef}
           className={`fixed flex top-8 right-16 z-50 ${cursorStyle}`}
           onClick={handleBackArrowClick}
           style={{
-            // CRITICAL FIX: Force hidden state during opening animation
-            opacity: isOpeningAnimation
-              ? 0
-              : inTransition
-              ? 1
-              : arrowState === "hidden"
-              ? 0
-              : isInitialModalOpen
-              ? 0
-              : 1,
-            transform: isOpeningAnimation
-              ? "translateY(-30px)"
-              : inTransition
-              ? "translateY(0px)"
-              : arrowState === "hidden"
-              ? "translateY(-30px)"
-              : isInitialModalOpen
-              ? "translateY(-30px)"
-              : "translateY(0px)",
-            transition: "none", // No CSS transitions to interfere with our animations
+            opacity: currentOpacity,
+            transform: `translateY(${currentY}px)`,
+            transition: "none",
             pointerEvents: pointerEvents,
           }}
         >
@@ -733,33 +707,18 @@ const Navbar = () => {
       );
     }
 
-    // Desktop version of back arrow
+    // Desktop version - use animation state values directly
+    const { currentY, currentOpacity } = arrowAnimationState.current;
+
     return (
       <div
         ref={arrowRef}
         className={`fixed flex mx-auto top-[50px] md:top-[50px] z-[-1] w-full justify-center items-center ${cursorStyle}`}
         onClick={handleBackArrowClick}
         style={{
-          // CRITICAL FIX: Force hidden state during opening animation
-          opacity: isOpeningAnimation
-            ? 0
-            : inTransition
-            ? 1
-            : arrowState === "hidden"
-            ? 0
-            : isInitialModalOpen
-            ? 0
-            : 1,
-          transform: isOpeningAnimation
-            ? "translateY(-30px)"
-            : inTransition
-            ? "translateY(0px)"
-            : arrowState === "hidden"
-            ? "translateY(-30px)"
-            : isInitialModalOpen
-            ? "translateY(-30px)"
-            : "translateY(0px)",
-          transition: "none", // No CSS transitions to interfere with our animations
+          opacity: currentOpacity,
+          transform: `translateY(${currentY}px)`,
+          transition: "none",
           pointerEvents: pointerEvents,
         }}
       >
