@@ -27,7 +27,7 @@ export const metadata = {
   title: "Mousequetaire",
   description: "Mousequetaire - Agence de développement web & design",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
   },
 };
 
@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content="Mousequetaire" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
         <title>Mousequetaire</title>
       </head>
       <body
