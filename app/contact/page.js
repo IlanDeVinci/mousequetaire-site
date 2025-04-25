@@ -1707,7 +1707,7 @@ export default function Contact() {
                         <BackgroundAnimation />
 
                         {/* Content overlay */}
-                        <div className="relative z-10 flex flex-col items-center min-h-screen gap-4 md:gap-6 w-full mt-24 md:mt-54">
+                        <div className="relative z-10 flex flex-col items-center min-h-screen gap-4 md:gap-6 w-full mt-24 md:mt-58">
                           <h3 className="text-xl md:text-3xl font-bold mb-2 mt-10 md:mt-16 px-4 text-center text-shadow-xs text-shadow-blue-950">
                             {!showExpandedOptions
                               ? "Qui êtes-vous ?"

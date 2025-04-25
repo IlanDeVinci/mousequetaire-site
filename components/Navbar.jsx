@@ -710,16 +710,21 @@ const Navbar = () => {
     // Desktop version - use animation state values directly
     const { currentY, currentOpacity } = arrowAnimationState.current;
 
+    // Determine top position based on screen size
+    const topPosition = isLargeScreen ? "50px" : "98px"; // Add 50px when smaller than 1450px
+
     return (
       <div
         ref={arrowRef}
-        className={`fixed flex mx-auto top-[50px] md:top-[50px] z-[-1] w-full justify-center items-center ${cursorStyle}`}
+        className={`fixed flex mx-auto w-full justify-center items-center ${cursorStyle}`}
         onClick={handleBackArrowClick}
         style={{
           opacity: currentOpacity,
           transform: `translateY(${currentY}px)`,
           transition: "none",
           pointerEvents: pointerEvents,
+          top: topPosition, // Apply dynamic top positioning based on screen size
+          zIndex: -1,
         }}
       >
         {/* Invisible hit area for better click detection */}
@@ -761,10 +766,6 @@ const Navbar = () => {
 
   // Calculate navbar classes based on scroll state and screen size
   const getNavbarClasses = () => {
-    // If not scrolled, return base padding
-    if (!scrolled) return "pt-2 mt-0";
-
-    // When scrolled, check screen size
     if (isLargeScreen) {
       return "pt-2 mt-0"; // Large screens (≥1450px)
     } else {
