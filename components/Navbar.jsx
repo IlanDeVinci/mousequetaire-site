@@ -70,7 +70,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1450);
+      setIsLargeScreen(window.innerWidth >= 1250);
       setIsMobileView(window.innerWidth < 768); // Match md breakpoint
     };
 

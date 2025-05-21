@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import ScrollReveal from "../../components/ScrollReveal";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, A11y, Autoplay } from "swiper/modules";
+
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 // Enhanced portfolio items with importance representing layout size:
 // 4: 2x2 grid (takes 4 spaces)
@@ -764,11 +771,17 @@ export default function Portfolio() {
           border-radius: 0.75rem;
           max-width: 95%;
           width: 1000px;
-          max-height: 90vh;
+          max-height: 80vh;
           overflow-y: auto;
           position: relative;
           border: 1px solid rgba(59, 130, 246, 0.2);
           box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
+        }
+
+        @media (max-width: 1250px) {
+          .modal-content {
+            max-height: 65vh;
+          }
         }
 
         .carousel-button {
@@ -799,27 +812,50 @@ export default function Portfolio() {
           right: 10px;
         }
 
-        .carousel-indicator {
-          position: absolute;
-          bottom: 10px;
-          left: 0;
-          right: 0;
+        .swiper {
+          width: 100%;
+          height: 100%;
+        }
+
+        .swiper-slide {
+          position: relative;
           display: flex;
           justify-content: center;
-          gap: 8px;
+          align-items: center;
         }
 
-        .indicator-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background-color: rgba(255, 255, 255, 0.5);
-          transition: all 0.2s ease;
+        .swiper-pagination-bullet {
+          background: rgba(255, 255, 255, 0.5);
+          opacity: 1;
         }
 
-        .indicator-dot.active {
-          background-color: white;
+        .swiper-pagination-bullet-active {
+          background: white;
           transform: scale(1.3);
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+          color: white;
+          background-color: rgba(0, 0, 0, 0.5);
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+          background-color: rgba(59, 130, 246, 0.7);
+        }
+
+        .swiper-button-next::after,
+        .swiper-button-prev::after {
+          font-size: 16px;
+          font-weight: bold;
         }
       `}</style>
 
@@ -886,6 +922,7 @@ export default function Portfolio() {
                       src={item.image}
                       alt={item.title}
                       fill
+                      priority
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -987,91 +1024,55 @@ export default function Portfolio() {
             </button>
 
             <div className="relative h-72 md:h-96">
-              <Image
-                src={
-                  selectedProject.images?.[currentImageIndex] ||
-                  selectedProject.image
-                }
-                alt={selectedProject.title}
-                fill
-                priority
-                className="object-cover rounded-t-lg"
-              />
+              {selectedProject.images && selectedProject.images.length > 0 ? (
+                <Swiper
+                  modules={[Navigation, Pagination, A11y, Autoplay]}
+                  spaceBetween={0}
+                  slidesPerView={1}
+                  navigation
+                  pagination={{ clickable: true }}
+                  loop={true}
+                  autoplay={{ delay: 5000, disableOnInteraction: false }}
+                  initialSlide={currentImageIndex}
+                  onSlideChange={(swiper) =>
+                    setCurrentImageIndex(swiper.activeIndex)
+                  }
+                  className="h-full"
+                  style={{
+                    "--swiper-pagination-bullet-size": "16px",
+                    "--swiper-theme-color": "#ffffff",
+                  }}
+                >
+                  {selectedProject.images.map((image, index) => (
+                    <SwiperSlide key={`slide-${index}`}>
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={image}
+                          alt={`${selectedProject.title} - image ${index + 1}`}
+                          fill
+                          priority
+                          className="object-cover rounded-t-lg"
+                        />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              ) : (
+                <Image
+                  src={selectedProject.image}
+                  alt={selectedProject.title}
+                  fill
+                  priority
+                  className="object-cover rounded-t-lg"
+                />
+              )}
 
               {/* Project title overlay */}
-              <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/90 to-transparent p-6">
+              <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/40 to-transparent p-6 z-10">
                 <h2 className="text-2xl md:text-3xl font-bold text-white">
                   {selectedProject.title}
                 </h2>
               </div>
-
-              {/* Image Navigation Controls */}
-              {selectedProject.images && selectedProject.images.length > 1 && (
-                <>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showPrevImage();
-                    }}
-                    className="carousel-button prev-button hover:scale-110"
-                    aria-label="Previous image"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 19l-7-7 7-7"
-                      />
-                    </svg>
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      showNextImage();
-                    }}
-                    className="carousel-button next-button hover:scale-110"
-                    aria-label="Next image"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </button>
-
-                  <div className="carousel-indicator">
-                    {selectedProject.images.map((_, index) => (
-                      <div
-                        key={index}
-                        className={`indicator-dot ${
-                          currentImageIndex === index ? "active" : ""
-                        }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setCurrentImageIndex(index);
-                        }}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
             </div>
 
             <div className="p-6 md:p-8 bg-linear-to-b from-gray-900 to-gray-950 rounded-b-lg">
@@ -1284,68 +1285,30 @@ export default function Portfolio() {
           border-radius: 20px;
         }
 
-        .carousel-button {
+        /* Swiper custom styles */
+        .swiper-pagination {
           position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          background-color: rgba(0, 0, 0, 0.6);
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-radius: 9999px;
-          width: 44px;
-          height: 44px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          z-index: 5;
+          bottom: 10px !important;
+          z-index: 20;
         }
 
-        .carousel-button:hover {
-          background-color: rgba(59, 130, 246, 0.7);
-          border-color: rgba(59, 130, 246, 0.8);
-          box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        .swiper-button-next,
+        .swiper-button-prev {
+          z-index: 20;
         }
 
-        .prev-button {
-          left: 16px;
-        }
+        /* Make sure swiper buttons are visible on mobile */
+        @media (max-width: 640px) {
+          .swiper-button-next::after,
+          .swiper-button-prev::after {
+            font-size: 14px;
+          }
 
-        .next-button {
-          right: 16px;
-        }
-
-        .carousel-indicator {
-          position: absolute;
-          bottom: 16px;
-          left: 0;
-          right: 0;
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-          z-index: 5;
-        }
-
-        .indicator-dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background-color: rgba(255, 255, 255, 0.5);
-          transition: all 0.3s ease;
-          cursor: pointer;
-          border: 2px solid transparent;
-        }
-
-        .indicator-dot:hover {
-          background-color: rgba(255, 255, 255, 0.8);
-        }
-
-        .indicator-dot.active {
-          background-color: rgba(59, 130, 246, 0.8);
-          transform: scale(1.3);
-          border-color: rgba(255, 255, 255, 0.7);
-          box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+          .swiper-button-next,
+          .swiper-button-prev {
+            width: 32px;
+            height: 32px;
+          }
         }
       `}</style>
     </div>
