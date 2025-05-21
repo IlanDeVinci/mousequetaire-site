@@ -843,7 +843,7 @@ function TypeWriter({ text, className, speed = 50 }) {
   const [index, setIndex] = React.useState(0);
   const [isComplete, setIsComplete] = React.useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (index < text.length) {
       const timer = setTimeout(() => {
         setDisplayText((prev) => prev + text.charAt(index));
