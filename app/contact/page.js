@@ -954,9 +954,9 @@ const ContactBox = ({
           <div
             className="overflow-hidden transition-all duration-300 absolute left-0 right-0 -bottom-2 -z-30"
             style={{
-              height: isHovered ? "80px" : "0px",
+              height: isHovered ? "100px" : "0px",
               opacity: isHovered ? 1 : 0,
-              transform: `translateY(${isHovered ? "65px" : "-10px"})`,
+              transform: `translateY(${isHovered ? "85px" : "-10px"})`,
             }}
           >
             <div className="bg-white p-3 sm:p-4 rounded-b-lg shadow-lg">
@@ -967,7 +967,7 @@ const ContactBox = ({
                 }}
                 className="flex gap-2"
               >
-                <input
+                <textarea
                   type="text"
                   value={inputValue}
                   onChange={(e) => {
@@ -1077,7 +1077,7 @@ const contactGridItems = [
     buttonLink: "mailto:support@mousequetaire.com",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-3.5h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
+        <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
       </svg>
     ),
     bgColor: "#007EBD",

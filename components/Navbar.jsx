@@ -106,6 +106,57 @@ const Navbar = () => {
     };
   }, []);
 
+  // Add this useEffect near your other modal-related effects
+  useEffect(() => {
+    // Run only on initial component mount
+    const isContactPage = pathname === "/contact";
+
+    // Always reset arrow state on component mount
+    setArrowState("hidden");
+
+    // Reset animation state and ensure arrow is hidden
+    if (arrowRef.current) {
+      arrowRef.current.style.transition = "none";
+      arrowRef.current.style.opacity = "0";
+      arrowRef.current.style.transform = "translateY(-30px)";
+    }
+
+    // Reset all animation-related refs
+    arrowAnimationState.current = {
+      currentY: -30,
+      targetY: -30,
+      currentOpacity: 0,
+      targetOpacity: 0,
+      startTime: null,
+      duration: 500,
+      isAnimating: false,
+      animationType: null,
+      lastModalState: {
+        isOpen: false,
+        isNested: false,
+      },
+    };
+
+    // Reset tracking refs
+    openingAnimationInProgressRef.current = false;
+    exitAnimationInProgressRef.current = false;
+    isFirstOpenRef.current = false;
+    modalOpenSourceRef.current = null;
+
+    // If on contact page and modal is open, only then update arrow state
+    if (isContactPage && isModalOpen) {
+      setArrowState(isNestedModal ? "nested" : "shown");
+    }
+
+    // Cancel any ongoing animations
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array means this runs once on mount
+
   // Track if we've recently handled a click to prevent multiple rapid clicks
   const clickHandledRef = useRef(false);
 
@@ -490,8 +541,28 @@ const Navbar = () => {
   const previousPathRef = useRef(pathname);
 
   useEffect(() => {
-    // Check if we're navigating away from the contact page
-    if (previousPathRef.current === "/contact" && pathname !== "/contact") {
+    // When navigating TO the contact page (not just away from it)
+    if (previousPathRef.current !== "/contact" && pathname === "/contact") {
+      console.log("Navigating to contact page, ensuring arrow is hidden");
+
+      // Force arrow to hidden state initially
+      setArrowState("hidden");
+
+      // Ensure arrow is visually hidden
+      if (arrowRef.current) {
+        arrowRef.current.style.transition = "none";
+        arrowRef.current.style.opacity = "0";
+        arrowRef.current.style.transform = "translateY(-30px)";
+      }
+
+      // Only after a delay, check if modals require it to be shown
+      setTimeout(() => {
+        if (isModalOpen) {
+          setArrowState(isNestedModal ? "nested" : "shown");
+          updateArrowTargetState("showing");
+        }
+      }, 100);
+
       console.log("Leaving contact page, resetting modal states");
 
       // Reset all modal-related states
@@ -617,7 +688,7 @@ const Navbar = () => {
 
   // Logo component positioned relatively within the navbar
   const Logo = () => (
-    <div className="absolute left-4 top-4 md:top-2 z-50">
+    <div className="absolute left-4 -top-1 z-50">
       <Link
         href="/"
         onClick={(e) => {
@@ -663,9 +734,6 @@ const Navbar = () => {
     const cursorStyle = isClickable ? "cursor-pointer" : "cursor-default";
     const pointerEvents = isClickable ? "auto" : "none";
 
-    // Check for modal transition for special rendering
-    const inTransition = isModalToModalTransition();
-
     // Mobile version of back arrow - keep original behavior for mobile
     if (isMobileView) {
       // Use the values from our animation state for consistency
@@ -674,7 +742,7 @@ const Navbar = () => {
       return (
         <div
           ref={arrowRef}
-          className={`fixed flex top-8 right-16 z-50 ${cursorStyle}`}
+          className={`fixed flex top-2 right-16 z-50 ${cursorStyle}`}
           onClick={handleBackArrowClick}
           style={{
             opacity: currentOpacity,
@@ -711,7 +779,7 @@ const Navbar = () => {
     const { currentY, currentOpacity } = arrowAnimationState.current;
 
     // Determine top position based on screen size
-    const topPosition = isLargeScreen ? "50px" : "98px"; // Add 50px when smaller than 1450px
+    const topPosition = isLargeScreen ? "35px" : "78px"; // Add 50px when smaller than 1450px
 
     return (
       <div
@@ -750,6 +818,7 @@ const Navbar = () => {
             />
           </svg>
         </div>
+        {/*
         <span
           className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 text-white text-xs whitespace-nowrap opacity-90 font-medium"
           style={{
@@ -760,6 +829,7 @@ const Navbar = () => {
         >
           {arrowLabel}
         </span>
+        */}
       </div>
     );
   };
@@ -784,7 +854,7 @@ const Navbar = () => {
 
       {/* Mobile hamburger menu button */}
       <button
-        className="absolute top-8 right-4 z-50 md:hidden bg-white rounded-full p-2 w-10 h-10"
+        className="absolute top-2 right-4 z-50 md:hidden bg-white rounded-full p-2 w-10 h-10"
         onClick={toggleMobileMenu}
         aria-label="Toggle menu"
       >
@@ -844,9 +914,9 @@ const Navbar = () => {
 
       {/* Desktop navbar */}
       <nav
-        className={`w-full px-4 hidden md:flex justify-center transition-all duration-300 delay-150 ${getNavbarClasses()}`}
+        className={`w-full px-1 hidden md:flex justify-center transition-all duration-300 delay-150 ${getNavbarClasses()}`}
       >
-        <div className="w-[800px] bg-white rounded-full px-4 py-2 md:py-4 shadow-md">
+        <div className="w-[650px]  top-2 bg-white rounded-full px-1 py-1 md:py-2 shadow-md">
           <div className="flex justify-center space-x-4">
             {[
               "Accueil",
@@ -873,7 +943,7 @@ const Navbar = () => {
                   className="relative px-4 py-2 transition-all duration-300 rounded-full group"
                 >
                   <span
-                    className={`relative text-xl z-10 font-medium font-montserrat pointer-events-none ${
+                    className={`relative text-base z-10 font-medium font-montserrat pointer-events-none ${
                       isActive ? "text-white" : "text-[#002132]"
                     }`}
                   >

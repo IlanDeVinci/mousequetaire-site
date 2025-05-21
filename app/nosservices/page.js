@@ -63,7 +63,7 @@ const SvgBubblesAnimation = () => {
   }, []);
 
   return (
-    <div className="relative h-full w-full flex items-center justify-center overflow-hidden">
+    <div className="relative h-full w-full flex items-center justify-center overflow-visible">
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative w-full h-full mt-0">
           <Image
@@ -75,7 +75,7 @@ const SvgBubblesAnimation = () => {
           />
           <div className="absolute">
             <div
-              className={`transition-all duration-700 sm:translate-x-[50px] translate-x-[20px] -scale-x-100 ${
+              className={`transition-all duration-700 lg:translate-x-[50px] md:translate-x-[170px] translate-x-[20px] -scale-x-100 ${
                 visibleBubble === 1
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-1/2"
@@ -92,7 +92,7 @@ const SvgBubblesAnimation = () => {
           </div>
           <div className="absolute">
             <div
-              className={`transition-all duration-700 sm:translate-x-[150%] translate-x-[75%] -scale-x-100 ${
+              className={`transition-all duration-700 lg:translate-x-[150%] md:translate-x-[220%] translate-x-[75%] -scale-x-100 ${
                 visibleBubble === 2
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-1/2"
@@ -109,7 +109,7 @@ const SvgBubblesAnimation = () => {
           </div>
           <div className="absolute">
             <div
-              className={`transition-all duration-700 sm:translate-x-[100%] translate-x-[60%] ${
+              className={`transition-all duration-700 lg:translate-x-[100%] md:translate-x-[150%] translate-x-[60%] ${
                 visibleBubble === 3
                   ? "opacity-100 translate-y-1/4"
                   : "opacity-0 translate-y-1/2"

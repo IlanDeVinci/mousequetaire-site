@@ -449,7 +449,7 @@ export default function Home() {
               <ScrollReveal animation="fade-up" delay={500} threshold={0.2}>
                 <div className="flex justify-start">
                   <div
-                    className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative py-12 overflow-hidden text-left"
+                    className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative py-12 overflow-hidden text-justify"
                     style={{
                       background:
                         "linear-gradient(to right, rgba(5,6,16,0.85), rgba(5,6,16,0.95))",
@@ -465,7 +465,7 @@ export default function Home() {
                         transition: "all 1.2s ease-out",
                       }}
                     ></div>
-                    <p className="text-lg relative z-10">
+                    <p className="text-lg relative z-10 backdrop-blur-xs p-4 rounded-2xl border-1 border-white/80">
                       Nous sommes trois passionnés qui, autour d&apos;un bon
                       repas et de discussions enflammées, avons donné vie à
                       Mouse-quetaires en 2025. Notre histoire ? Celle
@@ -480,10 +480,11 @@ export default function Home() {
               <ScrollReveal animation="fade-left" delay={1200} threshold={0.2}>
                 <div className="flex justify-end">
                   <div
-                    className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative overflow-hidden py-12 text-right"
+                    className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative overflow-hidden py-12 text-justify"
                     style={{
                       background:
                         "linear-gradient(to left, rgba(5,6,16,0.85), rgba(5,6,16,0.95))",
+                      textAlignLast: "right",
                     }}
                   >
                     <div
@@ -496,7 +497,7 @@ export default function Home() {
                         transition: "all 1.2s ease-out",
                       }}
                     ></div>
-                    <p className="text-lg relative z-10">
+                    <p className="text-lg relative z-10 backdrop-blur-xs p-4 rounded-2xl border-1 border-white/80">
                       Ce qui nous fait vibrer chaque jour ? La qualité sans
                       compromis, une créativité qui ne connaît pas de limites et
                       cette honnêteté qui nous tient à cœur. Les solutions
@@ -511,7 +512,7 @@ export default function Home() {
               <ScrollReveal animation="zoom-in" delay={1900} threshold={0.2}>
                 <div className="flex justify-start">
                   <div
-                    className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative text-left py-12"
+                    className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative py-12 text-justify"
                     style={{
                       background:
                         "linear-gradient(to right, rgba(5,6,16,0.85), rgba(5,6,16,0.95))",
@@ -522,7 +523,7 @@ export default function Home() {
                       style={{
                         backgroundImage: "url('/images/accueil3.svg')",
                         backgroundSize: "contain",
-                        backgroundPosition: "center left",
+                        backgroundPosition: "bottom  left",
                         backgroundRepeat: "no-repeat",
                         maskImage:
                           "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0))",
@@ -531,7 +532,7 @@ export default function Home() {
                         transition: "all 1.2s ease-out",
                       }}
                     ></div>
-                    <p className="text-lg relative z-10">
+                    <p className="text-lg relative z-10 backdrop-blur-xs p-4 rounded-2xl border-1 border-white/80">
                       Nous travaillons en équipe soudée, où expertise technique
                       et créativité se nourrissent mutuellement. C&apos;est
                       comme ça qu&apos;on arrive à comprendre vos défis
@@ -825,7 +826,7 @@ function FlipCard({ frontContent, backContent, index }) {
               {frontContent}
             </h3>
             <div className="grow flex items-center justify-center">
-              <p className="text-base md:text-lg font-medium leading-relaxed pb-[10%]">
+              <p className="text-base md:text-lg p-4 font-medium leading-relaxed pb-[10%]">
                 {backContent}
               </p>
             </div>
