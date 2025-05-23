@@ -355,40 +355,34 @@ function TeamMember({ image, name, role, description, reverse }) {
   const isDorian = name === "Dorian Collet";
 
   return (
-    <ScrollReveal
-      animation={reverse ? "fade-left" : "fade-right"}
-      delay={200}
-      threshold={0.1}
+    <article
+      className={`flex flex-col ${
+        reverse ? "md:flex-row-reverse" : "md:flex-row"
+      } items-center mb-8 md:mb-12`}
     >
-      <article
-        className={`flex flex-col ${
-          reverse ? "md:flex-row-reverse" : "md:flex-row"
-        } items-center mb-8 md:mb-12`}
+      <div className="rounded-full overflow-hidden shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
+        <Image
+          src={image}
+          alt={`Photo de ${name}`}
+          width={200}
+          height={200}
+          className={`w-full h-full object-cover object-top ${
+            isDorian ? "scale-125" : ""
+          }`}
+        />
+      </div>
+      <div
+        className={`${
+          reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
+        } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
       >
-        <div className="rounded-full overflow-hidden shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
-          <Image
-            src={image}
-            alt={`Photo de ${name}`}
-            width={200}
-            height={200}
-            className={`w-full h-full object-cover object-top ${
-              isDorian ? "scale-125" : ""
-            }`}
-          />
-        </div>
-        <div
-          className={`${
-            reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
-          } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
-        >
-          <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
-          <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
-            {role}
-          </h3>
-          <p className="text-xs sm:text-sm md:text-base">{description}</p>
-        </div>
-      </article>
-    </ScrollReveal>
+        <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
+        <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
+          {role}
+        </h3>
+        <p className="text-xs sm:text-sm md:text-base">{description}</p>
+      </div>
+    </article>
   );
 }
 

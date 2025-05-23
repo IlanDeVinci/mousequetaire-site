@@ -1,10 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import WindAnimation from "../components/WindAnimation";
 import ScrollReveal from "../components/ScrollReveal";
+import { gsap } from "gsap";
+import TypeWriter from "../components/TypeWriter";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "../context/GSAPContext";
 
 export default function Home() {
   return (
@@ -626,20 +630,55 @@ export default function Home() {
 function FlipCard({ frontContent, backContent, index }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const initialized = React.useRef(false);
+  const cardRef = useRef(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
     if (!initialized.current) {
-      // Simplified hover detection
+      // Detect touch device
       let touchDevice = false;
       if (window.matchMedia("(any-hover:none)").matches) {
         touchDevice = true;
       }
       setIsTouchDevice(touchDevice);
       initialized.current = true;
-      console.log("Touch device detected:", touchDevice);
+
+      // Initial animation
+      gsap.fromTo(
+        cardRef.current,
+        {
+          opacity: 0,
+          y: 30,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          delay: index * 0.2,
+          ease: "power2.out",
+        }
+      );
     }
-  }, []);
+  }, [index]);
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+
+    // Handle flip animation with GSAP
+    if (isFlipped) {
+      gsap.to(cardRef.current, {
+        rotationY: 180,
+        duration: 0.6,
+        ease: "power2.inOut",
+      });
+    } else {
+      gsap.to(cardRef.current, {
+        rotationY: 0,
+        duration: 0.6,
+        ease: "power2.inOut",
+      });
+    }
+  }, [isFlipped]);
 
   const handleClick = () => {
     // For touch devices, toggle flip on click
@@ -664,15 +703,16 @@ function FlipCard({ frontContent, backContent, index }) {
 
   return (
     <div
-      className={`flip-card-container card-animation ${
-        isTouchDevice ? "touch-device" : ""
-      }`}
+      className={`flip-card-container ${isTouchDevice ? "touch-device" : ""}`}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      style={{ animationDelay: `${index * 0.2}s` }}
     >
-      <div className={`flip-card ${isFlipped ? "flipped" : ""}`}>
+      <div
+        ref={cardRef}
+        className="flip-card"
+        style={{ transformStyle: "preserve-3d" }}
+      >
         <div className="flip-card-front overflow-hidden">
           <h3 className="text-2xl md:text-3xl font-medium text-[#87D7FF] z-10 absolute">
             {frontContent}
@@ -837,6 +877,8 @@ function FlipCard({ frontContent, backContent, index }) {
   );
 }
 
+{
+  /**
 // TypeWriter component for the animation
 function TypeWriter({ text, className, speed = 50 }) {
   const [displayText, setDisplayText] = React.useState("");
@@ -861,4 +903,7 @@ function TypeWriter({ text, className, speed = 50 }) {
       {!isComplete && <span className="animate-blink">|</span>}
     </p>
   );
+  
+}
+ */
 }

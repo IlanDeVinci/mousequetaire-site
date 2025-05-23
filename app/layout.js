@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import { ModalProvider } from "@/context/ModalContext";
+import { GSAPProvider } from "@/context/GSAPContext";
+import PageLoader from "@/context/PageLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,14 +45,17 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased relative bg-[#050610]`}
       >
-        <ModalProvider>
-          <Navbar />
-          <main className="w-full py-16 pt-32 bg-[#050610] min-h-screen overflow-x-hidden">
-            {children}
-          </main>
-          <BackToTop />
-          <Footer />
-        </ModalProvider>
+        <PageLoader />
+        <GSAPProvider>
+          <ModalProvider>
+            <Navbar />
+            <main className="w-full py-16 pt-32 bg-[#050610] min-h-screen overflow-x-hidden">
+              {children}
+            </main>
+            <BackToTop />
+            <Footer />
+          </ModalProvider>
+        </GSAPProvider>
       </body>
     </html>
   );

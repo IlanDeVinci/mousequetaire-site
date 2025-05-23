@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { useGSAP } from "../context/GSAPContext";
 
 export default function ScrollReveal({
   children,
@@ -8,63 +9,83 @@ export default function ScrollReveal({
   delay = 0,
   rootMargin = "0px",
   className = "",
-  animation = "fade-up", // Options: fade-up, fade-down, fade-left, fade-right, zoom-in, zoom-out
+  animation = "fade-up",
 }) {
   const ref = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const { contextReady, gsap, ScrollTrigger } = useGSAP();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // When the element is in view
-        if (entry.isIntersecting && !isVisible) {
-          // Wait for the delay before showing
-          setTimeout(() => {
-            setIsVisible(true);
-          }, delay);
+    // Simple timeout-based initialization
+    const initTimer = setTimeout(() => {
+      if (contextReady && gsap && ScrollTrigger && ref.current) {
+        // Define initial state based on animation type
+        let initialVars = {};
+
+        switch (animation) {
+          case "fade-up":
+            initialVars = { y: 64, opacity: 0 };
+            break;
+          case "fade-down":
+            initialVars = { y: -64, opacity: 0 };
+            break;
+          case "fade-left":
+            initialVars = { x: 64, opacity: 0 };
+            break;
+          case "fade-right":
+            initialVars = { x: -64, opacity: 0 };
+            break;
+          case "zoom-in":
+            initialVars = { scale: 0.95, opacity: 0 };
+            break;
+          case "zoom-out":
+            initialVars = { scale: 1.05, opacity: 0 };
+            break;
+          default:
+            initialVars = { opacity: 0 };
         }
-      },
-      {
-        root: null, // Use viewport as root
-        rootMargin: rootMargin,
-        threshold: threshold, // Trigger when 10% of the element is visible
+
+        // Set initial state
+        gsap.set(ref.current, initialVars);
+
+        // Create ScrollTrigger animation
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: ref.current,
+            start: `top bottom-=${threshold * 100}%`,
+            toggleActions: "play none none none",
+            markers: false,
+          },
+        });
+
+        // Animate to visible state
+        tl.to(ref.current, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          duration: 1,
+          ease: "power2.out",
+          delay: delay / 1000,
+        });
+
+        setIsInitialized(true);
+      } else {
+        // Fallback: just show the content after a delay if GSAP fails
+        setTimeout(() => setIsInitialized(true), 500);
       }
-    );
+    }, 300);
 
-    const currentElement = ref.current;
-
-    if (currentElement) {
-      observer.observe(currentElement);
-    }
-
-    return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement);
-      }
-    };
-  }, [threshold, delay, rootMargin, isVisible]);
-
-  // Base classes for all animations
-  const baseClasses = "transition-all duration-1000 ease-out";
-
-  // Animation specific classes when not visible
-  const animationClasses = {
-    "fade-up": "opacity-0 translate-y-16",
-    "fade-down": "opacity-0 -translate-y-16",
-    "fade-left": "opacity-0 translate-x-16",
-    "fade-right": "opacity-0 -translate-x-16",
-    "zoom-in": "opacity-0 scale-95",
-    "zoom-out": "opacity-0 scale-105",
-  };
+    return () => clearTimeout(initTimer);
+  }, [contextReady, gsap, ScrollTrigger, animation, threshold, delay]);
 
   return (
     <div
       ref={ref}
-      className={`${baseClasses} ${
-        isVisible
-          ? "opacity-100 translate-x-0 translate-y-0 scale-100"
-          : animationClasses[animation]
-      } ${className}`}
+      className={className}
+      style={{
+        visibility: isInitialized ? "visible" : "hidden",
+      }}
     >
       {children}
     </div>

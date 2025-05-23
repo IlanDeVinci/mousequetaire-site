@@ -9,10 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@heroicons/react": "^2.2.0",
     "gsap": "^3.13.0",
     "metallicss": "^4.0.3",
-    "next": "15.1.6",
+    "next": "^15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "swiper": "^11.2.6"

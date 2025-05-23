@@ -911,7 +911,11 @@ export default function Portfolio() {
                   relative overflow-hidden rounded-lg transition-all duration-300
                   group cursor-pointer
                   hover:shadow-lg hover:shadow-blue-500/20
+                  opacity-0 translate-y-8
                 `}
+                style={{
+                  visibility: "hidden",
+                }}
               >
                 <div
                   className="h-full w-full"
