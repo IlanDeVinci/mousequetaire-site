@@ -51,32 +51,19 @@ const sections = [
 // SVG Bubbles Animation Component
 const SvgBubblesAnimation = () => {
   const [visibleBubble, setVisibleBubble] = useState(null);
-  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Very simple initialization - just wait 100ms
-    const timer = setTimeout(() => setIsReady(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!isReady) return;
-
     let bubbleIndex = 0;
     const interval = setInterval(() => {
       setVisibleBubble(bubbleIndex);
-      bubbleIndex = (bubbleIndex + 1) % 4;
+      bubbleIndex = (bubbleIndex + 1) % 4; // 0-3, where 0 is no bubble
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [isReady]);
+  }, []);
 
   return (
-    <div
-      className={`relative h-full w-full flex items-center justify-center overflow-visible ${
-        isReady ? "opacity-100" : "opacity-0"
-      } transition-opacity duration-300`}
-    >
+    <div className="relative h-full w-full flex items-center justify-center overflow-visible">
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="relative w-full h-full mt-0">
           <Image
@@ -147,10 +134,9 @@ const SvgBubblesAnimation = () => {
 const TypewriterAnimation = () => {
   const [text, setText] = useState("");
   const [snippetIndex, setSnippetIndex] = useState(0);
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
-  const [snippetOrder, setSnippetOrder] = useState([]);
-  const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
-  const [isReady, setIsReady] = useState(false);
+  const [isTypingComplete, setIsTypingComplete] = useState(false); // Track if typing is done
+  const [snippetOrder, setSnippetOrder] = useState([]); // Store the randomized order of snippets
+  const [currentOrderIndex, setCurrentOrderIndex] = useState(0); // Track position in the order
   const codeSnippets = [
     `// Support monitoring
 function support24_7() {
@@ -802,8 +788,6 @@ class WebSolution {
 
   // Generate a randomized order on component mount
   useEffect(() => {
-    if (!isReady) return;
-
     // Create an array of indices and shuffle it
     const indices = Array.from({ length: codeSnippets.length }, (_, i) => i);
     const shuffled = [...indices];
@@ -816,12 +800,26 @@ class WebSolution {
 
     setSnippetOrder(shuffled);
     setSnippetIndex(shuffled[0]); // Set initial snippet from the shuffled order
-  }, [codeSnippets.length, isReady]);
+  }, [codeSnippets.length]);
+
+  // Add blinking cursor animation to Tailwind
+  useEffect(() => {
+    // Add keyframes for blinking cursor if they don't exist yet
+    if (!document.querySelector("style#blink-animation")) {
+      const style = document.createElement("style");
+      style.id = "blink-animation";
+      style.textContent = `
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   // Typing effect implementation with snippets following the randomized order
   useEffect(() => {
-    if (!isReady || snippetOrder.length === 0) return;
-
     let i = 0;
     setIsTypingComplete(false);
 
@@ -866,7 +864,7 @@ class WebSolution {
     }, speed);
     return () => clearInterval(typing);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullText, text.length == 0, snippetOrder, currentOrderIndex, isReady]);
+  }, [fullText, text.length == 0, snippetOrder, currentOrderIndex]);
 
   // Add blinking cursor animation to Tailwind
   useEffect(() => {
@@ -885,14 +883,6 @@ class WebSolution {
   }, []);
 
   // Remove the individual random snippet selection function since we're now using the predetermined order
-
-  if (!isReady) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-transparent rounded-xl overflow-hidden opacity-0">
-        {/* Hidden placeholder */}
-      </div>
-    );
-  }
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-transparent rounded-xl overflow-hidden">
@@ -941,7 +931,6 @@ const GridElementsAnimation = () => {
   ]);
   // Track rotation for each element (in degrees)
   const [rotations, setRotations] = useState(Array(9).fill(0));
-  const [isReady, setIsReady] = useState(false);
 
   // Updated elements with more varied rounded corners
   const elements = [
@@ -964,16 +953,8 @@ const GridElementsAnimation = () => {
     return { col, row };
   };
 
-  // Very simple initialization - just wait 100ms
-  useEffect(() => {
-    const timer = setTimeout(() => setIsReady(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Change gradients periodically with smooth transition
   useEffect(() => {
-    if (!isReady) return;
-
     const availableGradients = [
       { from: "rgb(96, 165, 250)", to: "rgb(168, 85, 247)" }, // blue to purple
       { from: "rgb(74, 222, 128)", to: "rgb(96, 165, 250)" }, // green to blue
@@ -1019,12 +1000,10 @@ const GridElementsAnimation = () => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [showingPseudo, isReady]);
+  }, [showingPseudo]);
 
   // Swap elements and apply random rotations
   useEffect(() => {
-    if (!isReady) return;
-
     const interval = setInterval(() => {
       const idx1 = Math.floor(Math.random() * 9);
       let idx2 = Math.floor(Math.random() * 9);
@@ -1044,12 +1023,10 @@ const GridElementsAnimation = () => {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isReady]);
+  }, []);
 
   // Add rotation animation effect
   useEffect(() => {
-    if (!isReady) return;
-
     const rotationInterval = setInterval(() => {
       // Pick a random element to rotate
       const elementIndex = Math.floor(Math.random() * 9);
@@ -1073,18 +1050,10 @@ const GridElementsAnimation = () => {
 
     return () => clearInterval(rotationInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady]);
-
-  if (!isReady) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center p-4 overflow-visible opacity-0">
-        {/* Hidden placeholder */}
-      </div>
-    );
-  }
+  }, []);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-4 overflow-visible">
+    <div className="absolute inset-0 flex items-center justify-center p-4 overflow-visible  ">
       <div className="relative w-full max-w-[400px] aspect-square">
         {elements.map((element, index) => {
           const { col, row } = calculatePosition(index);
