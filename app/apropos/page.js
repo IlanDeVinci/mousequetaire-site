@@ -111,31 +111,71 @@ function DiscoverElement() {
   };
 
   useEffect(() => {
-    if (!document.querySelector("#pulse-animations")) {
-      const styleEl = document.createElement("style");
-      styleEl.id = "pulse-animations";
-      styleEl.innerHTML = `
-        @keyframes pulseRing {
-          0% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0.8); }
-          70% { box-shadow: 0 0 0 25px rgba(135, 215, 255, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0); }
+    // Use GSAP for pulse animations instead of CSS
+    if (typeof gsap !== "undefined") {
+      // Remove CSS animations and use GSAP
+      const pulseElements = document.querySelectorAll(
+        ".animate-pulse-ring, .animate-pulse-light"
+      );
+
+      pulseElements.forEach((element) => {
+        if (element.classList.contains("animate-pulse-ring")) {
+          gsap.to(element, {
+            boxShadow: "0 0 0 25px rgba(135, 215, 255, 0)",
+            duration: 2,
+            repeat: -1,
+            ease: "power2.out",
+            keyframes: {
+              "0%": { boxShadow: "0 0 0 0 rgba(135, 215, 255, 0.8)" },
+              "70%": { boxShadow: "0 0 0 25px rgba(135, 215, 255, 0)" },
+              "100%": { boxShadow: "0 0 0 0 rgba(135, 215, 255, 0)" },
+            },
+          });
         }
-        
-        @keyframes pulseLight {
-          0% { background-color: rgba(255, 255, 255, 0.1); }
-          50% { background-color: rgba(135, 215, 255, 0.3); }
-          100% { background-color: rgba(255, 255, 255, 0.1); }
+
+        if (element.classList.contains("animate-pulse-light")) {
+          gsap.to(element, {
+            backgroundColor: "rgba(135, 215, 255, 0.3)",
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+            keyframes: {
+              "0%": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
+              "50%": { backgroundColor: "rgba(135, 215, 255, 0.3)" },
+              "100%": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
+            },
+          });
         }
-        
-        .animate-pulse-ring {
-          animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-        }
-        
-        .animate-pulse-light {
-          animation: pulseLight 2s ease-in-out infinite;
-        }
-      `;
-      document.head.appendChild(styleEl);
+      });
+    } else {
+      // Fallback to CSS animations
+      if (!document.querySelector("#pulse-animations")) {
+        const styleEl = document.createElement("style");
+        styleEl.id = "pulse-animations";
+        styleEl.innerHTML = `
+          @keyframes pulseRing {
+            0% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0.8); }
+            70% { box-shadow: 0 0 0 25px rgba(135, 215, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0); }
+          }
+          
+          @keyframes pulseLight {
+            0% { background-color: rgba(255, 255, 255, 0.1); }
+            50% { background-color: rgba(135, 215, 255, 0.3); }
+            100% { background-color: rgba(255, 255, 255, 0.1); }
+          }
+          
+          .animate-pulse-ring {
+            animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+          }
+          
+          .animate-pulse-light {
+            animation: pulseLight 2s ease-in-out infinite;
+          }
+        `;
+        document.head.appendChild(styleEl);
+      }
     }
   }, []);
 
@@ -355,34 +395,40 @@ function TeamMember({ image, name, role, description, reverse }) {
   const isDorian = name === "Dorian Collet";
 
   return (
-    <article
-      className={`flex flex-col ${
-        reverse ? "md:flex-row-reverse" : "md:flex-row"
-      } items-center mb-8 md:mb-12`}
+    <ScrollReveal
+      animation={reverse ? "fade-left" : "fade-right"}
+      delay={100}
+      className={`flex flex-col md:flex-row items-center mb-8 md:mb-12`}
     >
-      <div className="rounded-full overflow-hidden shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
-        <Image
-          src={image}
-          alt={`Photo de ${name}`}
-          width={200}
-          height={200}
-          className={`w-full h-full object-cover object-top ${
-            isDorian ? "scale-125" : ""
-          }`}
-        />
-      </div>
-      <div
-        className={`${
-          reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
-        } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
+      <article
+        className={`flex flex-col ${
+          reverse ? "md:flex-row-reverse" : "md:flex-row"
+        } items-center mb-8 md:mb-12`}
       >
-        <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
-        <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
-          {role}
-        </h3>
-        <p className="text-xs sm:text-sm md:text-base">{description}</p>
-      </div>
-    </article>
+        <div className="rounded-full overflow-hidden shrink-0 w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] md:w-[180px] md:h-[180px] lg:w-[200px] lg:h-[200px] mb-4 md:mb-0">
+          <Image
+            src={image}
+            alt={`Photo de ${name}`}
+            width={200}
+            height={200}
+            className={`w-full h-full object-cover object-top ${
+              isDorian ? "scale-125" : ""
+            }`}
+          />
+        </div>
+        <div
+          className={`${
+            reverse ? "mr-4 md:mr-6 lg:mr-12" : "ml-4 md:ml-6 lg:ml-12"
+          } text-center md:text-left ${reverse ? "md:text-right" : ""} text-lg`}
+        >
+          <h2 className="text-xl sm:text-2xl md:text-3xl">{name}</h2>
+          <h3 className="text-[#87D7FF] my-2 text-base sm:text-lg md:text-xl">
+            {role}
+          </h3>
+          <p className="text-xs sm:text-sm md:text-base">{description}</p>
+        </div>
+      </article>
+    </ScrollReveal>
   );
 }
 

@@ -2,18 +2,20 @@
 
 import { useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
+import { useLoading } from "../context/PageLoader";
 
 export default function TypeWriter({ text, className, speed = 50 }) {
   const textRef = useRef(null);
   const cursorRef = useRef(null);
   const [isTyping, setIsTyping] = useState(false);
   const [currentText, setCurrentText] = useState("");
+  const { isLoadingComplete } = useLoading();
 
-  // Handle the typing animation with GSAP
+  // Handle the typing animation with GSAP - wait for loading to complete
   useEffect(() => {
-    if (!textRef.current) return;
+    if (!textRef.current || !isLoadingComplete) return;
 
-    const startDelay = 1.0;
+    const startDelay = 1.5; // Slightly longer delay after loading
     setIsTyping(false);
     setCurrentText("");
 
@@ -57,7 +59,7 @@ export default function TypeWriter({ text, className, speed = 50 }) {
     return () => {
       tl.kill();
     };
-  }, [text, speed]);
+  }, [text, speed, isLoadingComplete]);
 
   // Optimized cursor blinking with GSAP
   useEffect(() => {

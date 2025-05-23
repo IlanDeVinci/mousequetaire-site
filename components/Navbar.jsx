@@ -9,7 +9,7 @@ import { useModal } from "@/context/ModalContext";
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const {
     isModalOpen,
@@ -70,7 +70,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 1250);
+      setIsSmallScreen(window.innerWidth <= 1250);
       setIsMobileView(window.innerWidth < 768); // Match md breakpoint
     };
 
@@ -779,7 +779,7 @@ const Navbar = () => {
     const { currentY, currentOpacity } = arrowAnimationState.current;
 
     // Determine top position based on screen size
-    const topPosition = isLargeScreen ? "35px" : "78px"; // Add 50px when smaller than 1450px
+    const topPosition = isSmallScreen ? "78px" : "35px"; // Add 50px when smaller than 1450px
 
     return (
       <div
@@ -836,11 +836,8 @@ const Navbar = () => {
 
   // Calculate navbar classes based on scroll state and screen size
   const getNavbarClasses = () => {
-    if (isLargeScreen) {
-      return "pt-2 mt-0"; // Large screens (≥1450px)
-    } else {
-      return "pt-14 mt-0"; // Smaller screens (<1450px) - added pt-14
-    }
+    // Start with pt-2 by default, but use pt-14 for smaller screens when needed
+    return isSmallScreen ? "pt-14 mt-0" : "pt-2 mt-0";
   };
 
   return (
