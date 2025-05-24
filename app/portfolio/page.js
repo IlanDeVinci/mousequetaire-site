@@ -903,12 +903,12 @@ export default function Portfolio() {
             >
               <ScrollReveal
                 key={item.uniqueKey || item.id}
-                threshold={0.1}
+                threshold={0.25}
                 delay={(index % 3) * 75}
                 animation="fade-up"
                 className={`
                   h-full w-full
-                  relative overflow-hidden rounded-lg
+                  relative overflow-hidden rounded-4xl
                   group cursor-pointer
                   hover:shadow-lg hover:shadow-blue-500/20
                   opacity-0 translate-y-8
