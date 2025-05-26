@@ -46,13 +46,11 @@ export default function ScrollReveal({
             y: distance,
             opacity: 0,
             scale: 0.95,
-            rotationX: 8,
           };
           animateVars = {
             y: 0,
             opacity: 1,
             scale: 1,
-            rotationX: 0,
             ease: "power3.out",
           };
           break;
@@ -67,7 +65,6 @@ export default function ScrollReveal({
             y: 0,
             opacity: 1,
             scale: 1,
-            rotationX: 0,
             ease: "power3.out",
           };
           break;
@@ -76,13 +73,11 @@ export default function ScrollReveal({
             x: distance,
             opacity: 0,
             scale: 0.9,
-            rotationY: 15,
           };
           animateVars = {
             x: 0,
             opacity: 1,
             scale: 1,
-            rotationY: 0,
             ease: "power3.out",
           };
           break;
@@ -91,13 +86,11 @@ export default function ScrollReveal({
             x: -distance,
             opacity: 0,
             scale: 0.9,
-            rotationY: -15,
           };
           animateVars = {
             x: 0,
             opacity: 1,
             scale: 1,
-            rotationY: 0,
             ease: "power3.out",
           };
           break;
@@ -105,12 +98,10 @@ export default function ScrollReveal({
           initialVars = {
             scale: 0.7,
             opacity: 0,
-            rotation: 5,
           };
           animateVars = {
             scale: 1,
             opacity: 1,
-            rotation: 0,
             ease: "back.out(1.7)",
           };
           break;
@@ -118,12 +109,10 @@ export default function ScrollReveal({
           initialVars = {
             scale: 1.3,
             opacity: 0,
-            rotation: -3,
           };
           animateVars = {
             scale: 1,
             opacity: 1,
-            rotation: 0,
             ease: "power2.out",
           };
           break;
@@ -133,14 +122,12 @@ export default function ScrollReveal({
             y: distance * 0.7,
             opacity: 0,
             scale: 0.8,
-            rotation: 10,
           };
           animateVars = {
             x: 0,
             y: 0,
             opacity: 1,
             scale: 1,
-            rotation: 0,
             ease: "power3.out",
           };
           break;
