@@ -84,7 +84,7 @@ const SvgBubblesAnimation = () => {
 
     // Create timeline for bubble animations
     const tl = gsap.timeline({ repeat: -1 });
-    const yoffset = -100;
+    const yoffset = -120;
     // Bubble 1 animation sequence
     tl.add(() => setVisibleBubble(1))
       .to(bubble1Ref.current, {
@@ -212,7 +212,7 @@ const SvgBubblesAnimation = () => {
               width: "clamp(110px, 18vw, 180px)",
               height: "clamp(66px, 11vw, 110px)",
               right: "clamp(15%, 20vw, 120px)",
-              top: "clamp(45%, 55%, 65%)",
+              top: "clamp(35%, 45%, 55%)",
             }}
           >
             <Image
