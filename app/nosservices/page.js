@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useCallback, useRef, useEffect } from "react";
 import ScrollReveal from "../../components/ScrollReveal";
+import { useGSAP } from "../../context/GSAPContext";
 
 const services = [
   {
@@ -48,24 +49,113 @@ const sections = [
   },
 ];
 
-// SVG Bubbles Animation Component
+// SVG Bubbles Animation Component with GSAP
 const SvgBubblesAnimation = () => {
+  const { gsap, contextReady } = useGSAP();
   const [visibleBubble, setVisibleBubble] = useState(null);
+  const bubble1Ref = useRef(null);
+  const bubble2Ref = useRef(null);
+  const bubble3Ref = useRef(null);
+  const timelineRef = useRef(null);
 
   useEffect(() => {
-    let bubbleIndex = 0;
-    const interval = setInterval(() => {
-      setVisibleBubble(bubbleIndex);
-      bubbleIndex = (bubbleIndex + 1) % 4; // 0-3, where 0 is no bubble
-    }, 2000);
+    if (!gsap || !contextReady) return;
 
-    return () => clearInterval(interval);
-  }, []);
+    if (timelineRef.current) {
+      timelineRef.current.kill();
+    }
+
+    const bubbles = [
+      bubble1Ref.current,
+      bubble2Ref.current,
+      bubble3Ref.current,
+    ];
+
+    // Set initial states - all bubbles start below and invisible
+    bubbles.forEach((bubble) => {
+      if (bubble) {
+        gsap.set(bubble, {
+          opacity: 0,
+          y: 80,
+          transformOrigin: "center center",
+        });
+      }
+    });
+
+    // Create timeline for bubble animations
+    const tl = gsap.timeline({ repeat: -1 });
+    const yoffset = -100;
+    // Bubble 1 animation sequence
+    tl.add(() => setVisibleBubble(1))
+      .to(bubble1Ref.current, {
+        opacity: 1,
+        y: yoffset,
+        duration: 0.8,
+        ease: "power2.out",
+      })
+      .to({}, { duration: 1.5 }) // Pause for 1.5 seconds
+      .to(bubble1Ref.current, {
+        opacity: 0,
+        y: yoffset - 40,
+        duration: 0.6,
+        ease: "power2.in",
+      })
+      .to({}, { duration: 0.3 }) // Small delay before next bubble
+
+      // Bubble 2 animation sequence
+      .add(() => setVisibleBubble(2))
+      .to(bubble2Ref.current, {
+        opacity: 1,
+        y: yoffset,
+        duration: 0.8,
+        ease: "power2.out",
+      })
+      .to({}, { duration: 1.5 }) // Pause for 1.5 seconds
+      .to(bubble2Ref.current, {
+        opacity: 0,
+        y: yoffset - 40,
+        duration: 0.6,
+        ease: "power2.in",
+      })
+      .to({}, { duration: 0.3 }) // Small delay before next bubble
+
+      // Bubble 3 animation sequence
+      .add(() => setVisibleBubble(3))
+      .to(bubble3Ref.current, {
+        opacity: 1,
+        y: yoffset,
+        duration: 0.8,
+        ease: "power2.out",
+      })
+      .to({}, { duration: 1.5 }) // Pause for 1.5 seconds
+      .to(bubble3Ref.current, {
+        opacity: 0,
+        y: yoffset - 40,
+        duration: 0.6,
+        ease: "power2.in",
+      })
+
+      // Reset all bubbles to starting position
+      .add(() => setVisibleBubble(null))
+      .set([bubble1Ref.current, bubble2Ref.current, bubble3Ref.current], {
+        y: 80,
+        opacity: 0,
+      })
+      .to({}, { duration: 1 }); // Wait before restarting
+
+    timelineRef.current = tl;
+
+    return () => {
+      if (timelineRef.current) {
+        timelineRef.current.kill();
+      }
+    };
+  }, [gsap, contextReady]);
 
   return (
     <div className="relative h-full w-full flex items-center justify-center overflow-visible">
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="relative w-full h-full mt-0">
+        <div className="relative w-full h-full">
           <Image
             src="/images/papotte.svg"
             alt="Communication"
@@ -73,56 +163,64 @@ const SvgBubblesAnimation = () => {
             className="object-contain p-4"
             style={{ marginTop: "80px" }}
           />
-          <div className="absolute">
-            <div
-              className={`transition-all duration-700 lg:translate-x-[50px] md:translate-x-[170px] translate-x-[20px] -scale-x-100 ${
-                visibleBubble === 1
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-1/2"
-              }`}
-              style={{ width: "200px", height: "112px" }}
-            >
-              <Image
-                src="/images/bulle1.svg"
-                alt="Message"
-                fill
-                className="object-contain"
-              />
-            </div>
+
+          {/* Bubble 1 - Left side */}
+          <div
+            ref={bubble1Ref}
+            className="absolute"
+            style={{
+              width: "clamp(120px, 20vw, 200px)",
+              height: "clamp(67px, 11.2vw, 112px)",
+              left: "clamp(5%, 8vw, 60px)",
+              top: "clamp(25%, 35%, 45%)",
+              transform: "scaleX(-1)",
+            }}
+          >
+            <Image
+              src="/images/bulle1.svg"
+              alt="Message"
+              fill
+              className="object-contain"
+            />
           </div>
-          <div className="absolute">
-            <div
-              className={`transition-all duration-700 lg:translate-x-[150%] md:translate-x-[220%] translate-x-[75%] -scale-x-100 ${
-                visibleBubble === 2
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-1/2"
-              }`}
-              style={{ width: "200px", height: "124px" }}
-            >
-              <Image
-                src="/images/bulle2.svg"
-                alt="Message"
-                fill
-                className="object-contain"
-              />
-            </div>
+
+          {/* Bubble 2 - Right side */}
+          <div
+            ref={bubble2Ref}
+            className="absolute"
+            style={{
+              width: "clamp(120px, 20vw, 200px)",
+              height: "clamp(74px, 12.4vw, 124px)",
+              right: "clamp(5%, 8vw, 60px)",
+              top: "clamp(20%, 30%, 40%)",
+              transform: "scaleX(-1)",
+            }}
+          >
+            <Image
+              src="/images/bulle2.svg"
+              alt="Message"
+              fill
+              className="object-contain"
+            />
           </div>
-          <div className="absolute">
-            <div
-              className={`transition-all duration-700 lg:translate-x-[100%] md:translate-x-[150%] translate-x-[60%] ${
-                visibleBubble === 3
-                  ? "opacity-100 translate-y-1/4"
-                  : "opacity-0 translate-y-1/2"
-              }`}
-              style={{ width: "200px", height: "110px" }}
-            >
-              <Image
-                src="/images/bulle3.svg"
-                alt="Message"
-                fill
-                className="object-contain"
-              />
-            </div>
+
+          {/* Bubble 3 - Center right */}
+          <div
+            ref={bubble3Ref}
+            className="absolute"
+            style={{
+              width: "clamp(110px, 18vw, 180px)",
+              height: "clamp(66px, 11vw, 110px)",
+              right: "clamp(15%, 20vw, 120px)",
+              top: "clamp(45%, 55%, 65%)",
+            }}
+          >
+            <Image
+              src="/images/bulle3.svg"
+              alt="Message"
+              fill
+              className="object-contain"
+            />
           </div>
         </div>
       </div>
@@ -130,13 +228,17 @@ const SvgBubblesAnimation = () => {
   );
 };
 
-// Typewriter Animation Component
+// Typewriter Animation Component with GSAP
 const TypewriterAnimation = () => {
+  const { gsap, contextReady } = useGSAP();
   const [text, setText] = useState("");
   const [snippetIndex, setSnippetIndex] = useState(0);
-  const [isTypingComplete, setIsTypingComplete] = useState(false); // Track if typing is done
-  const [snippetOrder, setSnippetOrder] = useState([]); // Store the randomized order of snippets
-  const [currentOrderIndex, setCurrentOrderIndex] = useState(0); // Track position in the order
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const [snippetOrder, setSnippetOrder] = useState([]);
+  const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
+  const cursorRef = useRef(null);
+  const typingTimelineRef = useRef(null);
+
   const codeSnippets = [
     `// Support monitoring
 function support24_7() {
@@ -201,7 +303,6 @@ class WebSolution {
 }`,
   ];
   const fullText = codeSnippets[snippetIndex];
-  const speed = 20;
 
   // Process text for syntax highlighting with improved colors
   const processedText = () => {
@@ -326,11 +427,9 @@ class WebSolution {
       "clearInterval",
     ];
 
-    // Split text by lines to handle comments properly
     const lines = text.split("\n");
     const lastLineIndex = lines.length - 1;
 
-    // Detect language by analyzing content patterns
     const isHTML =
       text.includes("</") ||
       text.includes("/>") ||
@@ -347,10 +446,8 @@ class WebSolution {
       text.includes("props") ||
       text.includes("=>") ||
       text.includes("&&");
-    const isJavaScript = !isHTML && !isCSS; // JavaScript or React
 
     return lines.map((line, lineIndex) => {
-      // Check for comments first
       const commentMatch =
         line.match(comment) ||
         (isHTML && line.match(htmlComment)) ||
@@ -362,7 +459,6 @@ class WebSolution {
         const htmlCommentIndex = line.indexOf("<!--");
         const cssCommentIndex = line.indexOf("/*");
 
-        // Find the actual index of the comment
         let actualIndex = -1;
         if (commentIndex !== -1) actualIndex = commentIndex;
         if (
@@ -384,11 +480,11 @@ class WebSolution {
             {processLine(beforeComment)}
             <span className={isCSS ? "text-gray-500" : "text-gray-400"}>
               {commentText}
-              {isLastLine && isTypingComplete && (
-                <span className="inline-block w-2 h-4 md:h-5 bg-white animate-[blink_1s_infinite] ml-0.5 align-middle"></span>
-              )}
-              {isLastLine && !isTypingComplete && (
-                <span className="inline-block w-2 h-4 md:h-5 bg-white opacity-70 ml-0.5 align-middle"></span>
+              {isLastLine && (
+                <span
+                  ref={isLastLine ? cursorRef : null}
+                  className="inline-block w-2 h-4 md:h-5 bg-white ml-0.5 align-middle"
+                ></span>
               )}
             </span>
           </div>
@@ -398,11 +494,11 @@ class WebSolution {
       return (
         <div key={`line-${lineIndex}`} className="whitespace-pre">
           {processLine(line)}
-          {isLastLine && isTypingComplete && (
-            <span className="inline-block w-2 h-4 md:h-5 bg-white animate-[blink_1s_infinite] ml-0.5 align-middle"></span>
-          )}
-          {isLastLine && !isTypingComplete && (
-            <span className="inline-block w-2 h-4 md:h-5 bg-white opacity-70 ml-0.5 align-middle"></span>
+          {isLastLine && (
+            <span
+              ref={cursorRef}
+              className="inline-block w-2 h-4 md:h-5 bg-white ml-0.5 align-middle"
+            ></span>
           )}
         </div>
       );
@@ -449,7 +545,6 @@ class WebSolution {
             !inAttributeValue
           ) {
             if (currentWord) {
-              // This is the tag name
               result.push(
                 <span key={`tagname-${i}`} className="text-cyan-400">
                   {currentWord}
@@ -462,7 +557,6 @@ class WebSolution {
             continue;
           } else if (inTag && inAttribute && char === "=" && !inString) {
             if (currentWord) {
-              // This is the attribute name
               result.push(
                 <span key={`attr-${i}`} className="text-yellow-300">
                   {currentWord}
@@ -673,28 +767,19 @@ class WebSolution {
             {word}
           </span>
         );
-      }
-
-      // Types
-      else if (types.includes(word)) {
+      } else if (types.includes(word)) {
         return (
           <span key={`type-${position}`} className="text-blue-300">
             {word}
           </span>
         );
-      }
-
-      // Built-in functions
-      else if (builtInFunctions.includes(word)) {
+      } else if (builtInFunctions.includes(word)) {
         return (
           <span key={`func-${position}`} className="text-yellow-200">
             {word}
           </span>
         );
-      }
-
-      // Variable/function names at definition
-      else if (
+      } else if (
         word.startsWith("const ") ||
         word.startsWith("let ") ||
         word.startsWith("var ") ||
@@ -707,10 +792,7 @@ class WebSolution {
             <span className="text-cyan-400">{parts.slice(1).join(" ")}</span>
           </span>
         );
-      }
-
-      // Booleans and numbers
-      else if (
+      } else if (
         word === "true" ||
         word === "false" ||
         /^-?\d+(\.\d+)?$/.test(word)
@@ -720,28 +802,19 @@ class WebSolution {
             {word}
           </span>
         );
-      }
-
-      // Object properties
-      else if (word.startsWith(".")) {
+      } else if (word.startsWith(".")) {
         return (
           <span key={`property-${position}`} className="text-cyan-300">
             {word}
           </span>
         );
-      }
-
-      // React Components (capitalized)
-      else if (isReact && /^[A-Z][a-zA-Z0-9]*$/.test(word)) {
+      } else if (isReact && /^[A-Z][a-zA-Z0-9]*$/.test(word)) {
         return (
           <span key={`component-${position}`} className="text-yellow-400">
             {word}
           </span>
         );
-      }
-
-      // Arrow functions
-      else if (word === "=>" || word.includes("=>")) {
+      } else if (word === "=>" || word.includes("=>")) {
         if (word === "=>") {
           return (
             <span key={`arrow-${position}`} className="text-purple-400">
@@ -760,10 +833,7 @@ class WebSolution {
             </span>
           );
         }
-      }
-
-      // Default case - context-sensitive coloring
-      else {
+      } else {
         if (isCSS)
           return (
             <span key={`css-word-${position}`} className="text-pink-200">
@@ -802,87 +872,99 @@ class WebSolution {
     setSnippetIndex(shuffled[0]); // Set initial snippet from the shuffled order
   }, [codeSnippets.length]);
 
-  // Add blinking cursor animation to Tailwind
+  // GSAP cursor blinking animation
   useEffect(() => {
-    // Add keyframes for blinking cursor if they don't exist yet
-    if (!document.querySelector("style#blink-animation")) {
-      const style = document.createElement("style");
-      style.id = "blink-animation";
-      style.textContent = `
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `;
-      document.head.appendChild(style);
+    if (!gsap || !contextReady || !cursorRef.current) return;
+
+    const cursor = cursorRef.current;
+
+    if (isTypingComplete) {
+      gsap.to(cursor, {
+        opacity: 0,
+        duration: 0.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "power2.inOut",
+      });
+    } else {
+      gsap.set(cursor, { opacity: 0.7 });
     }
-  }, []);
 
-  // Typing effect implementation with snippets following the randomized order
+    return () => {
+      gsap.killTweensOf(cursor);
+    };
+  }, [gsap, contextReady, isTypingComplete]);
+
+  // GSAP typing effect
   useEffect(() => {
-    let i = 0;
+    if (!gsap || !contextReady || !fullText || snippetOrder.length === 0)
+      return;
+
+    if (typingTimelineRef.current) {
+      typingTimelineRef.current.kill();
+    }
+
+    let currentIndex = 0;
     setIsTypingComplete(false);
+    setText("");
 
-    // Helper function to check if we're at the beginning of a new line with whitespace
     const shouldSkipWhitespace = (index) => {
-      // If this is a whitespace character
       if (fullText[index] && /\s/.test(fullText[index])) {
-        // Check if previous character is a newline or beginning of string
         const isPrevNewline = index === 0 || fullText[index - 1] === "\n";
-
-        if (isPrevNewline) {
-          return true;
-        }
+        return isPrevNewline;
       }
       return false;
     };
 
-    const typing = setInterval(() => {
-      if (i < fullText.length) {
-        // Skip whitespace at beginning of lines
-        while (shouldSkipWhitespace(i) && i < fullText.length) {
-          i++;
-        }
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setIsTypingComplete(true);
 
-        setText(fullText.slice(0, i + 1));
-        i++;
-      } else {
-        clearInterval(typing);
-        setIsTypingComplete(true); // Mark typing as complete to start blinking
-
-        setTimeout(() => {
+        gsap.delayedCall(3, () => {
           setText("");
-          i = 0;
-          setIsTypingComplete(false); // Reset for next snippet
+          setIsTypingComplete(false);
 
-          // Move to next snippet in the predetermined order
           const nextOrderIndex = (currentOrderIndex + 1) % snippetOrder.length;
           setCurrentOrderIndex(nextOrderIndex);
           setSnippetIndex(snippetOrder[nextOrderIndex]);
-        }, 3000);
-      }
-    }, speed);
-    return () => clearInterval(typing);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullText, text.length == 0, snippetOrder, currentOrderIndex]);
+        });
+      },
+    });
 
-  // Add blinking cursor animation to Tailwind
-  useEffect(() => {
-    // Add keyframes for blinking cursor if they don't exist yet
-    if (!document.querySelector("style#blink-animation")) {
-      const style = document.createElement("style");
-      style.id = "blink-animation";
-      style.textContent = `
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
+    // Create typing animation
+    const typeChar = () => {
+      if (currentIndex < fullText.length) {
+        while (
+          shouldSkipWhitespace(currentIndex) &&
+          currentIndex < fullText.length
+        ) {
+          currentIndex++;
         }
-      `;
-      document.head.appendChild(style);
-    }
-  }, []);
 
-  // Remove the individual random snippet selection function since we're now using the predetermined order
+        if (currentIndex < fullText.length) {
+          setText(fullText.slice(0, currentIndex + 1));
+          currentIndex++;
+
+          // Variable speed based on character type
+          let delay = 0.02;
+          if (fullText[currentIndex - 1] === "\n") delay = 0.1;
+          else if (/[.!?]/.test(fullText[currentIndex - 1])) delay = 0.05;
+          else if (/[,;]/.test(fullText[currentIndex - 1])) delay = 0.03;
+
+          tl.call(typeChar, null, `+=${delay}`);
+        }
+      }
+    };
+
+    tl.call(typeChar);
+    typingTimelineRef.current = tl;
+
+    return () => {
+      if (typingTimelineRef.current) {
+        typingTimelineRef.current.kill();
+      }
+    };
+  }, [gsap, contextReady, fullText, snippetOrder, currentOrderIndex]);
 
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-transparent rounded-xl overflow-hidden">
@@ -901,10 +983,29 @@ class WebSolution {
   );
 };
 
-// Grid Elements Animation Component
+// Grid Elements Animation Component with GSAP
 const GridElementsAnimation = () => {
+  const { gsap, contextReady } = useGSAP();
   const [positions, setPositions] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-  const [gradients, setGradients] = useState([
+  const gridRefs = useRef([]);
+  const pseudoRefs = useRef([]);
+  const colorTimelineRef = useRef(null);
+  const positionTimelineRef = useRef(null);
+  const rotationTimelineRef = useRef(null);
+
+  const elements = [
+    { id: 1, rounded: "rounded-tl-[69px] rounded-br-[69px]", hasLetter: false },
+    { id: 2, rounded: "rounded-lg", hasLetter: false },
+    { id: 3, rounded: "rounded-tr-full", hasLetter: false },
+    { id: 4, rounded: "rounded-full", hasLetter: false },
+    { id: 5, rounded: "", hasLetter: true },
+    { id: 6, rounded: "rounded-3xl", hasLetter: false },
+    { id: 7, rounded: "rounded-bl-full", hasLetter: false },
+    { id: 8, rounded: "rounded-xl", hasLetter: false },
+    { id: 9, rounded: "rounded-br-full", hasLetter: false },
+  ];
+
+  const availableGradients = [
     { from: "rgb(96, 165, 250)", to: "rgb(168, 85, 247)" },
     { from: "rgb(74, 222, 128)", to: "rgb(96, 165, 250)" },
     { from: "rgb(250, 204, 21)", to: "rgb(249, 115, 22)" },
@@ -914,188 +1015,292 @@ const GridElementsAnimation = () => {
     { from: "rgb(236, 72, 153)", to: "rgb(248, 113, 113)" },
     { from: "rgb(96, 165, 250)", to: "rgb(45, 212, 191)" },
     { from: "rgb(45, 212, 191)", to: "rgb(74, 222, 128)" },
-  ]);
-  // Track which elements are showing their pseudo-elements
-  const [showingPseudo, setShowingPseudo] = useState(Array(9).fill(false));
-  // Store alternate gradients for pseudo-elements
-  const [pseudoGradients, setPseudoGradients] = useState([
     { from: "rgb(249, 115, 22)", to: "rgb(250, 204, 21)" },
-    { from: "rgb(236, 72, 153)", to: "rgb(248, 113, 113)" },
-    { from: "rgb(45, 212, 191)", to: "rgb(74, 222, 128)" },
-    { from: "rgb(96, 165, 250)", to: "rgb(45, 212, 191)" },
-    { from: "rgb(250, 204, 21)", to: "rgb(249, 115, 22)" },
-    { from: "rgb(168, 85, 247)", to: "rgb(99, 102, 241)" },
-    { from: "rgb(74, 222, 128)", to: "rgb(96, 165, 250)" },
-    { from: "rgb(99, 102, 241)", to: "rgb(96, 165, 250)" },
-    { from: "rgb(96, 165, 250)", to: "rgb(168, 85, 247)" },
-  ]);
-  // Track rotation for each element (in degrees)
-  const [rotations, setRotations] = useState(Array(9).fill(0));
-
-  // Updated elements with more varied rounded corners
-  const elements = [
-    { id: 1, rounded: "rounded-tl-[69px] rounded-br-[69px]", hasLetter: false }, // Opposite corners rounded
-    { id: 2, rounded: "rounded-lg", hasLetter: false }, // Slightly rounded all corners
-    { id: 3, rounded: "rounded-tr-full", hasLetter: false },
-    { id: 4, rounded: "rounded-full", hasLetter: false }, // Fully rounded (circle)
-    { id: 5, rounded: "", hasLetter: true }, // The A letter (no rounding needed)
-    { id: 6, rounded: "rounded-3xl", hasLetter: false }, // More rounded all corners
-    { id: 7, rounded: "rounded-bl-full", hasLetter: false },
-    { id: 8, rounded: "rounded-xl", hasLetter: false }, // Medium rounded all corners
-    { id: 9, rounded: "rounded-br-full", hasLetter: false },
+    { from: "rgb(34, 211, 238)", to: "rgb(96, 165, 250)" },
   ];
 
-  // Position calculation
   const calculatePosition = (index) => {
     const pos = positions[index];
     const col = pos % 3;
     const row = Math.floor(pos / 3);
-    return { col, row };
+    return {
+      col,
+      row,
+      left: `${col * 33.333 + 1.2}%`,
+      top: `${row * 33.333 + 1.2}%`,
+    };
   };
 
-  // Change gradients periodically with smooth transition
+  // Initialize GSAP animations and set initial positions
   useEffect(() => {
-    const availableGradients = [
-      { from: "rgb(96, 165, 250)", to: "rgb(168, 85, 247)" }, // blue to purple
-      { from: "rgb(74, 222, 128)", to: "rgb(96, 165, 250)" }, // green to blue
-      { from: "rgb(250, 204, 21)", to: "rgb(249, 115, 22)" }, // yellow to orange
-      { from: "rgb(248, 113, 113)", to: "rgb(236, 72, 153)" }, // red to pink
-      { from: "rgb(168, 85, 247)", to: "rgb(99, 102, 241)" }, // purple to indigo
-      { from: "rgb(99, 102, 241)", to: "rgb(96, 165, 250)" }, // indigo to blue
-      { from: "rgb(236, 72, 153)", to: "rgb(248, 113, 113)" }, // pink to red
-      { from: "rgb(96, 165, 250)", to: "rgb(45, 212, 191)" }, // blue to teal
-      { from: "rgb(45, 212, 191)", to: "rgb(74, 222, 128)" }, // teal to green
-      { from: "rgb(249, 115, 22)", to: "rgb(250, 204, 21)" }, // orange to yellow
-      { from: "rgb(34, 211, 238)", to: "rgb(96, 165, 250)" }, // cyan to blue
-    ];
+    if (!gsap || !contextReady) return;
 
-    const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * 9);
-      const randomGradient =
-        availableGradients[
-          Math.floor(Math.random() * availableGradients.length)
-        ];
+    // Kill existing timelines
+    if (colorTimelineRef.current) colorTimelineRef.current.kill();
+    if (positionTimelineRef.current) positionTimelineRef.current.kill();
+    if (rotationTimelineRef.current) rotationTimelineRef.current.kill();
 
-      // Update the target gradient in the non-active layer (pseudo or main)
-      if (showingPseudo[randomIndex]) {
-        setGradients((prev) => {
-          const newGradients = [...prev];
-          newGradients[randomIndex] = randomGradient;
-          return newGradients;
-        });
-      } else {
-        setPseudoGradients((prev) => {
-          const newGradients = [...prev];
-          newGradients[randomIndex] = randomGradient;
-          return newGradients;
+    // Set initial positions for all elements
+    gridRefs.current.forEach((el, index) => {
+      if (el) {
+        const { left, top } = calculatePosition(index);
+        gsap.set(el, {
+          left,
+          top,
+          rotation: 0,
         });
       }
+    });
 
-      // Toggle the visibility state
-      setShowingPseudo((prev) => {
-        const newState = [...prev];
-        newState[randomIndex] = !newState[randomIndex];
-        return newState;
-      });
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [showingPseudo]);
-
-  // Swap elements and apply random rotations
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const idx1 = Math.floor(Math.random() * 9);
-      let idx2 = Math.floor(Math.random() * 9);
-
-      // Ensure we pick a different element
-      while (idx2 === idx1) {
-        idx2 = Math.floor(Math.random() * 9);
+    // Set initial pseudo element opacity for shapes only
+    pseudoRefs.current.forEach((el, index) => {
+      if (el && !elements[index].hasLetter) {
+        gsap.set(el, { opacity: 0 });
       }
+    });
 
-      setPositions((prev) => {
-        const newPositions = [...prev];
-        const temp = newPositions[idx1];
-        newPositions[idx1] = newPositions[idx2];
-        newPositions[idx2] = temp;
-        return newPositions;
-      });
-    }, 3000);
+    // Color change animation timeline
+    const createColorTimeline = () => {
+      const tl = gsap.timeline({ repeat: -1 });
 
-    return () => clearInterval(interval);
-  }, []);
+      tl.add(() => {
+        const randomIndex = Math.floor(Math.random() * 9);
+        const randomGradient =
+          availableGradients[
+            Math.floor(Math.random() * availableGradients.length)
+          ];
 
-  // Add rotation animation effect
-  useEffect(() => {
-    const rotationInterval = setInterval(() => {
-      // Pick a random element to rotate
-      const elementIndex = Math.floor(Math.random() * 9);
+        if (gridRefs.current[randomIndex]) {
+          const mainEl = gridRefs.current[randomIndex];
 
-      // Skip rotation for the letter 'A' (element with index 4)
-      if (elements[elementIndex].hasLetter) return;
+          // Handle letter A differently (text gradient) vs shapes (background gradient)
+          if (elements[randomIndex].hasLetter) {
+            // For letter A, animate the text gradient directly on both spans
+            const mainSpan = mainEl.querySelector(".main-letter");
+            const pseudoSpan = mainEl.querySelector(".pseudo-letter");
 
-      // Choose a random rotation amount (90, 180, or 360 degrees)
-      const rotationOptions = [90, 180, 360];
-      const rotationAmount =
-        rotationOptions[Math.floor(Math.random() * rotationOptions.length)];
+            if (mainSpan && pseudoSpan) {
+              // Set new gradient on pseudo span and animate it in
+              gsap.set(pseudoSpan, {
+                backgroundImage: `linear-gradient(135deg, ${randomGradient.from}, ${randomGradient.to})`,
+                webkitBackgroundClip: "text",
+                backgroundClip: "text",
+                webkitTextFillColor: "transparent",
+                color: "transparent",
+              });
 
-      setRotations((prevRotations) => {
-        const newRotations = [...prevRotations];
-        // Add the rotation to the current rotation value to make it cumulative
-        newRotations[elementIndex] =
-          (newRotations[elementIndex] + rotationAmount) % 360;
-        return newRotations;
-      });
-    }, 4000); // Separate timing from the swap effect
+              gsap
+                .timeline()
+                .to(pseudoSpan, {
+                  opacity: 1,
+                  duration: 1,
+                  ease: "power2.inOut",
+                })
+                .call(() => {
+                  // Update main span gradient while preserving background-clip
+                  gsap.set(mainSpan, {
+                    backgroundImage: `linear-gradient(135deg, ${randomGradient.from}, ${randomGradient.to})`,
+                    webkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    webkitTextFillColor: "transparent",
+                    color: "transparent",
+                  });
+                })
+                .to(pseudoSpan, {
+                  opacity: 0,
+                  duration: 0.5,
+                  ease: "power2.inOut",
+                });
+            }
+          } else {
+            // For shapes, use pseudo element for smooth background transition
+            const pseudoEl = pseudoRefs.current[randomIndex];
 
-    return () => clearInterval(rotationInterval);
+            if (pseudoEl) {
+              gsap.set(pseudoEl, {
+                background: `linear-gradient(135deg, ${randomGradient.from}, ${randomGradient.to})`,
+              });
+
+              gsap
+                .timeline()
+                .to(pseudoEl, {
+                  opacity: 1,
+                  duration: 1,
+                  ease: "power2.inOut",
+                })
+                .call(() => {
+                  gsap.set(mainEl, {
+                    background: `linear-gradient(135deg, ${randomGradient.from}, ${randomGradient.to})`,
+                  });
+                })
+                .to(pseudoEl, {
+                  opacity: 0,
+                  duration: 0.5,
+                  ease: "power2.inOut",
+                });
+            }
+          }
+        }
+      }, 0).to({}, { duration: 2 });
+
+      return tl;
+    };
+
+    // Position swap animation timeline
+    const createPositionTimeline = () => {
+      const tl = gsap.timeline({ repeat: -1 });
+
+      tl.add(() => {
+        const idx1 = Math.floor(Math.random() * 9);
+        let idx2 = Math.floor(Math.random() * 9);
+        while (idx2 === idx1) {
+          idx2 = Math.floor(Math.random() * 9);
+        }
+
+        // Update positions state for React tracking
+        setPositions((prev) => {
+          const newPositions = [...prev];
+          const temp = newPositions[idx1];
+          newPositions[idx1] = newPositions[idx2];
+          newPositions[idx2] = temp;
+          return newPositions;
+        });
+
+        // Animate the actual position swap with GSAP
+        if (gridRefs.current[idx1] && gridRefs.current[idx2]) {
+          const pos1 = calculatePosition(idx1);
+          const pos2 = calculatePosition(idx2);
+
+          gsap.to(gridRefs.current[idx1], {
+            left: pos2.left,
+            top: pos2.top,
+            duration: 1.5,
+            ease: "power2.inOut",
+          });
+
+          gsap.to(gridRefs.current[idx2], {
+            left: pos1.left,
+            top: pos1.top,
+            duration: 1.5,
+            ease: "power2.inOut",
+          });
+        }
+      }, 0).to({}, { duration: 3 });
+
+      return tl;
+    };
+
+    // Rotation animation timeline
+    const createRotationTimeline = () => {
+      const tl = gsap.timeline({ repeat: -1 });
+
+      tl.add(() => {
+        const elementIndex = Math.floor(Math.random() * 9);
+
+        // Skip rotation for the letter 'A'
+        if (elements[elementIndex].hasLetter) return;
+
+        if (gridRefs.current[elementIndex]) {
+          const rotationOptions = [90, 180, 360];
+          const rotationAmount =
+            rotationOptions[Math.floor(Math.random() * rotationOptions.length)];
+
+          gsap.to(gridRefs.current[elementIndex], {
+            rotation: `+=${rotationAmount}`,
+            duration: 1.5,
+            ease: "power2.inOut",
+          });
+        }
+      }, 0).to({}, { duration: 4 });
+
+      return tl;
+    };
+
+    // Create and start all timelines with different delays
+    colorTimelineRef.current = createColorTimeline();
+    positionTimelineRef.current = createPositionTimeline();
+    rotationTimelineRef.current = createRotationTimeline();
+
+    // Stagger the start times
+    colorTimelineRef.current.delay(0);
+    positionTimelineRef.current.delay(1);
+    rotationTimelineRef.current.delay(2);
+
+    return () => {
+      if (colorTimelineRef.current) colorTimelineRef.current.kill();
+      if (positionTimelineRef.current) positionTimelineRef.current.kill();
+      if (rotationTimelineRef.current) rotationTimelineRef.current.kill();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [gsap, contextReady]);
+
+  // Update positions when state changes (for any non-GSAP initiated changes)
+  useEffect(() => {
+    if (!gsap || !contextReady) return;
+
+    gridRefs.current.forEach((el, index) => {
+      if (el) {
+        const { left, top } = calculatePosition(index);
+        // Only animate if position is significantly different (avoid redundant animations)
+        const currentLeft = gsap.getProperty(el, "left");
+        const currentTop = gsap.getProperty(el, "top");
+
+        if (currentLeft !== left || currentTop !== top) {
+          gsap.to(el, {
+            left,
+            top,
+            duration: 1.5,
+            ease: "power2.inOut",
+          });
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gsap, contextReady, positions]);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-4 overflow-visible  ">
+    <div className="absolute inset-0 flex items-center justify-center p-4 overflow-visible">
       <div className="relative w-full max-w-[400px] aspect-square">
         {elements.map((element, index) => {
-          const { col, row } = calculatePosition(index);
+          const initialPos = calculatePosition(index);
+          const initialGradient =
+            availableGradients[index % availableGradients.length];
 
           if (element.hasLetter) {
-            // Render the A letter as the element itself with gradient
             return (
               <div
                 key={element.id}
+                ref={(el) => (gridRefs.current[index] = el)}
                 className="absolute flex items-center justify-center"
                 style={{
                   width: "calc(33.333% - 8px)",
                   height: "calc(33.333% - 8px)",
-                  left: `calc(${col} * 33.333% + 4px)`,
-                  top: `calc(${row} * 33.333% + 4px)`,
-                  transition: "all 1.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                  left: initialPos.left,
+                  top: initialPos.top,
                   position: "absolute",
                 }}
               >
                 <span
-                  className="text-7xl md:text-9xl font-bold relative"
+                  className="main-letter text-7xl md:text-9xl font-bold relative"
                   style={{
-                    backgroundImage: `linear-gradient(135deg, ${gradients[index].from}, ${gradients[index].to})`,
+                    background: `linear-gradient(135deg, ${initialGradient.from}, ${initialGradient.to})`,
                     WebkitBackgroundClip: "text",
                     backgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     color: "transparent",
-                    transition: "all 1s ease-in-out",
                     zIndex: 1,
                   }}
                 >
-                  A{/* Pseudo-element replacement for the letter A */}
+                  A
                   <span
-                    className="absolute inset-0 text-7xl md:text-9xl font-bold"
+                    className="pseudo-letter absolute inset-0 text-7xl md:text-9xl font-bold"
                     style={{
-                      backgroundImage: `linear-gradient(135deg, ${pseudoGradients[index].from}, ${pseudoGradients[index].to})`,
+                      background: `linear-gradient(135deg, ${initialGradient.from}, ${initialGradient.to})`,
                       WebkitBackgroundClip: "text",
                       backgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       color: "transparent",
-                      opacity: showingPseudo[index] ? 1 : 0,
-                      transition: "opacity 1s ease-in-out",
+                      opacity: 0,
                       zIndex: 2,
                     }}
                   >
@@ -1106,38 +1311,27 @@ const GridElementsAnimation = () => {
             );
           }
 
-          // Standard shape elements with rotation
           return (
             <div
               key={element.id}
+              ref={(el) => (gridRefs.current[index] = el)}
               className={`absolute ${element.rounded} flex items-center justify-center overflow-hidden`}
               style={{
                 width: "calc(33.333% - 8px)",
                 height: "calc(33.333% - 8px)",
-                left: `calc(${col} * 33.333% + 4px)`,
-                top: `calc(${row} * 33.333% + 4px)`,
-                transition: "all 1.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                left: initialPos.left,
+                top: initialPos.top,
                 position: "absolute",
-                backgroundImage: `linear-gradient(135deg, ${gradients[index].from}, ${gradients[index].to})`,
-                backgroundSize: "100%",
-                backgroundColor: "transparent",
+                background: `linear-gradient(135deg, ${initialGradient.from}, ${initialGradient.to})`,
                 zIndex: 1,
-                transform: `rotate(${rotations[index]}deg)`, // Apply rotation
               }}
             >
-              {/* Pseudo-element replacement using absolute positioning */}
               <div
+                ref={(el) => (pseudoRefs.current[index] = el)}
                 className="absolute inset-0"
                 style={{
-                  backgroundImage: `linear-gradient(135deg, ${pseudoGradients[index].from}, ${pseudoGradients[index].to})`,
-                  backgroundSize: "100%",
-                  opacity: showingPseudo[index] ? 1 : 0,
-                  transition: "opacity 1s ease-in-out",
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
+                  background: `linear-gradient(135deg, ${initialGradient.from}, ${initialGradient.to})`,
+                  opacity: 0,
                   zIndex: 0,
                 }}
               />
@@ -1293,8 +1487,8 @@ export default function Services() {
 
           {/* Desktop Interactive Circles */}
           <ScrollReveal animation="zoom-in">
-            <div className="hidden md:flex justify-center mb-16 lg:mb-24 relative h-72">
-              <div className="w-full min-w-[900px] max-w-[1000px] relative">
+            <div className="hidden md:flex justify-center mb-16 lg:mb-24 relative h-72 w-full mx-auto">
+              <div className="w-[1000px] relative">
                 {services.map((service, index) => (
                   <div
                     key={index}
@@ -1303,19 +1497,22 @@ export default function Services() {
                       left:
                         activeIndex === index
                           ? index === 2
-                            ? "calc(100% - 1012px)"
-                            : "0px"
-                          : `${index * 33}%`,
+                            ? window.innerWidth >= 1024
+                              ? "calc(102.5% - 1012px)"
+                              : "calc(102.5% - 930px)"
+                            : "2.5%"
+                          : `${index * 33 + 2.5}%`,
                       zIndex: activeIndex === index ? 10 : 1,
                       width: "288px",
-                      padding: "8px",
                     }}
                     onMouseEnter={() => handleMouseEnter(index)}
                     onMouseLeave={handleMouseLeave}
                   >
                     <div
-                      className={`h-72 rounded-full flex items-center justify-center cursor-pointer transition-all duration-700 ease-in-out relative overflow-hidden ${
-                        activeIndex === index ? "w-[1000px]" : "w-72"
+                      className={`h-72 rounded-full flex items-center justify-center transition-all duration-700 ease-in-out relative overflow-hidden ${
+                        activeIndex === index
+                          ? "lg:w-[960px] w-[890px]"
+                          : "w-72"
                       }`}
                       style={{
                         backgroundColor: service.bgColor,
@@ -1345,7 +1542,7 @@ export default function Services() {
                           <h3 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">
                             {service.title}
                           </h3>
-                          <p className="whitespace-normal max-w-[500px] md:max-w-[600px] text-lg md:text-xl">
+                          <p className="whitespace-normal min-w-[450px] max-w-[500px] md:max-w-[600px] text-lg md:text-xl">
                             {service.description}
                           </p>
                         </div>

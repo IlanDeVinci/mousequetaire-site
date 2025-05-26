@@ -455,7 +455,7 @@ export default function Home() {
                 </div>
               </ScrollReveal>
 
-              <ScrollReveal animation="fade-left" delay={1200} threshold={0.2}>
+              <ScrollReveal animation="fade-left" delay={500} threshold={0.2}>
                 <div className="flex justify-end">
                   <div
                     className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative overflow-hidden py-12 text-justify"
@@ -487,7 +487,7 @@ export default function Home() {
                 </div>
               </ScrollReveal>
 
-              <ScrollReveal animation="zoom-in" delay={1900} threshold={0.2}>
+              <ScrollReveal animation="zoom-in" delay={500} threshold={0.2}>
                 <div className="flex justify-start">
                   <div
                     className="w-4/5 md:w-2/3 text-gray-300 p-6 rounded-lg relative py-12 text-justify"
