@@ -217,7 +217,6 @@ export default function ScrollReveal({
         mainTimeline.to(
           element,
           {
-            filter: "blur(0px)",
             duration: duration * 0.3,
             ease: "none",
           },
@@ -255,7 +254,6 @@ export default function ScrollReveal({
       className={className}
       style={{
         visibility: isInitialized ? "visible" : "hidden",
-        filter: animationComplete ? "none" : "blur(0.5px)", // Subtle blur during animation
       }}
     >
       {children}
