@@ -1,13 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ScrollReveal from "../../components/ScrollReveal";
+import { useGSAP } from "../../context/GSAPContext";
 
 function DiscoverElement() {
   const [phase, setPhase] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
+  const containerRef = useRef(null);
+  const pulseRef = useRef(null);
+  const contentRef = useRef(null);
+  const { gsap, contextReady } = useGSAP();
 
   useEffect(() => {
     setTimeout(() => {
@@ -20,26 +25,43 @@ function DiscoverElement() {
       setIsMobileView(window.innerWidth < 700);
     };
 
-    // Check on initial load
     checkIsMobile();
-
-    // Add event listener for window resize
     window.addEventListener("resize", checkIsMobile);
-
-    // Clean up event listener
     return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
+  // GSAP animations for phase transitions
+  useEffect(() => {
+    if (!contextReady || !gsap || !contentRef.current || phase === 0) return;
+
+    const content = contentRef.current;
+
+    gsap.fromTo(
+      content,
+      {
+        opacity: 0,
+        scale: 0.8,
+        rotationY: -15,
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        rotationY: 0,
+        duration: 0.8,
+        ease: "back.out(1.7)",
+      }
+    );
+  }, [contextReady, gsap, phase]);
+
   const handleClick = () => {
-    if (phase === 0) {
-      setPhase(1);
-    } else if (phase === 1) {
-      setPhase(2);
-    } else if (phase === 2) {
-      setPhase(3);
-    } else if (phase === 3) {
-      setPhase(1);
-    }
+    const container = containerRef.current;
+
+    // Fallback without animations
+    if (phase === 0) setPhase(1);
+    else if (phase === 1) setPhase(2);
+    else if (phase === 2) setPhase(3);
+    else if (phase === 3) setPhase(1);
+    return;
   };
 
   const getBackgroundColor = () => {
@@ -110,91 +132,29 @@ function DiscoverElement() {
     }
   };
 
-  useEffect(() => {
-    // Use GSAP for pulse animations instead of CSS
-    if (typeof gsap !== "undefined") {
-      // Remove CSS animations and use GSAP
-      const pulseElements = document.querySelectorAll(
-        ".animate-pulse-ring, .animate-pulse-light"
-      );
-
-      pulseElements.forEach((element) => {
-        if (element.classList.contains("animate-pulse-ring")) {
-          gsap.to(element, {
-            boxShadow: "0 0 0 25px rgba(135, 215, 255, 0)",
-            duration: 2,
-            repeat: -1,
-            ease: "power2.out",
-            keyframes: {
-              "0%": { boxShadow: "0 0 0 0 rgba(135, 215, 255, 0.8)" },
-              "70%": { boxShadow: "0 0 0 25px rgba(135, 215, 255, 0)" },
-              "100%": { boxShadow: "0 0 0 0 rgba(135, 215, 255, 0)" },
-            },
-          });
-        }
-
-        if (element.classList.contains("animate-pulse-light")) {
-          gsap.to(element, {
-            backgroundColor: "rgba(135, 215, 255, 0.3)",
-            duration: 2,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-            keyframes: {
-              "0%": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
-              "50%": { backgroundColor: "rgba(135, 215, 255, 0.3)" },
-              "100%": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
-            },
-          });
-        }
-      });
-    } else {
-      // Fallback to CSS animations
-      if (!document.querySelector("#pulse-animations")) {
-        const styleEl = document.createElement("style");
-        styleEl.id = "pulse-animations";
-        styleEl.innerHTML = `
-          @keyframes pulseRing {
-            0% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0.8); }
-            70% { box-shadow: 0 0 0 25px rgba(135, 215, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(135, 215, 255, 0); }
-          }
-          
-          @keyframes pulseLight {
-            0% { background-color: rgba(255, 255, 255, 0.1); }
-            50% { background-color: rgba(135, 215, 255, 0.3); }
-            100% { background-color: rgba(255, 255, 255, 0.1); }
-          }
-          
-          .animate-pulse-ring {
-            animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-          }
-          
-          .animate-pulse-light {
-            animation: pulseLight 2s ease-in-out infinite;
-          }
-        `;
-        document.head.appendChild(styleEl);
-      }
-    }
-  }, []);
-
   // Mobile circle view rendering
   const renderMobileView = () => {
     const content = getContent();
 
     return (
       <div
+        ref={containerRef}
         onClick={handleClick}
         className={`w-[75vw] h-[75vw] mx-auto relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 flex items-center justify-center text-center ${
-          phase === 0 ? "bg-gray-700 animate-pulse-ring" : getBackgroundColor()
+          phase === 0 ? "bg-gray-700" : getBackgroundColor()
         }`}
+        style={{
+          animation: phase === 0 ? "circleGlow 3s infinite 0s" : "none",
+        }}
       >
         {phase === 0 && (
-          <div className="absolute inset-0 rounded-full animate-pulse-light z-10 pointer-events-none"></div>
+          <div
+            ref={pulseRef}
+            className="absolute inset-0 rounded-full z-10 pointer-events-none"
+          ></div>
         )}
 
-        <div className="relative z-20 px-6">
+        <div ref={contentRef} className="relative z-20 px-6">
           <h3
             style={{ textShadow: "0 0 5px rgba(0, 0, 0, 0.7)" }}
             className="text-xl font-bold mb-2 text-white"
@@ -264,19 +224,25 @@ function DiscoverElement() {
   const renderDesktopView = () => {
     return (
       <div
+        ref={containerRef}
         onClick={handleClick}
-        className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()} ${
-          phase === 0 ? "animate-pulse-ring" : ""
-        }`}
+        className={`w-full max-w-5xl h-48 sm:h-56 md:h-64 lg:h-80 relative overflow-hidden rounded-full shadow-lg cursor-pointer transition-all duration-700 ${getBackgroundColor()}`}
+        style={{
+          animation: phase === 0 ? "circleGlow 3s infinite 0s" : "none",
+        }}
       >
         {phase === 0 && (
-          <div className="absolute inset-0 rounded-full animate-pulse-light z-10 pointer-events-none"></div>
+          <div
+            ref={pulseRef}
+            className="absolute inset-0 rounded-full z-10 pointer-events-none"
+          ></div>
         )}
 
         <div
           className={`absolute ${getSliderPosition()} transition-all duration-700 ease-in-out h-[92%] w-[40%] sm:w-[40%] md:w-[50%] top-1/2 -translate-y-1/2 z-0`}
         >
           <div
+            ref={contentRef}
             className={`${getSliderColor()} rounded-full px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 shadow-lg h-full transition-all duration-700`}
           >
             <div className="flex flex-col h-full justify-center text-center font-montserrat">
@@ -393,6 +359,41 @@ const teamMembers = [
 
 function TeamMember({ image, name, role, description, reverse }) {
   const isDorian = name === "Dorian Collet";
+  const memberRef = useRef(null);
+  const { gsap, contextReady } = useGSAP();
+
+  useEffect(() => {
+    if (!contextReady || !gsap || !memberRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          gsap.fromTo(
+            memberRef.current,
+            {
+              opacity: 0,
+              x: reverse ? 50 : -50,
+              rotationY: reverse ? 15 : -15,
+            },
+            {
+              opacity: 1,
+              x: 0,
+              rotationY: 0,
+              duration: 1,
+              ease: "power3.out",
+              delay: 0.1,
+            }
+          );
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(memberRef.current);
+
+    return () => observer.disconnect();
+  }, [contextReady, gsap, reverse]);
 
   return (
     <ScrollReveal
@@ -401,6 +402,7 @@ function TeamMember({ image, name, role, description, reverse }) {
       className={`flex flex-col md:flex-row items-center mb-8 md:mb-12`}
     >
       <article
+        ref={memberRef}
         className={`flex flex-col ${
           reverse ? "md:flex-row-reverse" : "md:flex-row"
         } items-center mb-8 md:mb-12`}
@@ -437,6 +439,10 @@ export default function Equipe() {
   const [hoveredValue2, setHoveredValue2] = useState(false);
   const [hoveredValue3, setHoveredValue3] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const value1Ref = useRef(null);
+  const value2Ref = useRef(null);
+  const value3Ref = useRef(null);
+  const { gsap, contextReady } = useGSAP();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -449,23 +455,68 @@ export default function Equipe() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  useEffect(() => {
-    if (!document.querySelector("#fade-animations")) {
-      const styleEl = document.createElement("style");
-      styleEl.id = "fade-animations";
-      styleEl.innerHTML = `
-        @keyframes fadeIn {
-          0% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-in-out forwards;
-        }
-      `;
-      document.head.appendChild(styleEl);
+  const handleValueHover = (valueNumber, isHovering) => {
+    if (!contextReady || !gsap) return;
+
+    const refs = [value1Ref, value2Ref, value3Ref];
+    const setters = [setHoveredValue1, setHoveredValue2, setHoveredValue3];
+    const ref = refs[valueNumber - 1];
+    const setter = setters[valueNumber - 1];
+
+    if (!ref.current) return;
+
+    const content = ref.current.querySelector(".value-content");
+    const textElement = content?.querySelector("p");
+
+    if (!content || !textElement) return;
+
+    if (isHovering) {
+      // Smooth scale animation for the content
+      gsap.to(content, {
+        transformOrigin: valueNumber === 2 ? "right center" : "left center",
+        scaleX: 1,
+        duration: 0.1,
+        ease: "power2.out",
+      });
+
+      // Fade text animation - change state only after fade out is complete
+      gsap.to(textElement, {
+        opacity: 0,
+        duration: 0.15,
+        ease: "power2.out",
+        onComplete: () => {
+          setter(true);
+          gsap.to(textElement, {
+            opacity: 1,
+            duration: 0.15,
+            ease: "power2.out",
+          });
+        },
+      });
+    } else {
+      // Return to normal with smooth ease
+      gsap.to(content, {
+        scaleX: 1,
+        duration: 0.15,
+        ease: "power2.out",
+      });
+
+      // Fade text back - change state only after fade out is complete
+      gsap.to(textElement, {
+        opacity: 0,
+        duration: 0.2,
+        ease: "power2.out",
+        onComplete: () => {
+          setter(false);
+          gsap.to(textElement, {
+            opacity: 1,
+            duration: 0.15,
+            ease: "power2.out",
+          });
+        },
+      });
     }
-  }, []);
+  };
 
   return (
     <>
@@ -517,9 +568,10 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-right" delay={200} threshold={0.2}>
             <div
+              ref={value1Ref}
               className="relative px-2 md:px-4 py-24 sm:py-28 md:py-32 flex justify-center overflow-visible w-full cursor-pointer group"
-              onMouseEnter={() => !isMobile && setHoveredValue1(true)}
-              onMouseLeave={() => !isMobile && setHoveredValue1(false)}
+              onMouseEnter={() => !isMobile && handleValueHover(1, true)}
+              onMouseLeave={() => !isMobile && handleValueHover(1, false)}
               onClick={() => isMobile && setHoveredValue1(!hoveredValue1)}
             >
               {/* Invisible hitbox layer that covers the rectangle area */}
@@ -528,7 +580,7 @@ export default function Equipe() {
               <div
                 className={`absolute top-0 rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] left-0 z-10
-                        transition-all duration-300 ease-in-out
+                        transition-all duration-500 ease-out
                         ${
                           hoveredValue1
                             ? "w-[95vw] md:w-[85vw] lg:w-[80vw]"
@@ -539,7 +591,7 @@ export default function Equipe() {
               <div
                 className={`absolute top-0 rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] left-[-20px] md:left-[-40px] z-20
-                        transition-all duration-300 ease-in-out
+                        transition-all duration-500 ease-out
                         ${
                           hoveredValue1
                             ? "w-[95vw] md:w-[85vw] lg:w-[80vw]"
@@ -549,8 +601,8 @@ export default function Equipe() {
 
               <div
                 className={`absolute top-0 rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
-                        flex items-center gap-2 md:gap-4 
-                        transition-all duration-300 ease-in-out
+                        flex items-center gap-2 md:gap-4 value-content
+                        transition-all duration-500 ease-out
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] left-[-40px] md:left-[-80px] z-30
                         ${
                           hoveredValue1
@@ -573,10 +625,10 @@ export default function Equipe() {
                       hoveredValue1
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
-                    } transition-all duration-300 text-left`}
+                    } transition-all duration-500 ease-out text-left`}
                   >
                     {hoveredValue1 ? (
-                      <span className="animate-fadeIn overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[10px] sm:text-xs md:text-[13px] lg:text-sm">
+                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[10px] sm:text-xs md:text-[13px] lg:text-sm">
                         L&apos;entraide est au cœur de notre ADN, car nous
                         savons que les meilleures solutions naissent du partage
                         des idées et des compétences. Notre collaboration
@@ -597,9 +649,10 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-left" delay={300} threshold={0.2}>
             <div
+              ref={value2Ref}
               className="relative px-2 md:px-4 py-24 sm:py-28 md:py-32 flex justify-center overflow-visible w-full cursor-pointer group"
-              onMouseEnter={() => !isMobile && setHoveredValue2(true)}
-              onMouseLeave={() => !isMobile && setHoveredValue2(false)}
+              onMouseEnter={() => !isMobile && handleValueHover(2, true)}
+              onMouseLeave={() => !isMobile && handleValueHover(2, false)}
               onClick={() => isMobile && setHoveredValue2(!hoveredValue2)}
             >
               {/* Invisible hitbox layer that covers the rectangle area */}
@@ -608,7 +661,7 @@ export default function Equipe() {
               <div
                 className={`absolute top-0 rounded-l-full bg-[#00527A] text-white p-4 md:p-8 
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] right-0 z-10
-                        transition-all duration-300 ease-in-out
+                        transition-all duration-500 ease-out
                         ${
                           hoveredValue2
                             ? "w-[95vw] md:w-[85vw] lg:w-[80vw]"
@@ -619,7 +672,7 @@ export default function Equipe() {
               <div
                 className={`absolute top-0 rounded-l-full bg-[#006A9E] text-white p-4 md:p-8 
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] right-[-20px] md:right-[-40px] z-20
-                        transition-all duration-300 ease-in-out
+                        transition-all duration-500 ease-out
                         ${
                           hoveredValue2
                             ? "w-[95vw] md:w-[85vw] lg:w-[80vw]"
@@ -629,8 +682,8 @@ export default function Equipe() {
 
               <div
                 className={`absolute top-0 rounded-l-full bg-[#0091D9] text-white pr-4 md:pr-8 
-                        flex items-center justify-end gap-2 md:gap-4
-                        transition-all duration-300 ease-in-out
+                        flex items-center justify-end gap-2 md:gap-4 value-content
+                        transition-all duration-500 ease-out
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] right-[-40px] md:right-[-80px] z-30
                         ${
                           hoveredValue2
@@ -644,10 +697,10 @@ export default function Equipe() {
                       hoveredValue2
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
-                    } transition-all duration-300 text-right`}
+                    } transition-all duration-500 ease-out text-right`}
                   >
                     {hoveredValue2 ? (
-                      <span className="animate-fadeIn overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
+                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
                         L&apos;innovation guide chacune de nos décisions, nous
                         poussant constamment à explorer de nouvelles approches
                         pour résoudre vos défis numériques. Notre créativité se
@@ -677,9 +730,10 @@ export default function Equipe() {
 
           <ScrollReveal animation="fade-right" delay={400} threshold={0.2}>
             <div
+              ref={value3Ref}
               className="relative px-2 md:px-4 py-24 sm:py-28 md:py-32 flex justify-center overflow-visible w-full cursor-pointer group"
-              onMouseEnter={() => !isMobile && setHoveredValue3(true)}
-              onMouseLeave={() => !isMobile && setHoveredValue3(false)}
+              onMouseEnter={() => !isMobile && handleValueHover(3, true)}
+              onMouseLeave={() => !isMobile && handleValueHover(3, false)}
               onClick={() => isMobile && setHoveredValue3(!hoveredValue3)}
             >
               {/* Invisible hitbox layer that covers the rectangle area */}
@@ -688,7 +742,7 @@ export default function Equipe() {
               <div
                 className={`absolute top-0 rounded-r-full bg-[#00527A] text-white p-4 md:p-8 
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] left-0 z-10
-                        transition-all duration-300 ease-in-out
+                        transition-all duration-500 ease-out
                         ${
                           hoveredValue3
                             ? "w-[95vw] md:w-[85vw] lg:w-[80vw]"
@@ -699,7 +753,7 @@ export default function Equipe() {
               <div
                 className={`absolute top-0 rounded-r-full bg-[#006A9E] text-white p-4 md:p-8 
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] left-[-20px] md:left-[-40px] z-20
-                        transition-all duration-300 ease-in-out
+                        transition-all duration-500 ease-out
                         ${
                           hoveredValue3
                             ? "w-[95vw] md:w-[85vw] lg:w-[80vw]"
@@ -709,8 +763,8 @@ export default function Equipe() {
 
               <div
                 className={`absolute top-0 rounded-r-full bg-[#0091D9] text-white pl-4 md:pl-8 
-                        flex items-center gap-2 md:gap-4
-                        transition-all duration-300 ease-in-out
+                        flex items-center gap-2 md:gap-4 value-content
+                        transition-all duration-500 ease-out
                         h-[180px] sm:h-[180px] md:h-[180px] lg:h-[200px] left-[-40px] md:left-[-80px] z-30
                         ${
                           hoveredValue3
@@ -733,10 +787,10 @@ export default function Equipe() {
                       hoveredValue3
                         ? "font-montserrat font-bold"
                         : "font-montserrat font-extrabold whitespace-nowrap"
-                    } transition-all duration-300 text-left`}
+                    } transition-all duration-500 ease-out text-left`}
                   >
                     {hoveredValue3 ? (
-                      <span className="animate-fadeIn overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
+                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
                         L&apos;excellence n&apos;est pas négociable pour nous,
                         chaque ligne de code et chaque pixel sont
                         méticuleusement travaillés pour atteindre les plus hauts
@@ -757,6 +811,39 @@ export default function Equipe() {
           </ScrollReveal>
         </section>
       </main>
+
+      <style jsx global>{`
+        @keyframes circleGlow {
+          0% {
+            box-shadow: 0 0 0 0px rgba(135, 215, 255, 0.5);
+          }
+          50% {
+            box-shadow: 0 0 0 30px rgba(135, 215, 255, 0.8);
+          }
+          100% {
+            box-shadow: 0 0 0 0px rgba(135, 215, 255, 0.5);
+          }
+        }
+
+        @keyframes fadeInText {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .fade-in-text {
+          animation: fadeInText 0.6s ease-out forwards;
+        }
+
+        .value-content {
+          will-change: transform;
+        }
+      `}</style>
     </>
   );
 }
