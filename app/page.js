@@ -449,12 +449,13 @@ export default function Home() {
                       }}
                     ></div>
                     <p className="text-lg relative z-10 backdrop-blur-xs p-4 rounded-2xl border-1 border-white/80">
-                      Nous sommes trois passionnés qui, autour d&apos;un bon
-                      repas et de discussions enflammées, avons donné vie à
-                      Mouse-quetaires en 2025. Notre histoire ? Celle
-                      d&apos;amis qui partagent un rêve simple mais ambitieux :
-                      rendre la technologie et le developement Web vraiment
-                      accessibles à tous, sans le jargon qui fait peur.
+                      Mouse-quetaires est né en 2025 de la rencontre de trois
+                      passionnés réunis autour d&apos;un bon repas et de
+                      discussions animées. Notre aventure est celle d&apos;amis
+                      unis par une vision commune : rendre la technologie et le
+                      développement web accessibles à tous, en dépassant les
+                      barrières du jargon technique et en proposant une approche
+                      claire, humaine et pédagogique.
                     </p>
                   </div>
                 </div>
@@ -481,12 +482,16 @@ export default function Home() {
                       }}
                     ></div>
                     <p className="text-lg relative z-10 backdrop-blur-xs p-4 rounded-2xl border-1 border-white/80">
-                      Ce qui nous fait vibrer chaque jour ? La qualité sans
-                      compromis, une créativité qui ne connaît pas de limites et
-                      cette honnêteté qui nous tient à cœur. Les solutions
-                      génériques ? Très peu pour nous ! Votre projet est unique
-                      et mérite toute notre attention, avec cette touche
-                      personnelle qui change tout.
+                      Ce qui nous anime au quotidien ? L&apos;exigence
+                      d&apos;une qualité sans compromis, une créativité sans
+                      limites, et une transparence totale dans tout ce que nous
+                      entreprenons. Et nous croyons fermement qu&apos;une
+                      relation de confiance repose sur l&apos;honnêteté. Chaque
+                      projet est traité avec intégrité, sincérité et un
+                      engagement authentique. Les solutions standardisées ? Très
+                      peu pour nous. Votre projet est unique, et il mérite une
+                      attention sur mesure, avec cette touche personnelle qui
+                      fait toute la différence.
                     </p>
                   </div>
                 </div>
@@ -517,9 +522,10 @@ export default function Home() {
                     ></div>
                     <p className="text-lg relative z-10 backdrop-blur-xs p-4 rounded-2xl border-1 border-white/80">
                       Nous travaillons en équipe soudée, où expertise technique
-                      et créativité se nourrissent mutuellement. C&apos;est
-                      comme ça qu&apos;on arrive à comprendre vos défis
-                      numériques et à imaginer des solutions qui vous
+                      et créativité se nourrissent mutuellement. Nous sommes
+                      chacun experts dans nos domaines et c'est en mettant nos
+                      compétences en commun que nous arrivons à comprendre vos
+                      défis numériques et à imaginer des solutions qui vous
                       ressemblent vraiment.
                     </p>
                   </div>

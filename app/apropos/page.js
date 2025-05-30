@@ -99,17 +99,17 @@ function DiscoverElement() {
       case 1:
         return {
           title: "Ambitions",
-          text: "Ambitieux et pleins d'idées, nous voulions tous, un jour, pouvoir entreprendre et créer notre entreprise pour concevoir dans le digital.",
+          text: "Ambitieux et pleins d'idées, nous voulions tous, un jour, pouvoir entreprendre et révolutionner le digital en cassant les codes.",
         };
       case 2:
         return {
           title: "Rencontre",
-          text: "Nous nous sommes donc rencontrés en école supérieure, où nous avons pratiqué création web et Digital multimédia.",
+          text: "Nous nous sommes rencontrés en école supérieure, où nous avons eu l'occasion de mener à bien une multitude de projets, suivi des semaines intensives en Hackathon et bien d'autres",
         };
       case 3:
         return {
           title: "Collaboration",
-          text: "Nous avons donc eu l'idée de nous lancer dans cette aventure qui ne fera que de rendre le monde du web meilleur.",
+          text: "Nous avons donc eu l'idée de nous lancer dans cette aventure qui ne fera que de rendre le monde du web meilleur, nous apportons des solutions durables, qui auront de l'impact sur notre environnement.",
         };
       default:
         return {
@@ -326,9 +326,9 @@ const teamMembers = [
   {
     id: 2,
     name: "Célestin Godefroy",
-    role: "COO | Chief Operational Officer",
+    role: "COO | Chief Operational Officer / Responsable Communication",
     description:
-      "Je coordonne toutes nos opérations et veille au bon déroulement de votre projet. Je m'assure que les délais sont respectés et que chaque étape est réalisée avec qualité. Pour toute question pratique, je suis votre interlocuteur.",
+      "Je coordonne toutes nos opérations et veille au bon déroulement de votre projet. Je m'assure que les délais sont respectés et que chaque étape est réalisée avec qualité. Je suis également chargé de faire connaître et croître Mousequetaires.",
     image: "/images/photo-célestin.jpg",
   },
   {
@@ -628,7 +628,7 @@ export default function Equipe() {
                     } transition-all duration-500 ease-out text-left`}
                   >
                     {hoveredValue1 ? (
-                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[10px] sm:text-xs md:text-[13px] lg:text-sm">
+                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[60vw] font-montserrat font-bold text-[10px] xs:text-[10px] sm:text-xs md:text-[13px] lg:text-sm">
                         L&apos;entraide est au cœur de notre ADN, car nous
                         savons que les meilleures solutions naissent du partage
                         des idées et des compétences. Notre collaboration
@@ -700,7 +700,7 @@ export default function Equipe() {
                     } transition-all duration-500 ease-out text-right`}
                   >
                     {hoveredValue2 ? (
-                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
+                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[60vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
                         L&apos;innovation guide chacune de nos décisions, nous
                         poussant constamment à explorer de nouvelles approches
                         pour résoudre vos défis numériques. Notre créativité se
@@ -790,7 +790,7 @@ export default function Equipe() {
                     } transition-all duration-500 ease-out text-left`}
                   >
                     {hoveredValue3 ? (
-                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[65vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
+                      <span className="fade-in-text overflow-y-auto max-h-{170px] sm:max-h-[160px] md:max-h-[150px] lg:max-h-[170px] block w-[60vw] sm:w-[50vw] md:w-[55vw] lg:w-[60vw] font-montserrat font-bold text-[10px] xs:text-[11px] sm:text-xs md:text-[13px] lg:text-sm">
                         L&apos;excellence n&apos;est pas négociable pour nous,
                         chaque ligne de code et chaque pixel sont
                         méticuleusement travaillés pour atteindre les plus hauts

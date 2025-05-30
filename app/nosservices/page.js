@@ -8,7 +8,8 @@ const services = [
   {
     icon: "/bulbe.svg",
     title: "Développement Web",
-    description: "Création de sites web modernes et responsive",
+    description:
+      "Création de sites web modernes et compatibles sur tous type d'appareils",
     bgColor: "#004165",
   },
   {
@@ -20,7 +21,8 @@ const services = [
   {
     icon: "/internetpicto.svg",
     title: "Conseil",
-    description: "Solutions digitales sur mesure",
+    description:
+      "Solutions digitales sur mesure, communication, community management, rdv de mises au point professionnelles régulières, ...",
     bgColor: "#006A9E",
   },
 ];
@@ -34,9 +36,9 @@ const sections = [
     isReversed: false,
   },
   {
-    title: "Support 24/7",
+    title: "Support ultra réactif",
     description:
-      "Une équipe dédiée à votre service pour répondre à vos besoins en temps réel.",
+      "Un hébergement assuré par nos propres serveurs et une équipe ultra réactive pour intervenir en cas de problème technique",
     animationType: "typewriter",
     isReversed: true,
   },
