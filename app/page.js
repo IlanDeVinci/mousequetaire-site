@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import Link from "next/link";
-import WindAnimation from "../components/WindAnimation";
+import WindAnimationSVG, { WindAnimation } from "../components/WindAnimation";
 import ScrollReveal from "../components/ScrollReveal";
 import { gsap } from "gsap";
 import TypeWriter from "../components/TypeWriter";
@@ -19,6 +19,22 @@ export default function Home() {
   const heroTitleRef = useRef(null);
   const neonTextRef = useRef(null);
   const heroContainerRef = useRef(null);
+
+  const windAnimationRef = useRef(null);
+  // Initialize wind animation
+  // Singleton WindAnimation instance
+  useEffect(() => {
+    setTimeout(() => {
+      if (!window._windAnimationInstance) {
+        window._windAnimationInstance = new WindAnimation();
+      }
+      windAnimationRef.current = window._windAnimationInstance;
+    }, 1000); // Delay to ensure DOM is ready
+    return () => {
+      // Do not destroy singleton instance
+      windAnimationRef.current = null;
+    };
+  }, []);
 
   // GSAP hero animations
   useGSAP(() => {
@@ -78,7 +94,7 @@ export default function Home() {
         <section className="relative min-h-[90vh] -mt-16 flex items-center justify-center bg-[050610] overflow-hidden font-montserrat">
           {/* Wind Animation SVG - now with responsive sizing */}
           <div className="absolute inset-0 h-full">
-            <WindAnimation />
+            <WindAnimationSVG />
           </div>
 
           {/* Logo in top left */}

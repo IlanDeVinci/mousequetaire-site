@@ -850,7 +850,7 @@ class PathTree {
   }
 }
 
-class WindAnimation {
+export class WindAnimation {
   constructor(options = {}) {
     this.svg = document.querySelector(".wind-svg");
     this.active = false;
@@ -1688,18 +1688,7 @@ class WindAnimation {
   }
 }
 
-export default function initWindAnimation() {
-  if (typeof window !== "undefined") {
-    setTimeout(() => {
-      // If an animation already exists, deactivate it first
-      if (window.windAnimation) {
-        window.windAnimation = null;
-      }
-
-      // Create a new animation instance
-      window.windAnimation = new WindAnimation();
-    }, 1000);
-  }
+export default function WindAnimationSVG() {
   return (
     <svg
       className="wind-svg absolute inset-0 w-full h-full overflow-hidden"
