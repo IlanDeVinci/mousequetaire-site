@@ -155,8 +155,7 @@ const portfolioItems = [
   {
     id: 10,
     title: "Bot Discord Musique",
-    description:
-      "Bot discord de streaming musical.",
+    description: "Bot discord de streaming musical.",
     image: "/images/projets/projet_bot-discord.png",
     images: ["/images/projets/projet_bot-discord.png"],
     importance: Math.floor(Math.random() * 4) + 1,
@@ -871,25 +870,19 @@ export default function Portfolio() {
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300  "></div>
                   </div>
-                  <div className="portfolio-overlay absolute bottom-0 left-0 right-0 bg-black/70 text-white p-3 sm:p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out">
-                    <h3 className="text-base sm:text-lg font-semibold text-blue-300">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm mt-1 opacity-0 group-hover:opacity-100 transition-opacity delay-100 duration-300 line-clamp-2 sm:line-clamp-3">
-                      {portfolioItems
-                        .find((p) => p.id === item.id)
-                        ?.description?.slice(0, 80)}
-                      {portfolioItems.find((p) => p.id === item.id)?.description
-                        ?.length > 80
-                        ? "..."
-                        : ""}
-                    </p>
-                    <div className="flex items-center mt-2 sm:mt-3">
-                      <span className="text-xs px-2 py-1 bg-blue-800/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity delay-200 duration-300">
-                        View Project
-                      </span>
+                  <div className="absolute left-0 right-0 bottom-0 z-10">
+                    <div className="px-4 py-3 transition-transform duration-300 ease-in-out translate-y-full group-hover:translate-y-0 rounded-b-2xl bg-gradient-to-t from-black/20 to-transparent">
+                      <h3 className="text-base font-semibold text-blue-300 mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-gray-200 line-clamp-1">
+                        {
+                          portfolioItems.find((p) => p.id === item.id)
+                            ?.description
+                        }
+                      </p>
                     </div>
                   </div>
 
