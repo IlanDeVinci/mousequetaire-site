@@ -28,7 +28,6 @@ const portfolioItems = [
     technologies: ["IA", "24/7", "TailwindCSS"],
     client: "Projet personnel",
     year: "2025",
-    link: "https://example.com/project1",
   },
   {
     id: 2,
@@ -44,7 +43,6 @@ const portfolioItems = [
     technologies: ["App", "HTML5", "CSS3"],
     client: "Chambre de commerce franco-tchèque",
     year: "2025",
-    link: "https://example.com/project2",
   },
   {
     id: 3,
@@ -59,7 +57,6 @@ const portfolioItems = [
     technologies: ["Python", "OpenCV", "YOLOv3", "NumPy", "JSON"],
     client: "Projet IIM Digital School",
     year: "2025",
-    link: "https://example.com/project3",
   },
   {
     id: 4,
@@ -75,7 +72,6 @@ const portfolioItems = [
     technologies: ["IA", "Malvoyants"],
     client: "Projet personnel",
     year: "2024",
-    link: "https://example.com/project4",
   },
   {
     id: 5,
@@ -88,7 +84,6 @@ const portfolioItems = [
     technologies: ["JS", "CSS"],
     client: "Projet personnel",
     year: "2025",
-    link: "https://example.com/project5",
   },
   {
     id: 6,
@@ -104,7 +99,6 @@ const portfolioItems = [
     technologies: ["HTML", "Javascript", "Pytorch"],
     client: "Projet Personnel",
     year: "2025",
-    link: "https://example.com/project6",
   },
   {
     id: 7,
@@ -120,7 +114,6 @@ const portfolioItems = [
     technologies: ["HTML", "CSS"],
     client: "Projet scolaire",
     year: "2025",
-    link: "https://example.com/project7",
   },
   {
     id: 8,
@@ -133,7 +126,6 @@ const portfolioItems = [
     technologies: ["HTML", "CSS", "Transformers.js"],
     client: "Projet personnel",
     year: "2025",
-    link: "https://example.com/project8",
   },
   {
     id: 9,
@@ -150,7 +142,6 @@ const portfolioItems = [
     technologies: ["Symphony", "MySQL", "Twig", "Tailwindcss"],
     client: "Projet scolaire",
     year: "2025",
-    link: "https://example.com/project9",
   },
   {
     id: 10,
@@ -162,7 +153,6 @@ const portfolioItems = [
     technologies: ["Discord", "Node.js", "Discord.js"],
     client: "Projet personnel",
     year: "2025",
-    link: "https://example.com/project10",
   },
 ];
 
@@ -1062,7 +1052,7 @@ export default function Portfolio() {
                   </div>
                 )}
 
-              {selectedProject.link && (
+              {selectedProject.link != null && (
                 <div className="mb-8">
                   <a
                     href={selectedProject.link}
