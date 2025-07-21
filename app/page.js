@@ -93,9 +93,9 @@ export default function Home() {
               >
                 <span
                   className="neon-blue-text text-lg md:text-3xl"
-                  data-text="&lt;mouse-quetaires/&gt;"
+                  data-text="&lt;mouse-quetaire/&gt;"
                 >
-                  &lt;mouse-quetaires/&gt;
+                  &lt;mouse-quetaire/&gt;
                 </span>
               </div>
               <div className="relative mt-8 z-30">
