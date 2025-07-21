@@ -243,8 +243,8 @@ export default function Home() {
                   transform: rotateY(0);
                 }
 
-                .flip-card-scrollreveal:last-of-type .flip-card-front {
-                  align-items: flex-start;
+                .flip-card-scrollreveal:last-of-type .flip-card-front svg {
+                  align-self: flex-start;
                 }
 
                 .flip-card-front h3 {
@@ -730,7 +730,6 @@ function FlipCard({ frontContent, backContent, index }) {
         <div className="flip-card-front overflow-hidden" ref={frontRef}>
           <h3 className="text-2xl md:text-3xl font-medium text-[#87D7FF] z-10 absolute">
             {frontContent}
-            {index}
           </h3>
           {index == 0 ? (
             <svg
