@@ -360,7 +360,7 @@ const teamMembers = [
     name: "Jade-Bérénice",
     role: "Responsable Juridique",
     description:
-      "Je veille à la conformité juridique de tous nos projets et m'assure que vos données et votre activité respectent les réglementations en vigueur. Mon expertise en droit du numérique protège votre entreprise et garantit la sécurité juridique de vos innovations technologiques.",
+      "Je m'occupe de la rédaction et de la révision de tous les contrats et conditions d'utilisation de vos projets. Mon expertise juridique garantit que vos documents légaux sont conformes aux réglementations en vigueur et protègent efficacement votre entreprise et vos utilisateurs.",
     image: "/images/Photo-Jade.jpg",
   },
 ];
