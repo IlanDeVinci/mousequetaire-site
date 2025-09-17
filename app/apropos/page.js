@@ -355,6 +355,14 @@ const teamMembers = [
       "Je crée l'apparence visuelle de votre projet et m'assure qu'il soit beau et facile à utiliser. Mon travail est de concevoir des interfaces que vos utilisateurs aimeront et comprendront intuitivement. Je donne vie à votre marque à travers des designs attrayants et fonctionnels.",
     image: "/images/photo-xavier.png",
   },
+  {
+    id: 6,
+    name: "Jade-Bérénice",
+    role: "Responsable Juridique",
+    description:
+      "Je veille à la conformité juridique de tous nos projets et m'assure que vos données et votre activité respectent les réglementations en vigueur. Mon expertise en droit du numérique protège votre entreprise et garantit la sécurité juridique de vos innovations technologiques.",
+    image: "/images/Photo-Jade.jpg",
+  },
 ];
 
 function TeamMember({ image, name, role, description, reverse }) {

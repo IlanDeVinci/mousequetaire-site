@@ -563,18 +563,18 @@ export default function Home() {
                 {
                   title: "Plateforme E-commerce",
                   description: "Solution complète pour une boutique de mode",
-                  image: "/images/project1.jpg",
+                  image: "/images/projets/projet_e-commerce.png",
                 },
                 {
                   title: "Application Mobile",
                   description: "Service de livraison de proximité",
-                  image: "/images/project2.jpg",
+                  image: "/images/projets/projet_taskflow.png",
                 },
                 {
                   title: "Dashboard Analytique",
                   description:
                     "Visualisation de données pour une startup fintech",
-                  image: "/images/project3.jpg",
+                  image: "/images/projets/projet_IA.png",
                 },
               ].map((project, index) => (
                 <ScrollReveal
