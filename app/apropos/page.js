@@ -349,19 +349,19 @@ const teamMembers = [
   },
   {
     id: 5,
-    name: "Xavier d'Andurain",
-    role: "UI/UX Designer",
-    description:
-      "Je crée l'apparence visuelle de votre projet et m'assure qu'il soit beau et facile à utiliser. Mon travail est de concevoir des interfaces que vos utilisateurs aimeront et comprendront intuitivement. Je donne vie à votre marque à travers des designs attrayants et fonctionnels.",
-    image: "/images/photo-xavier.png",
-  },
-  {
-    id: 6,
     name: "Jade-Bérénice",
     role: "Responsable Juridique",
     description:
       "Je m'occupe de la rédaction et de la révision de tous les contrats et conditions d'utilisation de vos projets. Mon expertise juridique garantit que vos documents légaux sont conformes aux réglementations en vigueur et protègent efficacement votre entreprise et vos utilisateurs.",
     image: "/images/Photo-Jade.jpg",
+  },
+  {
+    id: 6,
+    name: "Ilona DUBLINEAU",
+    role: "Responsable Commercial & Marketing",
+    description:
+      "Je suis la Responsable Commercial et Marketing, en charge de développer notre portefeuille client. Mon rôle consiste à identifier de nouvelles opportunités, prospecter, et établir des relations solides avec nos futurs partenaires. J'accompagne les clients dès le premier contact, comprends leurs besoins et leur propose des solutions adaptées. Mon objectif est de créer une collaboration de confiance et de décrocher les contrats qui permettront à votre projet de prendre de l'ampleur.",
+    image: "/images/photo_ilona.jpg",
   },
 ];
 
