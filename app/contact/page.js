@@ -708,23 +708,23 @@ const ContactInfoLink = ({ icon, label, value, href }) => {
 // Sample images for the Instagram modal slider
 const sampleImages = [
   {
-    src: "/images/project1.jpg",
-    alt: "Sample image 1",
+    src: "/images/projets/MousequetaireShop/icon.png",
+    alt: "MousequetaireShop",
     type: "instagram",
   },
   {
-    src: "/images/project2.jpg",
-    alt: "Sample image 2",
+    src: "/images/projets/Application-teams/icon.png",
+    alt: "Reservation bureaux Teams",
     type: "linkedin",
   },
   {
-    src: "/images/project3.jpg",
-    alt: "Sample image 3",
+    src: "/images/projets/pizzeria/icon.png",
+    alt: "Pizzeria Chartrettes",
     type: "instagram",
   },
   {
-    src: "/images/project4.jpg",
-    alt: "Sample image 4",
+    src: "/images/projets/conge-chartrettes/icon.png",
+    alt: "Conge Chartrettes",
     type: "linkedin",
   },
 ];

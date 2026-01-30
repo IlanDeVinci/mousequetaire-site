@@ -561,20 +561,20 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 {
-                  title: "Plateforme E-commerce",
-                  description: "Solution complète pour une boutique de mode",
-                  image: "/images/projets/projet_e-commerce.png",
+                  title: "Pizzeria Chartrettes",
+                  description: "Site vitrine pour la pizzeria de Chartrettes",
+                  image: "/images/projets/pizzeria/icon.png",
                 },
                 {
-                  title: "Application Mobile",
-                  description: "Service de livraison de proximité",
-                  image: "/images/projets/projet_taskflow.png",
+                  title: "Reservation bureaux CCI",
+                  description: "Application de reservation integree a Teams",
+                  image: "/images/projets/Application-teams/icon.png",
                 },
                 {
-                  title: "Dashboard Analytique",
+                  title: "Conge Chartrettes",
                   description:
-                    "Visualisation de données pour une startup fintech",
-                  image: "/images/projets/projet_IA.png",
+                    "Application de gestion des conges pour la mairie",
+                  image: "/images/projets/conge-chartrettes/icon.png",
                 },
               ].map((project, index) => (
                 <ScrollReveal
