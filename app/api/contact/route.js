@@ -25,7 +25,7 @@ export async function POST(request) {
     const categoryLabel = category || "Général";
 
     await resend.emails.send({
-      from: "Mousequetaire Contact <onboarding@resend.dev>",
+      from: "Mousequetaire Contact <contact@mousequetaire.com>",
       to: "mousequetaires@gmail.com",
       replyTo: email,
       subject: `[${categoryLabel}] Nouveau message de ${name}`,

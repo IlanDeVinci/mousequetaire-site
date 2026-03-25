@@ -16,7 +16,9 @@
       "Bash(find /c/Users/mairi/Documents/GitHub/mousequetaire-site -type f \\\\\\(-name *.css -o -name *.config.* -o -name .env* \\\\\\))",
       "Bash(xargs grep:*)",
       "Bash(npx next:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(rsync -avz --delete --exclude '.git' --exclude 'node_modules' --exclude '.next' --exclude '.env.local' -e \"ssh -i C:\\\\Users\\\\mairi\\\\.ssh\\\\id_ed25519\" ./ root@192.168.1.4:/mnt/tank/mousequetaire-site/)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
