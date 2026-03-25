@@ -915,7 +915,7 @@ const ContactBox = ({
       return;
     }
     if (onClick) {
-      onClick(e, inputValue);
+      onClick(e, inputValue, title);
     }
   };
 
@@ -1002,61 +1002,135 @@ const ContactBox = ({
   );
 };
 
-// New expanded contact options for when a box is clicked
-const expandedContactOptions = [
-  {
-    title: "Support Technique",
-    description: "Assistance pour vos problèmes techniques",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
-      </svg>
-    ),
-    bgColor: "#1E3A4C",
-  },
-  {
-    title: "Service Client",
-    description: "Questions sur vos commandes et services",
-    icon: "",
-    bgColor: "#235A74",
-  },
-  {
-    title: "Ventes",
-    description: "Informations sur nos produits et services",
-    icon: "",
-    bgColor: "#286A89",
-  },
-  {
-    title: "Partenariats",
-    description: "Collaborations et opportunités d'affaires",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-      </svg>
-    ),
-    bgColor: "#2D7A9E",
-  },
-  {
-    title: "Médias",
-    description: "Demandes de presse et médias",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M22 3H2C.9 3 0 3.9 0 5v14c0 1.1.9 2 2 2h20c1.1 0 1.99-.9 1.99-2L24 5c0-1.1-.9-2-2-2zM8 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H2v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1zm3.85-4h1.64L21 16l-1.99 1.99c-1.31-.98-2.28-2.38-2.73-3.99-.18-.64-.28-1.31-.28-2s.1-1.36.28-2c.45-1.62 1.42-3.01 2.73-3.99L21 8l-1.51 2h-1.64c-.22.63-.35 1.3-.35 2s.13 1.37.35 2z" />
-      </svg>
-    ),
-    bgColor: "#328AB3",
-  },
-  {
-    title: "Retour",
-    description: "Revenir aux options principales",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-        <path d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z" />
-      </svg>
-    ),
-    bgColor: "#389AC7",
-  },
-];
+// Contact form component shown after selecting a category
+const ContactForm = ({ category, onBack }) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState("idle"); // idle, sending, success, error
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          category,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de l'envoi");
+      }
+
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err.message);
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <div className="w-full max-w-lg mx-auto px-4 text-center">
+        <div className="bg-[#1E3A4C] rounded-lg p-8 shadow-lg">
+          <svg viewBox="0 0 24 24" fill="#7DD4FF" className="w-16 h-16 mx-auto mb-4">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          <h3 className="text-2xl font-bold text-white mb-2 font-montserrat">Message envoyé !</h3>
+          <p className="text-gray-300 mb-6 font-montserrat">Nous vous répondrons dans les plus brefs délais.</p>
+          <button
+            onClick={onBack}
+            className="px-6 py-2 bg-[#7DD4FF] hover:bg-[#5AA8D0] text-[#0E304A] font-bold rounded-lg transition-colors font-montserrat"
+          >
+            Retour
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-lg mx-auto px-4">
+      <div className="bg-[#1E3A4C] rounded-lg p-6 md:p-8 shadow-lg">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl md:text-2xl font-bold text-white font-montserrat">
+            {category}
+          </h3>
+          <button
+            onClick={onBack}
+            className="text-[#7DD4FF] hover:text-white transition-colors"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path d="M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div>
+            <label className="block text-sm text-gray-300 mb-1 font-montserrat">Votre nom</label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-2 bg-[#0E304A] border border-[#2D7A9E] rounded-lg text-white placeholder-gray-400 focus:border-[#7DD4FF] outline-none transition-colors font-montserrat"
+              placeholder="Jean Dupont"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1 font-montserrat">Votre email</label>
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-4 py-2 bg-[#0E304A] border border-[#2D7A9E] rounded-lg text-white placeholder-gray-400 focus:border-[#7DD4FF] outline-none transition-colors font-montserrat"
+              placeholder="jean@exemple.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-300 mb-1 font-montserrat">Votre message</label>
+            <textarea
+              required
+              rows={5}
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              className="w-full px-4 py-2 bg-[#0E304A] border border-[#2D7A9E] rounded-lg text-white placeholder-gray-400 focus:border-[#7DD4FF] outline-none transition-colors resize-none font-montserrat"
+              placeholder="Décrivez votre demande..."
+            />
+          </div>
+
+          {status === "error" && (
+            <p className="text-red-400 text-sm font-montserrat">{errorMessage}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={status === "sending"}
+            className="w-full py-3 bg-[#7DD4FF] hover:bg-[#5AA8D0] disabled:bg-gray-500 text-[#0E304A] font-bold rounded-lg transition-colors font-montserrat text-lg"
+          >
+            {status === "sending" ? "Envoi en cours..." : "Envoyer"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const contactGridItems = [
   {
@@ -1512,12 +1586,13 @@ export default function Contact() {
     };
   }, []);
 
-  const handleContactBoxClick = (e, inputValue) => {
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [prefilledMessage, setPrefilledMessage] = useState("");
+
+  const handleContactBoxClick = (e, inputValue, categoryTitle) => {
     e.preventDefault();
-    if (inputValue) {
-      console.log("Input value:", inputValue);
-    }
-    console.log("Opening nested modal with expanded options");
+    setSelectedCategory(categoryTitle || "Général");
+    setPrefilledMessage(inputValue || "");
 
     // First set the expanded options state
     setShowExpandedOptions(true);
@@ -1711,41 +1786,34 @@ export default function Contact() {
                           <h3 className="text-xl md:text-3xl font-bold mb-2 mt-10 md:mt-16 px-4 text-center text-shadow-xs text-shadow-blue-950">
                             {!showExpandedOptions
                               ? "Qui êtes-vous ?"
-                              : "Pourquoi voulez-vous nous contacter ?"}
+                              : "Envoyez-nous un message"}
                           </h3>
 
-                          {/* Grid view for contact options */}
-                          <div
-                            className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-16`}
-                          >
-                            {!showExpandedOptions
-                              ? contactGridItems.map((item, index) => (
-                                  <ContactBox
-                                    key={index}
-                                    title={item.title}
-                                    description={item.description}
-                                    icon={item.icon}
-                                    bgColor={item.bgColor}
-                                    onClick={handleContactBoxClick}
-                                    hasInput={item.hasInput}
-                                    inputPlaceholder={item.inputPlaceholder}
-                                  />
-                                ))
-                              : expandedContactOptions.map((item, index) => (
-                                  <ContactBox
-                                    key={index}
-                                    title={item.title}
-                                    description={item.description}
-                                    icon={item.icon}
-                                    bgColor={item.bgColor}
-                                    onClick={
-                                      item.title === "Retour"
-                                        ? handleReturnClick
-                                        : undefined
-                                    }
-                                  />
-                                ))}
-                          </div>
+                          {!showExpandedOptions ? (
+                            <div
+                              className={`w-full max-w-5xl px-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10 mb-16`}
+                            >
+                              {contactGridItems.map((item, index) => (
+                                <ContactBox
+                                  key={index}
+                                  title={item.title}
+                                  description={item.description}
+                                  icon={item.icon}
+                                  bgColor={item.bgColor}
+                                  onClick={handleContactBoxClick}
+                                  hasInput={item.hasInput}
+                                  inputPlaceholder={item.inputPlaceholder}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="w-full max-w-lg mx-auto px-4 mb-16">
+                              <ContactForm
+                                category={selectedCategory}
+                                onBack={handleReturnClick}
+                              />
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

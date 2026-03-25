@@ -348,14 +348,6 @@ const teamMembers = [
     image: "/images/photo-dorian.png",
   },
   {
-    id: 5,
-    name: "Jade-Bérénice",
-    role: "Responsable Juridique",
-    description:
-      "Je m'occupe de la rédaction et de la révision de tous les contrats et conditions d'utilisation de vos projets. Mon expertise juridique garantit que vos documents légaux sont conformes aux réglementations en vigueur et protègent efficacement votre entreprise et vos utilisateurs.",
-    image: "/images/Photo-Jade.jpg",
-  },
-  {
     id: 6,
     name: "Ilona DUBLINEAU",
     role: "Responsable Commercial & Marketing",
