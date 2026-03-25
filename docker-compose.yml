@@ -1,19 +1,21 @@
 services:
   mousequetaire-site:
-    build: .
+    build:
+      context: .
+      args:
+        - RESEND_API_KEY=${RESEND_API_KEY}
     container_name: mousequetaire-site
     restart: unless-stopped
     ports:
       - "3001:3000"
     environment:
       - NODE_ENV=production
+      - RESEND_API_KEY=${RESEND_API_KEY}
 
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared-tunnel
     restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     depends_on:
       - mousequetaire-site

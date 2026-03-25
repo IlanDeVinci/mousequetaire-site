@@ -9,6 +9,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG RESEND_API_KEY
+ENV RESEND_API_KEY=$RESEND_API_KEY
 RUN npm run build
 
 # Stage 3: Production image
