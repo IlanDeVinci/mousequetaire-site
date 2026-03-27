@@ -7,5 +7,6 @@ export default function robots() {
       },
     ],
     sitemap: "https://mousequetaire.com/sitemap.xml",
+    other: "llms.txt: https://mousequetaire.com/llms.txt",
   };
 }

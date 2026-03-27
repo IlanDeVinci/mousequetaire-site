@@ -1,0 +1,106 @@
+# Mousequetaire - Agence de Développement Web & Design en Île-de-France
+
+> Mousequetaire est une agence de développement web, design UX/UI et conseil digital basée en Île-de-France, France. Fondée en 2025, l'agence crée des sites internet modernes, des applications web sur mesure, des solutions e-commerce et des outils intégrant l'intelligence artificielle. Site web : https://mousequetaire.com
+
+## Présentation
+
+Mousequetaire est née en 2025 de la vision de trois amis passionnés de technologie : Samuel Alhadef, Ilan Maouchi et Dorian Collet. Leur ambition est de rendre la technologie et l'IA accessibles à tous, sans jargon intimidant. L'agence se distingue par sa transparence, ses solutions sur mesure (jamais de templates standardisés) et un accompagnement personnalisé de chaque client.
+
+L'agence travaille avec des mairies, des entreprises, des startups et des institutions comme la CCI France. Elle est spécialisée dans les technologies React, Next.js, TailwindCSS, et intègre des solutions d'intelligence artificielle (API Gemini, OpenAI) et d'IoT (ESP32, impression 3D).
+
+## Services détaillés
+
+### Développement Web
+Création de sites web modernes et compatibles sur tous types d'appareils. L'agence développe des sites vitrines, des applications web complexes, des plateformes e-commerce et des outils métier sur mesure. Technologies principales : React.js, Next.js, TailwindCSS, Node.js. L'agence assure aussi l'hébergement sur ses propres serveurs dédiés pour garantir performance et réactivité.
+
+### Design UX/UI
+Maquettes d'applications, logos, chartes graphiques et interfaces utilisateur intuitives. Le design est créatif et fonctionnel, pensé pour valoriser la marque du client. L'agence propose des solutions visuelles complètes : identité visuelle, maquettes interactives, prototypage et direction artistique.
+
+### Stratégie Digitale
+Analyse de marché et ciblage précis de l'audience du client. Stratégies de référencement SEO/SEA pour maximiser la visibilité en ligne. Plans de conversion optimisés, community management et gestion de la présence sur les réseaux sociaux. L'expertise technique de l'équipe garantit un ROI mesurable.
+
+### Support Technique
+Hébergement sur serveurs dédiés propriétaires, maintenance préventive et corrective, assistance technique réactive et résolution de problèmes. L'agence propose un support ultra réactif avec intervention rapide en cas de problème.
+
+## Équipe
+
+### Samuel Alhadef - CEO/CCO (Chief Communication Officer)
+Responsable de la relation client. Il écoute et comprend les besoins des clients, répond à leurs questions et s'assure que chaque projet avance bien. Point de contact principal du premier rendez-vous jusqu'à la livraison.
+
+### Célestin Godefroy - COO (Chief Operational Officer) / Responsable Communication
+Coordinateur des opérations et garant du bon déroulement des projets. Il veille au respect des délais et à la qualité de chaque étape. Également chargé de la croissance et de la notoriété de Mousequetaire.
+
+### Ilan Maouchi - CTO (Chief Technical Officer)
+Expert technique de l'équipe. Il conçoit les solutions et choisit les technologies adaptées à chaque projet. Il transforme les idées des clients en réalités numériques fonctionnelles et innovantes.
+
+### Dorian Collet - Directeur Artistique
+Responsable de l'identité visuelle des projets. Il supervise la création des designs, garantit leur cohérence et s'assure qu'ils reflètent parfaitement l'image de marque des clients. Il transforme les idées en expériences visuelles impactantes.
+
+### Ilona Dublineau - Responsable Commercial & Marketing
+En charge du développement du portefeuille client. Elle identifie de nouvelles opportunités, prospecte et établit des relations solides avec les futurs partenaires. Elle accompagne les clients dès le premier contact.
+
+## Portfolio - Projets réalisés
+
+### Réservation de bureaux CCI (2024)
+Application professionnelle de réservation de bureaux développée pour la Chambre de Commerce et d'Industrie France en République Tchèque. Intégrée dans Microsoft Teams, elle permet aux employés de visualiser en temps réel la disponibilité des espaces de travail, de réserver un créneau et de gérer leurs réservations. Un back-office permet aux gestionnaires de configurer les espaces et consulter les statistiques d'occupation.
+Technologies : React.js, CSS, HTML, Microsoft Teams
+
+### Congé Chartrettes (2024)
+Projet complet hardware + software pour la mairie de Chartrettes. Application web Next.js pour la gestion des congés des agents municipaux. En parallèle, un dispositif de badgeage basé sur ESP32 (programmé en C++) avec boîtier imprimé en 3D (Fusion 360). Les données sont synchronisées en temps réel.
+Technologies : Next.js, TailwindCSS, C++, ESP32, Fusion 360
+
+### Apprentissage de Langues IA (2024)
+Application d'apprentissage de langues propulsée par l'IA Gemini de Google. L'outil analyse le niveau de l'utilisateur puis génère des exercices sur mesure : traduction, compréhension orale, grammaire, vocabulaire. L'IA corrige en temps réel avec des explications détaillées et adapte la difficulté progressivement.
+Technologies : Next.js, API Gemini, TailwindCSS
+
+### Pizzeria Chartrettes (2024)
+Site vitrine complet avec système de commande en ligne pour un restaurant local. Design moderne et responsive avec menu interactif, galerie photos et formulaire de commande.
+Technologies : Next.js, TailwindCSS
+
+### Murder Party App (2024)
+Application web interactive pour organiser des murder parties. Gestion des rôles, indices cachés, système de phases en temps réel pour 4 à 12 joueurs.
+Technologies : Next.js, TailwindCSS
+
+### Rackoon Streaming (2024)
+Plateforme de streaming vidéo avec catalogue organisé, moteur de recherche avancé, lecteur vidéo adaptatif et système de recommandations.
+Technologies : React.js, TailwindCSS
+
+### IA Détection d'objets (2024)
+Application utilisant YOLO (You Only Look Once) pour la détection d'objets en temps réel via webcam ou images.
+Technologies : Python, YOLO, React.js
+
+### PokemonBattleDetector (2023)
+Extension Twitch utilisant la vision par ordinateur pour détecter automatiquement les combats Pokémon dans un stream en direct.
+Technologies : Python, HTML, CSS, JS, Extension Twitch
+
+### MouseQuetaire (2025)
+Le site web de l'agence elle-même, vitrine de leur savoir-faire.
+Technologies : Next.js, TailwindCSS, Framer Motion
+
+## Informations pratiques
+
+- **Site web** : https://mousequetaire.com
+- **Email** : contact.mousequetaire@gmail.com
+- **Téléphone** : +33 6 52 21 34 87
+- **Localisation** : Île-de-France, France
+- **Zone d'intervention** : France entière
+- **Gamme de prix** : €€ (tarifs compétitifs adaptés aux PME, mairies et startups)
+- **Instagram** : https://www.instagram.com/mousequetaire
+- **LinkedIn** : https://www.linkedin.com/company/mousequetaire
+
+## FAQ
+
+### Quels types de projets réalise Mousequetaire ?
+Mousequetaire réalise des sites vitrines, des applications web sur mesure, des plateformes e-commerce, des outils métier, des intégrations IoT et des solutions utilisant l'intelligence artificielle. L'agence travaille avec des mairies, des entreprises, des startups et des institutions.
+
+### Quelles technologies utilise Mousequetaire ?
+L'agence utilise principalement React.js, Next.js et TailwindCSS pour le développement web. Pour les projets spéciaux, elle intègre des API d'IA (Gemini, OpenAI), des microcontrôleurs (ESP32) pour l'IoT, et des outils de conception 3D (Fusion 360).
+
+### Où est basée l'agence Mousequetaire ?
+Mousequetaire est basée en Île-de-France et intervient sur toute la France. L'agence travaille aussi à l'international, comme en témoigne son projet pour la CCI France en République Tchèque.
+
+### Comment contacter Mousequetaire ?
+Par email à contact.mousequetaire@gmail.com, par téléphone au +33 6 52 21 34 87, ou via le formulaire de contact sur https://mousequetaire.com/contact. L'agence s'engage à répondre sous 24h.
+
+### Mousequetaire propose-t-elle des devis gratuits ?
+Oui, Mousequetaire propose des devis gratuits et personnalisés pour chaque projet. Il suffit de les contacter via leur formulaire ou par email.

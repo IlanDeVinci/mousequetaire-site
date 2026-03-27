@@ -116,6 +116,7 @@ export default function RootLayout({ children }) {
     <html lang="fr" className="bg-[#050610]">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="author" href="https://mousequetaire.com/llms.txt" type="text/plain" title="LLMs.txt" />
         <OrganizationSchema />
         <WebSiteSchema />
       </head>

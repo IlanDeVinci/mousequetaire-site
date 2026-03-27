@@ -1,0 +1,38 @@
+# Mousequetaire
+
+> Mousequetaire est une agence de développement web, design UX/UI et conseil digital basée en Île-de-France, France. Fondée en 2025, l'agence crée des sites internet modernes, des applications web sur mesure, des solutions e-commerce et des outils intégrant l'intelligence artificielle. L'équipe utilise principalement React, Next.js et TailwindCSS.
+
+## Services
+
+- [Développement Web](https://mousequetaire.com/nosservices): Création de sites web modernes et responsive, applications web sur mesure, sites vitrines, e-commerce, intégration d'APIs et solutions IoT.
+- [Design UX/UI](https://mousequetaire.com/nosservices): Maquettes d'applications, logos, chartes graphiques, interfaces utilisateur intuitives et identité visuelle complète.
+- [Stratégie Digitale](https://mousequetaire.com/nosservices): Analyse de marché, SEO/SEA, community management, plans de conversion et présence sur les réseaux sociaux.
+- [Support Technique](https://mousequetaire.com/nosservices): Hébergement sur serveurs dédiés, maintenance, assistance et résolution de problèmes techniques avec un support ultra réactif.
+
+## Équipe
+
+- [Samuel Alhadef](https://mousequetaire.com/apropos): CEO/CCO - Responsable de la relation client, du premier contact jusqu'à la livraison du projet.
+- [Célestin Godefroy](https://mousequetaire.com/apropos): COO - Coordination des opérations, respect des délais et communication externe.
+- [Ilan Maouchi](https://mousequetaire.com/apropos): CTO - Expert technique, conception des solutions et choix des technologies.
+- [Dorian Collet](https://mousequetaire.com/apropos): Directeur Artistique - Identité visuelle, design et cohérence graphique des projets.
+- [Ilona Dublineau](https://mousequetaire.com/apropos): Responsable Commercial & Marketing - Développement du portefeuille client et prospection.
+
+## Réalisations
+
+- [Portfolio complet](https://mousequetaire.com/portfolio): Plus de 15 projets réalisés pour des mairies, entreprises, CCI et projets personnels.
+- [Réservation de bureaux CCI](https://mousequetaire.com/portfolio/3): Application Microsoft Teams pour la CCI France en République Tchèque - réservation de bureaux en temps réel.
+- [Congé Chartrettes](https://mousequetaire.com/portfolio/5): Application web + boîtier de badgeage IoT (ESP32) pour la mairie de Chartrettes - gestion des congés et présences.
+- [Apprentissage de Langues IA](https://mousequetaire.com/portfolio/4): Application d'apprentissage de langues propulsée par l'IA Gemini de Google avec exercices adaptatifs.
+- [Pizzeria Chartrettes](https://mousequetaire.com/portfolio/8): Site vitrine complet avec système de commande en ligne pour un restaurant.
+
+## Contact
+
+- [Page de contact](https://mousequetaire.com/contact): Formulaire de contact, devis gratuit, réponse sous 24h.
+- Email: contact.mousequetaire@gmail.com
+- Téléphone: +33 6 52 21 34 87
+- Instagram: https://www.instagram.com/mousequetaire
+- LinkedIn: https://www.linkedin.com/company/mousequetaire
+
+## Optional
+
+- [À propos](https://mousequetaire.com/apropos): Histoire de l'agence, valeurs et présentation détaillée de l'équipe.
