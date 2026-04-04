@@ -110,9 +110,25 @@ export default async function Image() {
             fontSize: "20px",
             color: "rgba(255, 255, 255, 0.6)",
             fontWeight: 400,
+            marginBottom: "28px",
           }}
         >
           Île-de-France · Sites web · Applications · E-commerce
+        </div>
+
+        {/* Call to action */}
+        <div
+          style={{
+            display: "flex",
+            fontSize: "20px",
+            fontWeight: 700,
+            color: "#ffffff",
+            background: "#006a9e",
+            padding: "12px 32px",
+            borderRadius: "8px",
+          }}
+        >
+          Devis gratuit →
         </div>
       </div>
     ),

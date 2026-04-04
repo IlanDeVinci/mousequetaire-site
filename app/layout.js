@@ -69,8 +69,7 @@ export const metadata = {
     locale: "fr_FR",
     url: "https://mousequetaire.com",
     siteName: "Mousequetaire",
-    title:
-      "Mousequetaire — Agence de Développement Web & Design en Île-de-France",
+    title: "Mousequetaire — Agence Web & Design Île-de-France",
     description:
       "Création de sites internet modernes, applications web sur mesure, e-commerce et support technique. 15+ projets réalisés pour mairies, entreprises et startups.",
     images: [
