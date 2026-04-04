@@ -75,9 +75,9 @@ export const metadata = {
       "Création de sites internet modernes, applications web sur mesure, e-commerce et support technique. 15+ projets réalisés pour mairies, entreprises et startups.",
     images: [
       {
-        url: "/logo.png",
-        width: 800,
-        height: 600,
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
         alt: "Mousequetaire - Agence de Développement Web et Design en Île-de-France",
       },
     ],
@@ -87,7 +87,7 @@ export const metadata = {
     title: "Mousequetaire | Agence Web & Design Île-de-France",
     description:
       "Création de sites internet modernes, applications web sur mesure et support technique dédié. Devis gratuit.",
-    images: ["/logo.png"],
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
