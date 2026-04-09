@@ -1035,6 +1035,13 @@ const ContactForm = ({ category, onBack }) => {
 
       setStatus("success");
       setFormData({ name: "", email: "", message: "" });
+
+      // Google Ads conversion tracking
+      if (typeof gtag === "function") {
+        gtag("event", "conversion", {
+          send_to: "AW-16453600887/kWl0COOiyo8ZEPeM2KU9",
+        });
+      }
     } catch (err) {
       setStatus("error");
       setErrorMessage(err.message);
