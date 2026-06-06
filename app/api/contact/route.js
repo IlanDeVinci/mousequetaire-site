@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const dynamic = "force-dynamic";
 
 export async function POST(request) {
   try {
@@ -23,6 +23,13 @@ export async function POST(request) {
     }
 
     const categoryLabel = category || "Général";
+
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("RESEND_API_KEY non défini — email non envoyé.");
+      return Response.json({ success: true, skipped: true });
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
       from: "Mousequetaire Contact <contact@mousequetaire.com>",
