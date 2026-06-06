@@ -879,8 +879,14 @@ const Navbar = () => {
         }`}
       >
         <nav className="flex flex-col items-center space-y-6">
-          {["Accueil", "Nos services", "A propos", "Portfolio", "Contact"].map(
-            (item) => {
+          {[
+            "Accueil",
+            "Nos services",
+            "Nos tarifs",
+            "A propos",
+            "Portfolio",
+            "Contact",
+          ].map((item) => {
               const itemPath =
                 item === "Accueil"
                   ? "/"
@@ -913,11 +919,12 @@ const Navbar = () => {
       <nav
         className={`w-full px-1 hidden md:flex justify-center transition-all duration-300 delay-150 ${getNavbarClasses()}`}
       >
-        <div className="w-[650px]  top-2 bg-white rounded-full px-1 py-1 md:py-2 shadow-md">
+        <div className="w-auto max-w-[95vw] top-2 bg-white rounded-full px-2 py-1 md:py-2 shadow-md">
           <div className="flex justify-center space-x-4">
             {[
               "Accueil",
               "Nos services",
+              "Nos tarifs",
               "A propos",
               "Portfolio",
               "Contact",
