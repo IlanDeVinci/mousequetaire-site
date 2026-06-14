@@ -1,9 +1,9 @@
 import { BreadcrumbSchema } from "@/app/schema";
 
 export const metadata = {
-  title: "Nos Tarifs — Grille Tarifaire Développement Web",
+  title: "Nos Tarifs — Web, Print et Design",
   description:
-    "Tarifs Mousequetaire : sites vitrine, landing pages, e-commerce, applications web sur mesure, refonte, maintenance et services additionnels. Devis gratuit et sans engagement, paiements échelonnés.",
+    "Tarifs Mousequetaire : landing pages, sites vitrine, e-commerce, applications web, identité visuelle, supports print et réseaux sociaux.",
   keywords: [
     "tarif création site internet",
     "prix site vitrine",
@@ -11,14 +11,17 @@ export const metadata = {
     "prix application web sur mesure",
     "tarif refonte site web",
     "prix maintenance site internet",
+    "tarif identité visuelle",
+    "prix supports print",
+    "tarif design réseaux sociaux",
     "devis site web gratuit",
     "tarif développeur web freelance",
     "grille tarifaire agence web",
   ],
   openGraph: {
-    title: "Nos Tarifs — Grille Tarifaire Mousequetaire",
+    title: "Nos Tarifs — Web, Print et Design | Mousequetaire",
     description:
-      "Sites vitrine, e-commerce, applications web sur mesure, refonte et maintenance. Tarifs transparents, devis gratuit et sans engagement.",
+      "Découvrez nos tarifs pour le web, l'identité visuelle, les supports print et les réseaux sociaux.",
     url: "https://mousequetaire.com/nostarifs",
   },
   alternates: {

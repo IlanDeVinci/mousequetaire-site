@@ -1,10 +1,9 @@
 export const metadata = {
-  title: "Nos Tarifs — Grille Tarifaire (v2)",
-  description:
-    "Tarifs Mousequetaire : landing page, site vitrine, e-commerce et application web sur mesure.",
+  title: "Nos Tarifs",
+  description: "Cette page a été déplacée vers /nostarifs.",
   robots: { index: false, follow: false },
   alternates: {
-    canonical: "https://mousequetaire.com/nostarifs-v2",
+    canonical: "https://mousequetaire.com/nostarifs",
   },
 };
 
