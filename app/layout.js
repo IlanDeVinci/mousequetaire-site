@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -10,9 +10,10 @@ import PageLoader from "@/context/PageLoader";
 import { LoadingProvider } from "@/context/PageLoader";
 import { OrganizationSchema, WebSiteSchema } from "./schema";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -131,7 +132,7 @@ export default function RootLayout({ children }) {
         <WebSiteSchema />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased relative bg-[#050610]`}
+        className={`${inter.variable} ${geistMono.variable} ${montserrat.variable} antialiased relative bg-[#050610]`}
       >
         <LoadingProvider>
           <GSAPProvider>

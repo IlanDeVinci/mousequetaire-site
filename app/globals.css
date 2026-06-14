@@ -4,7 +4,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-geist: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
+  --font-inter: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --font-montserrat: var(--font-montserrat);
 }
@@ -78,7 +79,16 @@
   body {
     color: var(--foreground);
     background: var(--background);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
   }
 
   /* Wind Animation Styles */
@@ -324,5 +334,174 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ===== Animated tarif cards ===== */
+
+/* Card 2: starfield rotation is driven by JS (velocity based) */
+.card2-stars {
+  transform-origin: center;
+}
+
+/* Card 3: dark veil widens to the right; icons slide in once and reverse on leave */
+.card3-dark {
+  width: 32%;
+  transition: width 2.2s ease;
+}
+.tarif-card3:hover .card3-dark {
+  width: 85%;
+}
+.card3-icon {
+  left: -240px;
+  transform: translateY(-50%);
+  transition: left 1s ease-in-out;
+}
+.tarif-card3:hover .card3-icon {
+  left: var(--final);
+}
+
+/* Card 4: outlined squares grow to wrap the number */
+.card4-square {
+  transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy))) scale(0.3);
+  opacity: 0;
+  transition: transform 0.7s ease, opacity 0.7s ease;
+}
+.group:hover .card4-square {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.9;
+}
+
+/* Card 4: rings grow uniformly (container), lines extend horizontally */
+.card4-line {
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.8s ease-in-out;
+}
+.group:hover .card4-line {
+  transform: scaleX(1);
+}
+
+/* Card 5: layered waves and floating identity marks */
+.tarif-compact-card {
+  container-type: inline-size;
+}
+
+.tarif-card5 {
+  isolation: isolate;
+}
+
+.tarif-compact-content {
+  column-gap: clamp(14px, 4cqw, 59px);
+  padding-inline: clamp(28px, 7cqw, 103px);
+}
+
+.tarif-compact-main {
+  font-size: clamp(18px, 2.45cqw, 36px);
+}
+
+.tarif-compact-subtitle {
+  font-size: clamp(11px, 1.65cqw, 24px);
+}
+
+.card5-wave {
+  bottom: -58px;
+  left: -6%;
+  min-width: 1000px;
+  transform-origin: center;
+  width: 112%;
+  transition: transform 1.05s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.card5-wave-back {
+  transform: translate3d(-2.5%, -4px, 0);
+}
+
+.card5-wave-front {
+  transform: translate3d(2.5%, 54px, 0);
+}
+
+.tarif-card5:hover .card5-wave-back {
+  transform: translate3d(4.5%, -50px, 0);
+}
+
+.tarif-card5:hover .card5-wave-front {
+  transform: translate3d(-5%, -30px, 0);
+}
+
+.card5-sparkle,
+.card5-diamond {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+  transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.card5-sparkle-left {
+  bottom: -64px;
+  left: 2.5%;
+  transform: translate3d(0, 0, 0) rotate(-13deg) scale(0.76);
+}
+
+.card5-sparkle-right {
+  bottom: -58px;
+  right: 13%;
+  transform: translate3d(0, 0, 0) rotate(8deg) scale(0.88);
+}
+
+.card5-diamond {
+  bottom: 38px;
+  right: 5.2%;
+  transform: translate3d(0, 0, 0) rotate(-3deg);
+}
+
+.tarif-card5:hover .card5-sparkle-left {
+  transform: translate3d(8px, -202px, 0) rotate(285deg) scale(0.88);
+}
+
+.tarif-card5:hover .card5-sparkle-right {
+  transform: translate3d(clamp(-110px, -7cqw, -60px), -186px, 0)
+    rotate(-280deg) scale(0.5);
+}
+
+.tarif-card5:hover .card5-diamond {
+  transform: translate3d(-4px, -166px, 0) rotate(9deg);
+}
+
+.tarif-card5:hover .card5-content {
+  color: white;
+  text-shadow: 0 0 9px rgba(255, 255, 255, 0.72),
+    0 0 24px rgba(255, 255, 255, 0.38);
+}
+
+@media (max-width: 767px) {
+  .card5-wave {
+    left: 50%;
+    width: 1000px;
+  }
+
+  .card5-wave-back {
+    transform: translate3d(-52.5%, -4px, 0);
+  }
+
+  .card5-wave-front {
+    transform: translate3d(-47.5%, 54px, 0);
+  }
+
+  .tarif-card5:hover .card5-wave-back {
+    transform: translate3d(-45.5%, -50px, 0);
+  }
+
+  .tarif-card5:hover .card5-wave-front {
+    transform: translate3d(-55%, -30px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card5-wave,
+  .card5-sparkle,
+  .card5-diamond {
+    transition-duration: 0.01ms;
   }
 }
