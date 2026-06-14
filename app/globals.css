@@ -417,7 +417,7 @@
 }
 
 .card5-wave-back {
-  transform: translate3d(-2.5%, -18px, 0);
+  transform: translate3d(-2.5%, -50px, 0);
 }
 
 .card5-wave-front {
@@ -425,7 +425,7 @@
 }
 
 .tarif-card5:hover .card5-wave-back {
-  transform: translate3d(4.5%, -64px, 0);
+  transform: translate3d(4.5%, -96px, 0);
 }
 
 .tarif-card5:hover .card5-wave-front {
@@ -731,7 +731,7 @@
   }
 
   .card5-wave-back {
-    transform: translate3d(-52.5%, -18px, 0);
+    transform: translate3d(-52.5%, -50px, 0);
   }
 
   .card5-wave-front {
@@ -739,7 +739,7 @@
   }
 
   .tarif-card5:hover .card5-wave-back {
-    transform: translate3d(-45.5%, -64px, 0);
+    transform: translate3d(-45.5%, -96px, 0);
   }
 
   .tarif-card5:hover .card5-wave-front {
