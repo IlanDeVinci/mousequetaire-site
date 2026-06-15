@@ -222,13 +222,19 @@ export default function AnimatedTarifCards() {
     const MAX_VEL = 70; // deg/s
     const ACCEL = 90; // deg/s^2 while hovered
     const DECEL = 45; // deg/s^2 while leaving
+    const card = starsRef.current?.closest(".tarif-card2");
     let raf;
     const tick = (t) => {
       const s = stateRef.current;
       if (!s.last) s.last = t;
       const dt = Math.min((t - s.last) / 1000, 0.05);
       s.last = t;
-      if (hoveredRef.current) {
+      // On desktop the field spins while hovered; on mobile (no hover) it spins
+      // while the card is centered in view.
+      const active =
+        hoveredRef.current ||
+        (window.innerWidth <= 767 && !!card?.classList.contains("in-view"));
+      if (active) {
         s.vel = Math.min(MAX_VEL, s.vel + ACCEL * dt);
       } else {
         s.vel = Math.max(0, s.vel - DECEL * dt);
@@ -244,48 +250,50 @@ export default function AnimatedTarifCards() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8 sm:gap-10">
+    <div className="flex flex-col gap-10">
       {/* Card 1 — full-width glow line + #146683 header/footer */}
       <div
-        className="tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full"
+        className="tarif-card1 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full"
         style={{ backgroundColor: "#003E5C" }}
       >
-        {/* center glow — soft & wide band across the full width */}
-        <div
-          className="absolute inset-0 z-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(125,212,255,0) 8%, rgba(125,212,255,0.12) 30%, rgba(125,212,255,0.4) 50%, rgba(125,212,255,0.12) 70%, rgba(125,212,255,0) 92%)",
-            filter: "blur(14px)",
-          }}
-        />
-        {/* header — off-screen by default, slides down on hover (no fade) */}
-        <div
-          className="absolute inset-x-0 top-0 z-10 -translate-y-full transition-transform duration-500 group-hover:translate-y-0"
-          style={{ backgroundColor: "#146683" }}
-        >
-          <div className="mx-auto flex max-w-[52%] items-center justify-between py-4">
-            <div className="flex gap-3">
-              <span className="h-3 w-3 rounded-full bg-white" />
-              <span className="h-3 w-3 rounded-full bg-white" />
-              <span className="h-3 w-3 rounded-full bg-white" />
-            </div>
-            <div className="flex gap-4">
-              <span className={`${pill} w-10`} />
-              <span className={`${pill} w-10`} />
-              <span className={`${pill} w-12`} />
+        <div className="tarif-art">
+          {/* center glow — soft & wide band across the full width */}
+          <div
+            className="card1-glow absolute inset-0 z-0"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(125,212,255,0) 8%, rgba(125,212,255,0.12) 30%, rgba(125,212,255,0.4) 50%, rgba(125,212,255,0.12) 70%, rgba(125,212,255,0) 92%)",
+              filter: "blur(14px)",
+            }}
+          />
+          {/* header — off-screen by default, slides down on hover (no fade) */}
+          <div
+            className="card1-header absolute inset-x-0 top-0 z-10"
+            style={{ backgroundColor: "#146683" }}
+          >
+            <div className="mx-auto flex max-w-[52%] items-center justify-between py-4">
+              <div className="flex gap-3">
+                <span className="h-3 w-3 rounded-full bg-white" />
+                <span className="h-3 w-3 rounded-full bg-white" />
+                <span className="h-3 w-3 rounded-full bg-white" />
+              </div>
+              <div className="flex gap-4">
+                <span className={`${pill} w-10`} />
+                <span className={`${pill} w-10`} />
+                <span className={`${pill} w-12`} />
+              </div>
             </div>
           </div>
-        </div>
-        {/* footer — off-screen by default, slides into place on hover (no fade) */}
-        <div
-          className="absolute inset-x-0 bottom-0 z-10 translate-y-full transition-transform duration-500 group-hover:translate-y-0"
-          style={{ backgroundColor: "#146683" }}
-        >
-          <div className="mx-auto flex max-w-[52%] items-center justify-center gap-4 py-4">
-            <span className={`${pill} w-12`} />
-            <span className={`${pill} w-10`} />
-            <span className={`${pill} w-8`} />
+          {/* footer — off-screen by default, slides into place on hover (no fade) */}
+          <div
+            className="card1-footer absolute inset-x-0 bottom-0 z-10"
+            style={{ backgroundColor: "#146683" }}
+          >
+            <div className="mx-auto flex max-w-[52%] items-center justify-center gap-4 py-4">
+              <span className={`${pill} w-12`} />
+              <span className={`${pill} w-10`} />
+              <span className={`${pill} w-8`} />
+            </div>
           </div>
         </div>
         <CardContent {...cards[0]} glow />
@@ -298,19 +306,21 @@ export default function AnimatedTarifCards() {
         onMouseEnter={() => (hoveredRef.current = true)}
         onMouseLeave={() => (hoveredRef.current = false)}
       >
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[100vw] w-[100vw] -translate-x-1/2 -translate-y-1/2">
-          <div ref={starsRef} className="card2-stars relative h-full w-full">
-            {stars.map((s, i) => (
-              <span
-                key={i}
-                className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{
-                  left: s.left,
-                  top: s.top,
-                  backgroundColor: "rgba(255,255,255,0.23)",
-                }}
-              />
-            ))}
+        <div className="tarif-art">
+          <div className="card2-field pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div ref={starsRef} className="card2-stars relative h-full w-full">
+              {stars.map((s, i) => (
+                <span
+                  key={i}
+                  className="absolute h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                  style={{
+                    left: s.left,
+                    top: s.top,
+                    backgroundColor: "rgba(255,255,255,0.23)",
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
         <CardContent {...cards[1]} />
@@ -318,59 +328,63 @@ export default function AnimatedTarifCards() {
 
       {/* Card 3 — gradient slides L→R + provided icons rushing/converging */}
       <div className="tarif-card3 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full">
-        {/* light base */}
-        <div className="absolute inset-0 z-0" style={{ backgroundColor: "#006698" }} />
-        {/* dark veil: covers the left, widens to the right on hover */}
-        <div
-          className="card3-dark absolute left-0 top-0 bottom-0 z-0"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, #03151E 0%, #03151E 18%, rgba(3,21,30,0) 100%)",
-          }}
-        />
-        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-          {rushIcons.map((ic, i) => (
-            <RushIcon key={i} {...ic} />
-          ))}
+        <div className="tarif-art">
+          {/* light base */}
+          <div className="absolute inset-0 z-0" style={{ backgroundColor: "#006698" }} />
+          {/* dark veil: covers the left, widens to the right on hover */}
+          <div
+            className="card3-dark absolute left-0 top-0 bottom-0 z-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, #03151E 0%, #03151E 18%, rgba(3,21,30,0) 100%)",
+            }}
+          />
+          <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+            {rushIcons.map((ic, i) => (
+              <RushIcon key={i} {...ic} />
+            ))}
+          </div>
         </div>
         <CardContent {...cards[2]} />
       </div>
 
       {/* Card 4 — fades to black, squares wrap the 4, glow square at right edge */}
       <div
-        className="tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full"
+        className="tarif-card4 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full"
         style={{ backgroundColor: "#002132" }}
       >
-        <div className="absolute inset-0 z-0 bg-black opacity-0 transition-opacity duration-700 group-hover:opacity-80" />
-        {/* concentric circles (grow) + 4 lines (extend horizontally), centered on the right edge */}
-        <div
-          className="pointer-events-none absolute right-0 top-1/2 z-0 h-[700px] w-[700px] -translate-y-1/2 translate-x-1/2 scale-[0.18] opacity-0 transition-all duration-700 group-hover:scale-100 group-hover:opacity-100"
-          style={{ filter: "drop-shadow(0 0 12px rgba(255,255,255,0.66))" }}
-        >
-          <svg className="h-full w-full" viewBox={`0 0 ${RING_VB} ${RING_VB}`} fill="none">
-            <circle cx={RING_C} cy={RING_C} r={RING_HUGE} stroke="white" strokeWidth="3" />
-            <circle cx={RING_C} cy={RING_C} r={RING_MED} stroke="white" strokeWidth="3" />
-            <circle cx={RING_C} cy={RING_C} r={RING_SMALL} stroke="white" strokeWidth="3" />
-            {card4Lines.map((l, i) => (
-              <line
-                key={i}
-                className="card4-line"
-                x1={l.x1}
-                y1={l.y}
-                x2={l.x2}
-                y2={l.y}
-                stroke="white"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-            ))}
-          </svg>
+        <div className="tarif-art">
+          <div className="card4-veil absolute inset-0 z-0 bg-black" />
+          {/* concentric circles (grow) + 4 lines (extend horizontally), centered on the right edge */}
+          <div
+            className="card4-rings pointer-events-none absolute right-0 top-1/2 z-0 h-[700px] w-[700px]"
+            style={{ filter: "drop-shadow(0 0 12px rgba(255,255,255,0.66))" }}
+          >
+            <svg className="h-full w-full" viewBox={`0 0 ${RING_VB} ${RING_VB}`} fill="none">
+              <circle cx={RING_C} cy={RING_C} r={RING_HUGE} stroke="white" strokeWidth="3" />
+              <circle cx={RING_C} cy={RING_C} r={RING_MED} stroke="white" strokeWidth="3" />
+              <circle cx={RING_C} cy={RING_C} r={RING_SMALL} stroke="white" strokeWidth="3" />
+              {card4Lines.map((l, i) => (
+                <line
+                  key={i}
+                  className="card4-line"
+                  x1={l.x1}
+                  y1={l.y}
+                  x2={l.x2}
+                  y2={l.y}
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+              ))}
+            </svg>
+          </div>
         </div>
 
         {/* content (card 4 has squares anchored to the number) */}
         <div className="tarif-compact-content relative z-20 grid h-full grid-cols-[auto_minmax(0,1fr)_auto] items-center">
           <span className="tarif-compact-main relative grid shrink-0 place-items-center font-bold text-white">
-            <span className="pointer-events-none absolute left-1/2 top-1/2 block h-0 w-0">
+            <span className="card4-square-anchor pointer-events-none absolute left-1/2 top-1/2 block h-0 w-0">
               {card4Squares.map((s, i) => (
                 <span
                   key={i}
@@ -458,7 +472,7 @@ function Sparkle({ className }) {
 function DiamondMark() {
   return (
     <svg
-      className="card5-diamond absolute z-10 h-[38px] w-[38px] sm:h-[52px] sm:w-[52px] md:h-[67px] md:w-[67px]"
+      className="card5-diamond absolute z-10 h-[67px] w-[67px]"
       viewBox="0 0 67 67"
       fill="none"
       aria-hidden="true"
@@ -480,35 +494,37 @@ function LogoIdentityCard() {
 
   return (
     <div className="tarif-card5 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full bg-[#10AEF4]">
-      <svg
-        className="card5-wave card5-wave-back absolute left-0 z-0 h-[230px] w-full min-w-[900px]"
-        viewBox="0 0 1470 230"
-        preserveAspectRatio="none"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M1532 101.219C1453.82 25.6222 1425.51 56.7173 1334.84 86.2775C1244.18 115.838 1177.21 -2.94872 1031.99 43.11C886.764 89.1687 879.955 29.5027 712.645 72.2968C545.334 115.091 592.819 110.1 419.717 31.9121C246.615 -46.2758 276.374 46.9809 149.304 22.1629C22.2349 -2.65513 -64 4.21553 -64 126.758V290.148L1532 315.113C1532 315.113 1526.76 188.221 1532 101.219Z"
-          fill="#41C0FF"
-        />
-      </svg>
+      <div className="tarif-art">
+        <svg
+          className="card5-wave card5-wave-back absolute left-0 z-0 h-[230px] w-full min-w-[900px]"
+          viewBox="0 0 1470 230"
+          preserveAspectRatio="none"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M1532 101.219C1453.82 25.6222 1425.51 56.7173 1334.84 86.2775C1244.18 115.838 1177.21 -2.94872 1031.99 43.11C886.764 89.1687 879.955 29.5027 712.645 72.2968C545.334 115.091 592.819 110.1 419.717 31.9121C246.615 -46.2758 276.374 46.9809 149.304 22.1629C22.2349 -2.65513 -64 4.21553 -64 126.758V290.148L1532 315.113C1532 315.113 1526.76 188.221 1532 101.219Z"
+            fill="#41C0FF"
+          />
+        </svg>
 
-      <svg
-        className="card5-wave card5-wave-front absolute left-0 z-[1] h-[230px] w-full min-w-[900px]"
-        viewBox="0 0 1470 230"
-        preserveAspectRatio="none"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M1532 101.533C1453.82 25.9334 1351.83 -5.58297 1261.17 23.9868C1170.5 53.5565 1115.94 116.363 1031.99 43.4308C948.03 -29.5011 879.955 29.8235 712.645 72.6144C545.334 115.405 549.447 -33.1135 419.717 32.2329C289.986 97.5793 267.295 -54.8871 149.304 22.4837C31.3131 99.8546 -64 4.53637 -64 127.079V290.469L1532 315.43C1532 315.43 1526.76 188.532 1532 101.533Z"
-          fill="#56C7FF"
-        />
-      </svg>
+        <svg
+          className="card5-wave card5-wave-front absolute left-0 z-[1] h-[230px] w-full min-w-[900px]"
+          viewBox="0 0 1470 230"
+          preserveAspectRatio="none"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M1532 101.533C1453.82 25.9334 1351.83 -5.58297 1261.17 23.9868C1170.5 53.5565 1115.94 116.363 1031.99 43.4308C948.03 -29.5011 879.955 29.8235 712.645 72.6144C545.334 115.405 549.447 -33.1135 419.717 32.2329C289.986 97.5793 267.295 -54.8871 149.304 22.4837C31.3131 99.8546 -64 4.53637 -64 127.079V290.469L1532 315.43C1532 315.43 1526.76 188.532 1532 101.533Z"
+            fill="#56C7FF"
+          />
+        </svg>
 
-      <Sparkle className="card5-sparkle card5-sparkle-left absolute z-10 h-[102px] w-[102px] sm:h-[132px] sm:w-[132px] md:h-[164px] md:w-[164px]" />
-      <Sparkle className="card5-sparkle card5-sparkle-right absolute z-10 h-[92px] w-[92px] sm:h-[122px] sm:w-[122px] md:h-[150px] md:w-[150px]" />
-      <DiamondMark />
+        <Sparkle className="card5-sparkle card5-sparkle-left absolute z-10 h-[164px] w-[164px]" />
+        <Sparkle className="card5-sparkle card5-sparkle-right absolute z-10 h-[150px] w-[150px]" />
+        <DiamondMark />
+      </div>
 
       <div className="tarif-compact-content card5-content relative z-20 grid h-full grid-cols-[auto_minmax(0,1fr)_auto] items-center text-[#002132] transition-[color,text-shadow] duration-700">
         <span className="tarif-compact-main shrink-0 font-bold">
@@ -680,21 +696,23 @@ function PrintCard() {
 
   return (
     <div className="tarif-card6 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full bg-[#063D55]">
-      <div className="card6-stage pointer-events-none absolute inset-0 z-0">
-        <PrintTall className="card6-art card6-art-1" />
-        <PrintWideDetails className="card6-art card6-art-2" />
-        <PrintWideLight
-          className="card6-art card6-art-3"
-          clipId="card6-wide-light-left"
-        />
-        <PrintTall className="card6-art card6-art-4" long />
-        <PrintWideDetails className="card6-art card6-art-5" gradient />
-        <PrintWideLight
-          className="card6-art card6-art-6"
-          clipId="card6-wide-light-right"
-        />
+      <div className="tarif-art">
+        <div className="card6-stage pointer-events-none absolute inset-0 z-0">
+          <PrintTall className="card6-art card6-art-1" />
+          <PrintWideDetails className="card6-art card6-art-2" />
+          <PrintWideLight
+            className="card6-art card6-art-3"
+            clipId="card6-wide-light-left"
+          />
+          <PrintTall className="card6-art card6-art-4" long />
+          <PrintWideDetails className="card6-art card6-art-5" gradient />
+          <PrintWideLight
+            className="card6-art card6-art-6"
+            clipId="card6-wide-light-right"
+          />
+        </div>
+        <div className="card6-glow pointer-events-none absolute inset-0 z-10" />
       </div>
-      <div className="card6-glow pointer-events-none absolute inset-0 z-10" />
       <CompactCardContent
         number={card.number}
         title={card.title}
@@ -731,10 +749,12 @@ function RestaurantCard() {
 
   return (
     <div className="tarif-card7 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full bg-[#7DD4FF]">
-      <div className="card7-stripe card7-stripe-1" />
-      <div className="card7-stripe card7-stripe-2" />
-      <div className="card7-stripe card7-stripe-3" />
-      <RestaurantGlassware />
+      <div className="tarif-art">
+        <div className="card7-stripe card7-stripe-1" />
+        <div className="card7-stripe card7-stripe-2" />
+        <div className="card7-stripe card7-stripe-3" />
+        <RestaurantGlassware />
+      </div>
       <CompactCardContent
         number={card.number}
         title={card.title}
@@ -880,17 +900,19 @@ function SocialTemplatesCard() {
 
   return (
     <div className="tarif-card8 tarif-compact-card group relative h-[333px] w-full overflow-hidden rounded-full bg-[#A7B5BB]">
-      <div className="card8-scroll-window pointer-events-none absolute inset-y-0 z-0">
-        <img
-          className="card8-scroll"
-          src="/images/social-scroll.svg"
-          alt=""
-          aria-hidden="true"
-        />
+      <div className="tarif-art">
+        <div className="card8-scroll-window pointer-events-none absolute inset-y-0 z-0">
+          <img
+            className="card8-scroll"
+            src="/images/social-scroll.svg"
+            alt=""
+            aria-hidden="true"
+          />
+        </div>
+        <SocialCardBack />
+        <SocialCardFront />
+        <div className="card8-darkness pointer-events-none absolute inset-0 z-10" />
       </div>
-      <SocialCardBack />
-      <SocialCardFront />
-      <div className="card8-darkness pointer-events-none absolute inset-0 z-10" />
       <CompactCardContent
         number={card.number}
         title={card.title}
@@ -904,7 +926,7 @@ function SocialTemplatesCard() {
 
 export function AnimatedTarifCards2() {
   return (
-    <div className="flex flex-col gap-8 sm:gap-10">
+    <div className="flex flex-col gap-10">
       <LogoIdentityCard />
       <PrintCard />
       <RestaurantCard />

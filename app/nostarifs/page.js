@@ -2,6 +2,7 @@ import ScrollReveal from "../../components/ScrollReveal";
 import AnimatedTarifCards, {
   AnimatedTarifCards2,
 } from "../../components/tarifs/AnimatedTarifCards";
+import MobileScale from "../../components/tarifs/MobileScale";
 
 export default function Tarifs() {
   return (
@@ -25,10 +26,12 @@ export default function Tarifs() {
         </ScrollReveal>
 
         <ScrollReveal animation="fade-up" delay={200}>
-          <AnimatedTarifCards />
+          <MobileScale>
+            <AnimatedTarifCards />
+          </MobileScale>
         </ScrollReveal>
 
-        <ScrollReveal animation="fade-down">
+        <ScrollReveal animation="fade-down" threshold={0}>
           <h2
             className="text-3xl sm:text-4xl md:text-5xl font-semibold text-center mt-24 sm:mt-32 mb-3"
             style={{ color: "#EBF2FA" }}
@@ -36,7 +39,7 @@ export default function Tarifs() {
             Grille Tarifaire Print / Design
           </h2>
         </ScrollReveal>
-        <ScrollReveal animation="fade-up" delay={150}>
+        <ScrollReveal animation="fade-up" delay={150} threshold={0}>
           <p className="text-center text-xl sm:text-2xl font-medium text-[#EBF2FA] mb-1">
             Grille Tarifaire
           </p>
@@ -45,8 +48,10 @@ export default function Tarifs() {
           </p>
         </ScrollReveal>
 
-        <ScrollReveal animation="fade-up" delay={200}>
-          <AnimatedTarifCards2 />
+        <ScrollReveal animation="fade-up" delay={200} threshold={0}>
+          <MobileScale>
+            <AnimatedTarifCards2 />
+          </MobileScale>
         </ScrollReveal>
       </div>
     </div>

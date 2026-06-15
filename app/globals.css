@@ -388,6 +388,59 @@
   container-type: inline-size;
 }
 
+/* Decorative layer — on mobile it is scaled down (see media query below) while
+   the text content layer keeps a readable size. */
+.tarif-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.card2-field {
+  width: 100vw;
+  height: 100vw;
+}
+
+/* Card 1 (was inline group-hover utilities, moved to CSS so the in-view state
+   can replay the animation on mobile) */
+.card1-glow {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.group:hover .card1-glow {
+  opacity: 1;
+}
+.card1-header {
+  transform: translateY(-100%);
+  transition: transform 0.5s ease;
+}
+.card1-footer {
+  transform: translateY(100%);
+  transition: transform 0.5s ease;
+}
+.group:hover .card1-header,
+.group:hover .card1-footer {
+  transform: translateY(0);
+}
+
+/* Card 4 veil + rings (moved off inline utilities, same reason) */
+.card4-veil {
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.group:hover .card4-veil {
+  opacity: 0.8;
+}
+.card4-rings {
+  transform: translate(50%, -50%) scale(0.18);
+  opacity: 0;
+  transition: transform 0.7s ease, opacity 0.7s ease;
+}
+.group:hover .card4-rings {
+  transform: translate(50%, -50%) scale(1);
+  opacity: 1;
+}
+
 .tarif-card5 {
   isolation: isolate;
 }
@@ -724,26 +777,179 @@
   text-shadow: 0 2px 6px rgba(0, 24, 35, 0.66);
 }
 
+/* ===== Mobile: shrink the decorative art proportionally, keep text readable,
+   stack the number on top with the price beside the title, and replay the
+   hover animations on scroll-into-view (touch has no hover). ===== */
 @media (max-width: 767px) {
-  .card5-wave {
-    left: 50%;
-    width: 1000px;
+  .tarif-compact-card {
+    height: auto;
+    aspect-ratio: 704 / 333;
   }
 
-  .card5-wave-back {
-    transform: translate3d(-52.5%, -50px, 0);
+  .tarif-art {
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: 704px;
+    height: 333px;
+    transform-origin: top left;
+    transform: scale(var(--tarif-scale, 0.5));
   }
 
-  .card5-wave-front {
-    transform: translate3d(-47.5%, 54px, 0);
+  .card2-field {
+    width: 900px;
+    height: 900px;
   }
 
-  .tarif-card5:hover .card5-wave-back {
-    transform: translate3d(-45.5%, -96px, 0);
+  /* Content: number centered on top, title/description left + price right */
+  .tarif-compact-content {
+    position: absolute;
+    inset: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "num num"
+      "title price";
+    align-content: center;
+    align-items: center;
+    column-gap: 3.5cqw;
+    row-gap: 6cqw;
+    padding-left: 8cqw;
+    padding-right: 8cqw;
+  }
+  .tarif-compact-content > *:nth-child(1) {
+    grid-area: num;
+    justify-self: center;
+    text-align: center;
+    font-size: clamp(17px, 5.6cqw, 26px);
+  }
+  .tarif-compact-content > *:nth-child(2) {
+    grid-area: title;
+  }
+  .tarif-compact-content > *:nth-child(3) {
+    grid-area: price;
+    justify-self: end;
+    align-self: center;
+  }
+  .tarif-compact-main {
+    font-size: clamp(13px, 3.9cqw, 20px);
+  }
+  .tarif-compact-subtitle {
+    font-size: clamp(12px, 3.1cqw, 15px);
   }
 
-  .tarif-card5:hover .card5-wave-front {
-    transform: translate3d(-55%, -30px, 0);
+  /* Replay hover end-states when the card scrolls into view */
+  .tarif-card1.in-view .card1-glow {
+    opacity: 1;
+  }
+  .tarif-card1.in-view .card1-header,
+  .tarif-card1.in-view .card1-footer {
+    transform: translateY(0);
+  }
+
+  .tarif-card3.in-view .card3-dark {
+    width: 85%;
+  }
+  .tarif-card3.in-view .card3-icon {
+    left: var(--final);
+  }
+
+  /* Card 4 number squares live in the (unscaled) content layer, so shrink them
+     to match the smaller number; rings are oversized relative to the card. */
+  .card4-square-anchor {
+    transform: scale(0.5);
+  }
+  .card4-rings {
+    width: 440px;
+    height: 440px;
+  }
+
+  .tarif-card4.in-view .card4-veil {
+    opacity: 0.8;
+  }
+  .tarif-card4.in-view .card4-rings {
+    transform: translate(50%, -50%) scale(1);
+    opacity: 1;
+  }
+  .tarif-card4.in-view .card4-square {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.9;
+  }
+  .tarif-card4.in-view .card4-line {
+    transform: scaleX(1);
+  }
+
+  .tarif-card5.in-view .card5-wave-back {
+    transform: translate3d(4.5%, -96px, 0);
+  }
+  .tarif-card5.in-view .card5-wave-front {
+    transform: translate3d(-5%, -30px, 0);
+  }
+  .tarif-card5.in-view .card5-sparkle-left {
+    transform: translate3d(4px, -240px, 0) rotate(285deg) scale(0.58);
+  }
+  .tarif-card5.in-view .card5-sparkle-right {
+    transform: translate3d(clamp(-110px, -7cqw, -60px), -186px, 0) rotate(-280deg)
+      scale(0.5);
+  }
+  .tarif-card5.in-view .card5-diamond {
+    transform: translate3d(-4px, -166px, 0) rotate(9deg);
+  }
+  .tarif-card5.in-view .card5-content {
+    color: white;
+    text-shadow: 0 0 9px rgba(255, 255, 255, 0.72),
+      0 0 24px rgba(255, 255, 255, 0.38);
+  }
+
+  .tarif-card6.in-view .card6-art {
+    filter: drop-shadow(0 10px 18px rgba(0, 25, 38, 0.32));
+    opacity: 0.88;
+    transform: translate3d(0, var(--hover-y), 0);
+  }
+  .tarif-card6.in-view .card6-glow {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  .tarif-card7.in-view .card7-stripe-1 {
+    clip-path: polygon(0 0, 30% 0, 45.5% 100%, 0 100%);
+  }
+  .tarif-card7.in-view .card7-stripe-2 {
+    clip-path: polygon(30% 0, 51% 0, 66% 100%, 45.5% 100%);
+  }
+  .tarif-card7.in-view .card7-stripe-3 {
+    clip-path: polygon(51% 0, 75% 0, 90.5% 100%, 66% 100%);
+  }
+  .tarif-card7.in-view .card7-glassware {
+    left: 84%;
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  .tarif-card8.in-view {
+    background-color: #b7c2c7;
+  }
+  .tarif-card8.in-view .card8-scroll {
+    transform: translate3d(0, calc(-100% + 333px), 0);
+  }
+  .tarif-card8.in-view .card8-template-back {
+    left: 75%;
+    transform: translate3d(-50%, 0, 0) rotate(10deg);
+  }
+  .tarif-card8.in-view .card8-template-front {
+    left: 55%;
+    transform: translate3d(-50%, 0, 0) rotate(-11deg);
+  }
+  .tarif-card8.in-view .card8-darkness {
+    background: rgba(0, 20, 29, 0.08);
+  }
+
+  /* Cards 6 & 8 sit over busy/light art — darken tightly behind the letters so
+     the text stays readable (strong, low-blur shadow). */
+  .card6-content,
+  .card8-content {
+    text-shadow: 0 0 4px rgba(0, 16, 25, 0.95), 0 1px 2px rgba(0, 16, 25, 0.98),
+      0 0 9px rgba(0, 16, 25, 0.85);
   }
 }
 
